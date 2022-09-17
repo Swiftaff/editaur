@@ -19,7 +19,9 @@
 
     {#each rows as row, r}
         <div on:mouseup={(e) => caret(r, 100000)}>
-            {r}: {#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i>.</i>{/if}<b
+            <span on:mouseup|stopPropagation={(e) => caret(r, 0)}
+                >{r}:
+            </span>{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i>.</i>{/if}<b
                     style={"z-index:" + 100 + c}
                     on:mouseup|stopPropagation={(e) => caret(r, c)}><u>.</u>{char}</b
                 >{/each}
