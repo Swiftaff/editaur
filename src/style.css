@@ -27,7 +27,7 @@ div {
   margin: 0px;
   min-height: 1.5rem;
 }
-div:hover {
+.highlighted {
   background-color: #ddd;
 }
 /* a character with a dot to the left for overlapping with adjacent-left character for ease of selection */

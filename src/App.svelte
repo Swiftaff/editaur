@@ -21,8 +21,7 @@
     ];
     let caret;
     let cursor = { r: 0, c: 0 };
-    let previous_down_c = 0;
-    let previous_up_c = 0;
+    let previous_updown_c = 0;
     function caret_update(r, c) {
         console.log("click", r, c);
         if (r < rows.length) {
@@ -34,32 +33,62 @@
         console.log("key:", e.key);
         if (e.key == "ArrowDown") arrowDown();
         if (e.key == "ArrowUp") arrowUp();
+        if (e.key == "ArrowLeft") arrowLeft();
+        if (e.key == "ArrowRight") arrowRight();
     }
     function arrowDown() {
         let { r, c } = cursor;
-        if (cursor.r < rows.length - 1) {
-            r = cursor.r + 1;
-            previous_up_c = 0;
+        if (r < rows.length - 1) {
+            r = r + 1;
             if (c > rows[r].length) {
-                previous_down_c = c;
+                previous_updown_c = c;
                 c = rows[r].length;
             }
-            if (c < previous_down_c && previous_down_c <= rows[r].length) c = previous_down_c;
-            console.log("down", cursor, { r, c }, previous_down_c);
+            if (c < previous_updown_c && previous_updown_c <= rows[r].length) c = previous_updown_c;
             cursor = { r, c };
+        } else if (c < rows[r].length) {
+            cursor = { r, c: rows[r].length };
+            previous_updown_c = rows[r].length;
         }
     }
     function arrowUp() {
         let { r, c } = cursor;
-        if (cursor.r > 0) {
-            r = cursor.r - 1;
-            previous_down_c = 0;
+        if (r > 0) {
+            r = r - 1;
             if (c > rows[r].length) {
-                previous_up_c = c;
+                previous_updown_c = c;
                 c = rows[r].length;
             }
-            if (c < previous_up_c && previous_up_c <= rows[r].length) c = previous_up_c;
-            console.log("down", cursor, { r, c }, previous_up_c);
+            if (c < previous_updown_c && previous_updown_c <= rows[r].length) c = previous_updown_c;
+            cursor = { r, c };
+        } else if (c > 0) {
+            cursor = { r, c: 0 };
+            previous_updown_c = 0;
+        }
+    }
+    function arrowLeft() {
+        let { r, c } = cursor;
+        if (c > 0) {
+            c = c - 1;
+            cursor = { r, c };
+            previous_updown_c = 0;
+        } else if (r > 0) {
+            r = r - 1;
+            c = rows[r].length;
+            previous_updown_c = 0;
+            cursor = { r, c };
+        }
+    }
+    function arrowRight() {
+        let { r, c } = cursor;
+        if (c < rows[cursor.r].length) {
+            c = c + 1;
+            cursor = { r, c };
+            previous_updown_c = 0;
+        } else if (r < rows.length - 1) {
+            r = r + 1;
+            c = 0;
+            previous_updown_c = 0;
             cursor = { r, c };
         }
     }
@@ -70,7 +99,7 @@
 <main>
     test
     {#each rows as row, r}
-        <div on:mouseup={(e) => caret_update(r, 100000)}>
+        <div on:mouseup={(e) => caret_update(r, 100000)} class={r == cursor.r ? "highlighted" : ""}>
             <span class="num" on:mouseup|stopPropagation={(e) => caret_update(r, 0)}>{1000 + r}: </span><span
                 class="text"
                 >{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i bind:this={caret} />{/if}<b
