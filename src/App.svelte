@@ -1,6 +1,25 @@
 <script>
     import Greet from "./lib/Greet.svelte";
-    let rows = ["example", "text"];
+    let rows = [
+        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
+        "text",
+        "text",
+        "text",
+        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
+        "text",
+        "text",
+        "text",
+        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
+        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
+        "text",
+        "text",
+        "text",
+        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
+        "text",
+        "text",
+        "text",
+        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
+    ];
     let cursor = { r: 0, c: 0 };
     function caret(r, c) {
         console.log("click", r, c);
@@ -15,29 +34,32 @@
 </script>
 
 <main class="container" on:keypress={handleKeyPress}>
-    <h1>Tauri Svelte Editor</h1>
-
     {#each rows as row, r}
         <div on:mouseup={(e) => caret(r, 100000)}>
-            <span on:mouseup|stopPropagation={(e) => caret(r, 0)}
-                >{r}:
-            </span>{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i>.</i>{/if}<b
-                    style={"z-index:" + 100 + c}
-                    on:mouseup|stopPropagation={(e) => caret(r, c)}><u>.</u>{char}</b
-                >{/each}
+            <span class="num" on:mouseup|stopPropagation={(e) => caret(r, 0)}>{1000 + r}: </span><span class="text"
+                >{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i />{/if}<b
+                        style={"z-index:" + 100 + c}
+                        on:mouseup|stopPropagation={(e) => caret(r, c)}><u>.</u>{char}</b
+                    >{/each}</span
+            >
         </div>
     {/each}
-    {JSON.stringify(rows)}
-    {JSON.stringify(cursor)}
-    <ul>
-        <li>rows of divs of characters = better text display, caret position selection and display</li>
-    </ul>
 </main>
 
 <style>
+    main {
+        border: 1px solid 666;
+        background-color: #eee;
+        height: calc(100vh - 80px);
+        padding: 5px;
+    }
     div {
         user-select: none;
         cursor: text;
+        position: relative;
+        padding: 0px;
+        margin: 0px;
+        min-height: 1.5rem;
     }
     div:hover {
         background-color: #ddd;
@@ -47,6 +69,8 @@
         font-weight: normal;
         margin-left: -0.25em;
         position: relative;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
     }
     /* just the dot character inside the b above */
     u {
@@ -57,8 +81,8 @@
         font-weight: bold;
         font-style: normal;
         position: absolute;
-        margin-top: 2px;
-        height: 1.3rem;
+        margin-top: 0.02rem;
+        height: 1.5rem;
         margin-left: -0.05rem;
         width: 3px;
         background-color: green;
@@ -74,5 +98,18 @@
         100% {
             opacity: 0;
         }
+    }
+    .text {
+        display: inline-block;
+        /* todo fix hard-coded width with flexbox layout? */
+        width: calc(100% - 150px);
+        margin-left: 100px;
+        position: relative;
+        top: 0px;
+    }
+    .num {
+        display: inline-block;
+        position: absolute;
+        top: 0px;
     }
 </style>
