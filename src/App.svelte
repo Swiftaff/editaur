@@ -106,30 +106,69 @@
             cursor = { r, c };
         }
     }
-    function scroll_up(override = false) {
+    function scroll_up(wheelscroll = false) {
         let caret_position = caret.getBoundingClientRect();
+        let main_position = main.getBoundingClientRect();
         console.log("scroll_up", caret_position, main.scrollTop);
-        if (caret_position.top < 0) {
-            console.log("TODO - mange scrolling when caret is offscreen");
-        }
-        if (override || caret_position.top < caret_position.height) {
+        if (!wheelscroll && caret_position.top < 0) {
+            console.log("TODO - manage scrolling up when caret is offscreen above");
             main.scrollTo(
                 0,
-                main.scrollTop - caret_position.height * (override && pressing_shift ? SHIFT_SCROLL_MULTIPLIER : 1)
+                main.scrollTop +
+                    Math.floor(caret_position.top / caret_position.height) * caret_position.height -
+                    caret_position.height
+            );
+        } else if (!wheelscroll && caret_position.top > main_position.height) {
+            console.log(
+                "TODO - manage scrolling down when caret is offscreen below",
+                caret_position.top,
+                main.scrollTop,
+                main_position.height
+            );
+            main.scrollTo(
+                0,
+                main.scrollTop +
+                    Math.floor(caret_position.top / caret_position.height) * caret_position.height +
+                    caret_position.height -
+                    main_position.height
+            );
+        } else if (wheelscroll || caret_position.top < caret_position.height) {
+            main.scrollTo(
+                0,
+                main.scrollTop - caret_position.height * (wheelscroll && pressing_shift ? SHIFT_SCROLL_MULTIPLIER : 1)
             );
         }
     }
-    function scroll_down(override = false) {
+    function scroll_down(wheelscroll = false) {
         let caret_position = caret.getBoundingClientRect();
         let main_position = main.getBoundingClientRect();
         console.log("scroll_down", caret_position, main.scrollTop, main_position);
-        if (caret_position.top < 0) {
-            console.log("TODO - mange scrolling when caret is offscreen");
-        }
-        if (override || caret_position.top + caret_position.height > main_position.height) {
+        if (!wheelscroll && caret_position.top < 0) {
+            console.log("TODO - manage scrolling down when caret is offscreen above", main.scrollTop);
             main.scrollTo(
                 0,
-                main.scrollTop + caret_position.height * (override && pressing_shift ? SHIFT_SCROLL_MULTIPLIER : 1)
+                main.scrollTop +
+                    Math.floor(caret_position.top / caret_position.height) * caret_position.height +
+                    caret_position.height
+            );
+        } else if (!wheelscroll && caret_position.top > main_position.height) {
+            console.log(
+                "TODO - manage scrolling down when caret is offscreen below",
+                caret_position.top,
+                main.scrollTop,
+                main_position.height
+            );
+            main.scrollTo(
+                0,
+                main.scrollTop +
+                    Math.floor(caret_position.top / caret_position.height) * caret_position.height +
+                    caret_position.height * 2 -
+                    main_position.height
+            );
+        } else if (wheelscroll || caret_position.top + caret_position.height > main_position.height) {
+            main.scrollTo(
+                0,
+                main.scrollTop + caret_position.height * (wheelscroll && pressing_shift ? SHIFT_SCROLL_MULTIPLIER : 1)
             );
         }
     }
