@@ -19,9 +19,10 @@
         "text",
         "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
     ];
+    let main;
     let caret;
     let cursor = { r: 0, c: 0 };
-    let previous_updown_c = 0;
+    let previous_c = 0;
     function caret_update(r, c) {
         console.log("click", r, c);
         if (r < rows.length) {
@@ -38,44 +39,67 @@
     }
     function arrowDown() {
         let { r, c } = cursor;
+        let m = caret.clientTop;
+        let pos = caret.getBoundingClientRect();
+        console.log(m, pos);
         if (r < rows.length - 1) {
             r = r + 1;
-            if (c > rows[r].length) {
-                previous_updown_c = c;
-                c = rows[r].length;
-            }
-            if (c < previous_updown_c && previous_updown_c <= rows[r].length) c = previous_updown_c;
-            cursor = { r, c };
-        } else if (c < rows[r].length) {
-            cursor = { r, c: rows[r].length };
-            previous_updown_c = rows[r].length;
+            c = move_caret_to_eol_if_shorter_than_previous(r, c);
+            c = move_caret_back_to_previous_if_line_is_long_enough(r, c);
+        } else {
+            c = move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c);
         }
+        cursor = { r, c };
     }
     function arrowUp() {
         let { r, c } = cursor;
+        let m = caret.clientTop;
+        let pos = caret.getBoundingClientRect();
+        console.log(m, pos);
         if (r > 0) {
             r = r - 1;
-            if (c > rows[r].length) {
-                previous_updown_c = c;
-                c = rows[r].length;
-            }
-            if (c < previous_updown_c && previous_updown_c <= rows[r].length) c = previous_updown_c;
-            cursor = { r, c };
-        } else if (c > 0) {
-            cursor = { r, c: 0 };
-            previous_updown_c = 0;
+            c = move_caret_to_eol_if_shorter_than_previous(r, c);
+            c = move_caret_back_to_previous_if_line_is_long_enough(r, c);
+        } else {
+            c = move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c);
         }
+        cursor = { r, c };
+    }
+    function move_caret_to_eol_if_shorter_than_previous(r, c) {
+        if (c > rows[r].length) {
+            previous_c = c;
+            c = rows[r].length;
+        }
+        return c;
+    }
+    function move_caret_back_to_previous_if_line_is_long_enough(r, c) {
+        if (c < previous_c && previous_c <= rows[r].length) c = previous_c;
+        return c;
+    }
+    function move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c) {
+        if (c > 0) {
+            c = 0;
+            previous_c = 0;
+        }
+        return c;
+    }
+    function move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c) {
+        if (c < rows[r].length) {
+            c = rows[r].length;
+            previous_c = rows[r].length;
+        }
+        return c;
     }
     function arrowLeft() {
         let { r, c } = cursor;
         if (c > 0) {
             c = c - 1;
             cursor = { r, c };
-            previous_updown_c = 0;
+            previous_c = 0;
         } else if (r > 0) {
             r = r - 1;
             c = rows[r].length;
-            previous_updown_c = 0;
+            previous_c = 0;
             cursor = { r, c };
         }
     }
@@ -84,11 +108,11 @@
         if (c < rows[cursor.r].length) {
             c = c + 1;
             cursor = { r, c };
-            previous_updown_c = 0;
+            previous_c = 0;
         } else if (r < rows.length - 1) {
             r = r + 1;
             c = 0;
-            previous_updown_c = 0;
+            previous_c = 0;
             cursor = { r, c };
         }
     }
@@ -96,7 +120,7 @@
 
 <svelte:window on:keydown|preventDefault={handleKeyPress} />
 
-<main>
+<main bind:this={main}>
     test
     {#each rows as row, r}
         <div on:mouseup={(e) => caret_update(r, 100000)} class={r == cursor.r ? "highlighted" : ""}>

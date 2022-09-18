@@ -16,8 +16,9 @@
 main {
   border: 1px solid 666;
   background-color: #eee;
-  min-height: calc(100vh - 80px);
+  height: calc(100vh - 80px);
   padding: 5px;
+  overflow-y: auto;
 }
 div {
   user-select: none;
