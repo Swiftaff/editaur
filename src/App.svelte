@@ -17,18 +17,51 @@
     }
     function handle_key_down(e) {
         console.log("key:", e.key);
-        if (e.key == "ArrowDown") arrow_down();
-        if (e.key == "ArrowUp") arrow_up();
-        if (e.key == "ArrowLeft") arrow_left();
-        if (e.key == "ArrowRight") arrow_right();
-        if (e.key == "Shift") shift_key_down();
-        if (e.key == "Enter") enter();
-        if (e.key == "Delete") del();
-        if (e.key == "Backspace") backspace();
+        switch (e.key) {
+            case "ArrowDown":
+                arrow_down();
+                break;
+            case "ArrowUp":
+                arrow_up();
+                break;
+            case "ArrowLeft":
+                arrow_left();
+                break;
+            case "ArrowRight":
+                arrow_right();
+                break;
+            case "Shift":
+                shift_key_down();
+                break;
+            case "Enter":
+                enter();
+                break;
+            case "Delete":
+                del();
+                break;
+            case "Backspace":
+                backspace();
+                break;
+            default:
+                insert(e.key);
+                break;
+        }
     }
     function handle_key_up(e) {
         //console.log("key:", e.key);
         if (e.key == "Shift") shift_key_up();
+    }
+    function insert(char) {
+        console.log("insert", char);
+        if (char.length == 1) {
+            let { r, c } = cursor;
+            let new_rows = [...rows];
+            new_rows[r] = new_rows[r].slice(0, c).concat(char, new_rows[r].slice(c));
+            cursor = { r, c: c + 1 };
+            rows = new_rows;
+            scroll_up();
+            scroll_down();
+        }
     }
     function backspace() {
         console.log("Backspace");
