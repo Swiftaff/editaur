@@ -6,6 +6,7 @@
     let cursor = { r: 0, c: 0 };
     let previous_c = 0;
     let pressing_shift = false;
+    const SHIFT_SCROLL_DEFAULT = 3;
     const SHIFT_SCROLL_MULTIPLIER = 5;
     function caret_update(r, c) {
         //console.log("click", r, c);
@@ -147,7 +148,9 @@
         let direction = down ? 1 : -1;
         main.scrollTo(
             0,
-            main.scrollTop + direction * (caret_pos.height * (wheel && pressing_shift ? SHIFT_SCROLL_MULTIPLIER : 1))
+            main.scrollTop +
+                direction *
+                    (caret_pos.height * (wheel ? (pressing_shift ? SHIFT_SCROLL_MULTIPLIER : SHIFT_SCROLL_DEFAULT) : 1))
         );
     }
     function scroll_offscrn_above(caret_pos, down = false) {
