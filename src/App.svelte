@@ -16,17 +16,39 @@
         }
     }
     function handle_key_down(e) {
-        //console.log("key:", e.key);
+        console.log("key:", e.key);
         if (e.key == "ArrowDown") arrow_down();
         if (e.key == "ArrowUp") arrow_up();
         if (e.key == "ArrowLeft") arrow_left();
         if (e.key == "ArrowRight") arrow_right();
         if (e.key == "Shift") shift_key_down();
         if (e.key == "Enter") enter();
+        if (e.key == "Delete") del();
     }
     function handle_key_up(e) {
         //console.log("key:", e.key);
         if (e.key == "Shift") shift_key_up();
+    }
+    function del() {
+        console.log("Delete");
+        let { r, c } = cursor;
+        let new_rows = [...rows];
+        if (c == 0) {
+            console.log("start of line");
+            new_rows[r] = new_rows[r].slice(c + 1);
+        } else if (c == rows[r].length) {
+            console.log("eol");
+            if (new_rows.length > r + 1) {
+                new_rows[r] = new_rows[r].concat(new_rows[r + 1]);
+                new_rows.splice(r + 1, 1);
+            }
+        } else {
+            console.log("mid line");
+            new_rows[r] = new_rows[r].slice(0, c).concat(new_rows[r].slice(c + 1));
+        }
+        rows = new_rows;
+        scroll_up();
+        scroll_down();
     }
     function enter() {
         console.log("Enter");
