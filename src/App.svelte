@@ -3,7 +3,7 @@
     let rows = imported_rows;
     let main;
     let caret;
-    let selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, in_progress: false };
+    let selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, in_progress: false, rows: [] };
     let cursor = { r: 0, c: 0 };
     let previous_c = 0;
     let pressing_shift = false;
@@ -18,16 +18,23 @@
         selection.in_progress = false;
         console.log("selection_end", selection);
     }
-    function selection_start(r, c) {
+    function selection_start(e, r, c) {
         selection.start = { r, c };
         selection.end = { r, c };
         selection.in_progress = true;
-        console.log("selection_start", selection);
+        let { x, y } = e.target.parentElement.getBoundingClientRect();
+        selection.rows = [{ x: Math.floor(x), y, w: 5 }];
+        console.log("selection_start", e);
     }
-    function selection_update(r, c) {
+    function selection_update(e, r, c) {
         if (selection.in_progress) {
+            if (c > rows[r].length - 1) c = rows[r].length;
             selection.end = { r, c };
-            console.log("selection_update", selection);
+            cursor = { r, c };
+            let { x, y } = e.target.parentElement.getBoundingClientRect();
+            let first = selection.rows[0];
+            selection.rows = [{ ...first, w: Math.floor(x) - first.x }];
+            console.log("selection_update", r, c);
         }
     }
     function handle_key_down(e) {
@@ -297,32 +304,23 @@
 <svelte:window on:keydown|preventDefault={handle_key_down} on:keyup|preventDefault={handle_key_up} use:wheel={true} />
 
 <main bind:this={main}>
+    {#each selection.rows as row}<div class="selection" style={`left: ${row.x - 5}px; width: ${row.w}px`} />{/each}
     {#each rows as row, r}
         <div on:mouseup={(e) => caret_update(r, 100000)} class={r == cursor.r ? "highlighted" : ""}>
             <span class="num" on:mouseup|stopPropagation={(e) => caret_update(r, 0)}>{1000 + r}: </span><span
                 class="text"
                 on:mouseup={(e) => caret_update(r, 100000)}
-                on:mouseover={(e) => selection_update(r, 100000)}
-                on:focus={(e) => selection_update(r, 100000)}
-                >{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i bind:this={caret} />{/if}<b
-                        style={"z-index:" + 100 + c}
-                        on:mousedown={(e) => selection_start(r, c)}
-                        on:mouseup|stopPropagation={(e) => caret_update(r, c)}
-                        on:mouseover={(e) => selection_update(r, c)}
-                        on:focus={(e) => selection_update(r, c)}
-                        ><u>.</u><s
-                            class={/* selection starts on a previous row */
-                            (selection.start.r < r ||
-                                /* or selection starts on same row, and on or before this character */
-                                (selection.start.r == r && selection.start.c <= c)) &&
-                            /* selection ends on a later row */
-                            (selection.end.r > r ||
-                                /* or selection starts on same row, and after this character */
-                                (selection.end.r == r && selection.end.c >= c + 1))
-                                ? "selected"
-                                : ""}>{char}</s
-                        ></b
-                    >{/each}</span
+                on:mouseover={(e) => selection_update(e, r, 100000)}
+                on:focus={(e) => selection_update(e, r, 100000)}
+                ><span class="textrow"
+                    >{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i bind:this={caret} />{/if}<b
+                            style={"z-index:" + 100 + c}
+                            on:mousedown={(e) => selection_start(e, r, c)}
+                            on:mouseup|stopPropagation={(e) => caret_update(r, c)}
+                            on:mouseover|stopPropagation={(e) => selection_update(e, r, c)}
+                            on:focus|stopPropagation={(e) => selection_update(e, r, c)}><u>.</u><s>{char}</s></b
+                        >{/each}</span
+                ></span
             >
         </div>
     {/each}

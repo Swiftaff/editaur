@@ -55,6 +55,7 @@ i {
   background-color: green;
   animation: flash 1s linear infinite;
   z-index: 100000;
+  pointer-events: none;
 }
 @keyframes flash {
   0%,
@@ -80,8 +81,12 @@ i {
   top: 0px;
   width: 100px;
 }
-.selected {
-  background-color: rgba(200,200,200,1);
+.selection {
+  background-color: red;
+  height: 24px;
+  position: absolute;
+  z-index: 100;
+  opacity: 0.5;
 }
 s {
   text-decoration: none;
