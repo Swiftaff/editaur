@@ -193,6 +193,7 @@
         <div on:mouseup={(e) => caret_update(r, 100000)} class={r == cursor.r ? "highlighted" : ""}>
             <span class="num" on:mouseup|stopPropagation={(e) => caret_update(r, 0)}>{1000 + r}: </span><span
                 class="text"
+                on:mouseup={(e) => caret_update(r, 100000)}
                 >{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i bind:this={caret} />{/if}<b
                         style={"z-index:" + 100 + c}
                         on:mouseup|stopPropagation={(e) => caret_update(r, c)}><u>.</u>{char}</b
