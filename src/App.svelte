@@ -24,10 +24,35 @@
         if (e.key == "Shift") shift_key_down();
         if (e.key == "Enter") enter();
         if (e.key == "Delete") del();
+        if (e.key == "Backspace") backspace();
     }
     function handle_key_up(e) {
         //console.log("key:", e.key);
         if (e.key == "Shift") shift_key_up();
+    }
+    function backspace() {
+        console.log("Backspace");
+        let { r, c } = cursor;
+        let new_rows = [...rows];
+        if (c == 0) {
+            console.log("start of line");
+            if (r > 0) {
+                cursor = { r: r - 1, c: new_rows[r - 1].length };
+                new_rows[r - 1] = new_rows[r - 1].concat(new_rows[r]);
+                new_rows.splice(r, 1);
+            }
+        } else if (c == rows[r].length) {
+            console.log("eol");
+            new_rows[r] = new_rows[r].slice(0, c - 1).concat(new_rows[r].slice(c));
+            cursor = { r, c: c - 1 };
+        } else {
+            console.log("mid line");
+            new_rows[r] = new_rows[r].slice(0, c - 1).concat(new_rows[r].slice(c));
+            cursor = { r, c: c - 1 };
+        }
+        rows = new_rows;
+        scroll_up();
+        scroll_down();
     }
     function del() {
         console.log("Delete");
