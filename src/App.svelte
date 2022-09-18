@@ -3,6 +3,7 @@
     let rows = imported_rows;
     let main;
     let caret;
+    let selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, in_progress: false };
     let cursor = { r: 0, c: 0 };
     let previous_c = 0;
     let pressing_shift = false;
@@ -11,9 +12,22 @@
     const SHIFT_SCROLL_MULTIPLIER = 5;
     function caret_update(r, c) {
         //console.log("click", r, c);
-        if (r < rows.length) {
-            if (c > rows[r].length - 1) c = rows[r].length;
-            cursor = { r, c };
+        if (c > rows[r].length - 1) c = rows[r].length;
+        cursor = { r, c };
+        selection.end = { r, c };
+        selection.in_progress = false;
+        console.log("selection_end", selection);
+    }
+    function selection_start(r, c) {
+        selection.start = { r, c };
+        selection.end = { r, c };
+        selection.in_progress = true;
+        console.log("selection_start", selection);
+    }
+    function selection_update(r, c) {
+        if (selection.in_progress) {
+            selection.end = { r, c };
+            console.log("selection_update", selection);
         }
     }
     function handle_key_down(e) {
@@ -288,9 +302,26 @@
             <span class="num" on:mouseup|stopPropagation={(e) => caret_update(r, 0)}>{1000 + r}: </span><span
                 class="text"
                 on:mouseup={(e) => caret_update(r, 100000)}
+                on:mouseover={(e) => selection_update(r, 100000)}
+                on:focus={(e) => selection_update(r, 100000)}
                 >{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i bind:this={caret} />{/if}<b
                         style={"z-index:" + 100 + c}
-                        on:mouseup|stopPropagation={(e) => caret_update(r, c)}><u>.</u>{char}</b
+                        on:mousedown={(e) => selection_start(r, c)}
+                        on:mouseup|stopPropagation={(e) => caret_update(r, c)}
+                        on:mouseover={(e) => selection_update(r, c)}
+                        on:focus={(e) => selection_update(r, c)}
+                        ><u>.</u><s
+                            class={/* selection starts on a previous row */
+                            (selection.start.r < r ||
+                                /* or selection starts on same row, and on or before this character */
+                                (selection.start.r == r && selection.start.c <= c)) &&
+                            /* selection ends on a later row */
+                            (selection.end.r > r ||
+                                /* or selection starts on same row, and after this character */
+                                (selection.end.r == r && selection.end.c >= c + 1))
+                                ? "selected"
+                                : ""}>{char}</s
+                        ></b
                     >{/each}</span
             >
         </div>
