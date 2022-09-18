@@ -1,24 +1,5 @@
 <script>
-    let rows = [
-        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
-        "text",
-        "text",
-        "text",
-        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
-        "text",
-        "text",
-        "text",
-        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
-        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
-        "text",
-        "text",
-        "text",
-        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
-        "text",
-        "text",
-        "text",
-        "example of really long text on a single line like you might see in a sentence with many words, much like this one. It might even go onto another line, or go on for thousands of characters in the case of a minified file.",
-    ];
+    import rows from "./test_data.js";
     let main;
     let caret;
     let cursor = { r: 0, c: 0 };
