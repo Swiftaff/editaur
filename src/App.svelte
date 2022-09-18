@@ -6,6 +6,7 @@
     let cursor = { r: 0, c: 0 };
     let previous_c = 0;
     let pressing_shift = false;
+    let pressing_control = false;
     const SHIFT_SCROLL_DEFAULT = 3;
     const SHIFT_SCROLL_MULTIPLIER = 5;
     function caret_update(r, c) {
@@ -16,7 +17,7 @@
         }
     }
     function handle_key_down(e) {
-        console.log("key:", e.key);
+        //console.log("key:", e.key);
         switch (e.key) {
             case "ArrowDown":
                 arrow_down();
@@ -32,6 +33,9 @@
                 break;
             case "Shift":
                 shift_key_down();
+                break;
+            case "Control":
+                control_key_down();
                 break;
             case "Enter":
                 enter();
@@ -50,10 +54,11 @@
     function handle_key_up(e) {
         //console.log("key:", e.key);
         if (e.key == "Shift") shift_key_up();
+        if (e.key == "Control") control_key_up();
     }
     function insert(char) {
-        console.log("insert", char);
-        if (char.length == 1) {
+        //console.log("insert", char);
+        if (!pressing_control && char.length == 1) {
             let { r, c } = cursor;
             let new_rows = [...rows];
             new_rows[r] = new_rows[r].slice(0, c).concat(char, new_rows[r].slice(c));
@@ -64,22 +69,22 @@
         }
     }
     function backspace() {
-        console.log("Backspace");
+        //console.log("Backspace");
         let { r, c } = cursor;
         let new_rows = [...rows];
         if (c == 0) {
-            console.log("start of line");
+            //console.log("start of line");
             if (r > 0) {
                 cursor = { r: r - 1, c: new_rows[r - 1].length };
                 new_rows[r - 1] = new_rows[r - 1].concat(new_rows[r]);
                 new_rows.splice(r, 1);
             }
         } else if (c == rows[r].length) {
-            console.log("eol");
+            //console.log("eol");
             new_rows[r] = new_rows[r].slice(0, c - 1).concat(new_rows[r].slice(c));
             cursor = { r, c: c - 1 };
         } else {
-            console.log("mid line");
+            //console.log("mid line");
             new_rows[r] = new_rows[r].slice(0, c - 1).concat(new_rows[r].slice(c));
             cursor = { r, c: c - 1 };
         }
@@ -88,20 +93,20 @@
         scroll_down();
     }
     function del() {
-        console.log("Delete");
+        //console.log("Delete");
         let { r, c } = cursor;
         let new_rows = [...rows];
         if (c == 0) {
-            console.log("start of line");
+            //console.log("start of line");
             new_rows[r] = new_rows[r].slice(c + 1);
         } else if (c == rows[r].length) {
-            console.log("eol");
+            //console.log("eol");
             if (new_rows.length > r + 1) {
                 new_rows[r] = new_rows[r].concat(new_rows[r + 1]);
                 new_rows.splice(r + 1, 1);
             }
         } else {
-            console.log("mid line");
+            //console.log("mid line");
             new_rows[r] = new_rows[r].slice(0, c).concat(new_rows[r].slice(c + 1));
         }
         rows = new_rows;
@@ -109,17 +114,17 @@
         scroll_down();
     }
     function enter() {
-        console.log("Enter");
+        //console.log("Enter");
         let { r, c } = cursor;
         let new_rows = [...rows];
         if (c == 0) {
-            console.log("start of line");
+            //console.log("start of line");
             new_rows.splice(r, 0, "");
         } else if (c == rows[r].length) {
-            console.log("eol");
+            //console.log("eol");
             new_rows.splice(r + 1, 0, "");
         } else {
-            console.log("mid line");
+            //console.log("mid line");
             let first_half = new_rows[r].substring(0, c);
             let second_half = new_rows[r].substring(c, new_rows[r].length);
             new_rows[r] = first_half;
@@ -134,6 +139,12 @@
     }
     function shift_key_up() {
         pressing_shift = false;
+    }
+    function control_key_down() {
+        if (!pressing_control) pressing_control = true;
+    }
+    function control_key_up() {
+        pressing_control = false;
     }
     function arrow_down() {
         let { r, c } = cursor;
