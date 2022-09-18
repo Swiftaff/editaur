@@ -1,5 +1,6 @@
 <script>
-    import rows from "./test_data.js";
+    import imported_rows from "./test_data.js";
+    let rows = imported_rows;
     let main;
     let caret;
     let cursor = { r: 0, c: 0 };
@@ -20,10 +21,32 @@
         if (e.key == "ArrowLeft") arrow_left();
         if (e.key == "ArrowRight") arrow_right();
         if (e.key == "Shift") shift_key_down();
+        if (e.key == "Enter") enter();
     }
     function handle_key_up(e) {
         //console.log("key:", e.key);
         if (e.key == "Shift") shift_key_up();
+    }
+    function enter() {
+        console.log("Enter");
+        let { r, c } = cursor;
+        let new_rows = [...rows];
+        if (c == 0) {
+            console.log("start of line");
+            new_rows.splice(r, 0, "");
+        } else if (c == rows[r].length) {
+            console.log("eol");
+            new_rows.splice(r + 1, 0, "");
+        } else {
+            console.log("mid line");
+            let first_half = new_rows[r].substring(0, c);
+            let second_half = new_rows[r].substring(c, new_rows[r].length);
+            new_rows[r] = first_half;
+            new_rows.splice(r + 1, 0, second_half);
+        }
+        cursor = { r: r + 1, c: 0 };
+        rows = new_rows;
+        scroll_down();
     }
     function shift_key_down() {
         if (!pressing_shift) pressing_shift = true;
