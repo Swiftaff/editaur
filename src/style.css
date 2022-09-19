@@ -1,9 +1,8 @@
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  font-family: Consolas, Courier New, monospace;
+  font-size: 15px;
   line-height: 24px;
   font-weight: 400;
-
   color: #0f0f0f;
   background-color: #f6f6f6;
 
@@ -16,7 +15,7 @@
 main {
   border: 1px solid 666;
   background-color: #eee;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 580px);
   padding: 5px;
   overflow-y: auto;
 }
@@ -34,7 +33,7 @@ div {
 /* a character with a dot to the left for overlapping with adjacent-left character for ease of selection */
 b {
   font-weight: normal;
-  margin-left: -0.25em;
+  margin-left: -0.5rem;
   position: relative;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
@@ -42,6 +41,9 @@ b {
 /* just the dot character inside the b above */
 u {
   opacity: 0;
+  min-width: 2px;
+  background-color: rgba(200,100,100,.5);
+  text-decoration: none;
 }
 /* flashing caret */
 i {
@@ -81,10 +83,15 @@ i {
   top: 0px;
   width: 100px;
 }
+.selection_parent {
+  position: absolute;
+  left: -1px;
+  margin-top: -7px;
+}
 .selection {
   background-color: red;
   height: 24px;
-  position: absolute;
+  position: relative;
   z-index: 100;
   opacity: 0.5;
 }

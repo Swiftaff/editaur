@@ -1,6 +1,8 @@
 <script>
     import imported_rows from "./test_data.js";
-    let rows = imported_rows;
+    let rows = imported_rows.map((text) => {
+        return { text };
+    });
     let main;
     let caret;
     let selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, in_progress: false, rows: [] };
@@ -8,33 +10,58 @@
     let previous_c = 0;
     let pressing_shift = false;
     let pressing_control = false;
+    let scrollTop = 0;
     const SHIFT_SCROLL_DEFAULT = 3;
     const SHIFT_SCROLL_MULTIPLIER = 5;
+    const CHAR_WIDTH = 9;
     function caret_update(r, c) {
         //console.log("click", r, c);
-        if (c > rows[r].length - 1) c = rows[r].length;
+        if (c > rows[r].text.length - 1) c = rows[r].text.length;
         cursor = { r, c };
         selection.end = { r, c };
         selection.in_progress = false;
-        console.log("selection_end", selection);
+        //console.log("selection_end", selection);
     }
     function selection_start(e, r, c) {
         selection.start = { r, c };
         selection.end = { r, c };
         selection.in_progress = true;
-        let { x, y } = e.target.parentElement.getBoundingClientRect();
-        selection.rows = [{ x: Math.floor(x), y, w: 5 }];
-        console.log("selection_start", e);
+        //let char = e.target.parentElement;
+        let row = e.target.parentElement.parentElement;
+        //let div = e.target.parentElement.parentElement.parentElement.parentElement;
+        let { x, y, height } = e.target.parentElement.getBoundingClientRect();
+        selection.rows = [{ x: Math.floor(x), y, w: 0, row, h: height }];
     }
     function selection_update(e, r, c) {
+        //console.log(r, c);
         if (selection.in_progress) {
-            if (c > rows[r].length - 1) c = rows[r].length;
+            if (c > rows[r].text.length - 1) c = rows[r].text.length;
             selection.end = { r, c };
-            cursor = { r, c };
-            let { x, y } = e.target.parentElement.getBoundingClientRect();
+
             let first = selection.rows[0];
-            selection.rows = [{ ...first, w: Math.floor(x) - first.x }];
-            console.log("selection_update", r, c);
+            let num_rows = selection.end.r - selection.start.r;
+            if (num_rows == 0) {
+                selection.rows = [{ ...first, w: (c - selection.start.c) * CHAR_WIDTH }];
+            } else {
+                //console.log(first.row);
+                let { x1, y1, width, height } = first.row.getBoundingClientRect();
+                let new_rows = [{ ...first, w: Math.floor(width) - (first.x - 106) }];
+                let { x2, y2 } = e.target.getBoundingClientRect();
+                for (let index = 0; index < num_rows; index++) {
+                    console.log(index);
+                    if (index == num_rows - 1) {
+                        new_rows.push({ x: first.x - 8, y: index * 10, w: c * CHAR_WIDTH });
+                    } else {
+                        new_rows.push({ x: first.x - 8, y: index * 10, w: 10 });
+                    }
+                }
+                selection.rows = new_rows;
+                //console.log("selection_update", width, first.x - 100);
+                //
+                //selection.rows = [{ ...first, w: Math.floor(x) - first.x }];
+            }
+            //console.log("selection_update", selection.rows[0]);
+            cursor = { r, c };
         }
     }
     function handle_key_down(e) {
@@ -82,7 +109,7 @@
         if (!pressing_control && char.length == 1) {
             let { r, c } = cursor;
             let new_rows = [...rows];
-            new_rows[r] = new_rows[r].slice(0, c).concat(char, new_rows[r].slice(c));
+            new_rows[r].text = new_rows[r].text.slice(0, c).concat(char, new_rows[r].text.slice(c));
             cursor = { r, c: c + 1 };
             rows = new_rows;
             scroll_up();
@@ -96,17 +123,17 @@
         if (c == 0) {
             //console.log("start of line");
             if (r > 0) {
-                cursor = { r: r - 1, c: new_rows[r - 1].length };
-                new_rows[r - 1] = new_rows[r - 1].concat(new_rows[r]);
+                cursor = { r: r - 1, c: new_rows[r - 1].text.length };
+                new_rows[r - 1].text = new_rows[r - 1].text.concat(new_rows[r].text);
                 new_rows.splice(r, 1);
             }
-        } else if (c == rows[r].length) {
+        } else if (c == rows[r].text.length) {
             //console.log("eol");
-            new_rows[r] = new_rows[r].slice(0, c - 1).concat(new_rows[r].slice(c));
+            new_rows[r].text = new_rows[r].text.slice(0, c - 1).concat(new_rows[r].text.slice(c));
             cursor = { r, c: c - 1 };
         } else {
             //console.log("mid line");
-            new_rows[r] = new_rows[r].slice(0, c - 1).concat(new_rows[r].slice(c));
+            new_rows[r].text = new_rows[r].text.slice(0, c - 1).concat(new_rows[r].text.slice(c));
             cursor = { r, c: c - 1 };
         }
         rows = new_rows;
@@ -119,16 +146,16 @@
         let new_rows = [...rows];
         if (c == 0) {
             //console.log("start of line");
-            new_rows[r] = new_rows[r].slice(c + 1);
-        } else if (c == rows[r].length) {
+            new_rows[r].text = new_rows[r].text.slice(c + 1);
+        } else if (c == rows[r].text.length) {
             //console.log("eol");
             if (new_rows.length > r + 1) {
-                new_rows[r] = new_rows[r].concat(new_rows[r + 1]);
+                new_rows[r].text = new_rows[r].text.concat(new_rows[r + 1].text);
                 new_rows.splice(r + 1, 1);
             }
         } else {
             //console.log("mid line");
-            new_rows[r] = new_rows[r].slice(0, c).concat(new_rows[r].slice(c + 1));
+            new_rows[r].text = new_rows[r].text.slice(0, c).concat(new_rows[r].text.slice(c + 1));
         }
         rows = new_rows;
         scroll_up();
@@ -140,16 +167,16 @@
         let new_rows = [...rows];
         if (c == 0) {
             //console.log("start of line");
-            new_rows.splice(r, 0, "");
-        } else if (c == rows[r].length) {
+            new_rows.splice(r, 0, { text: "" });
+        } else if (c == rows[r].text.length) {
             //console.log("eol");
-            new_rows.splice(r + 1, 0, "");
+            new_rows.splice(r + 1, 0, { text: "" });
         } else {
             //console.log("mid line");
-            let first_half = new_rows[r].substring(0, c);
-            let second_half = new_rows[r].substring(c, new_rows[r].length);
-            new_rows[r] = first_half;
-            new_rows.splice(r + 1, 0, second_half);
+            let first_half = new_rows[r].text.substring(0, c);
+            let second_half = new_rows[r].text.substring(c, new_rows[r].text.length);
+            new_rows[r].text = first_half;
+            new_rows.splice(r + 1, 0, { text: second_half });
         }
         cursor = { r: r + 1, c: 0 };
         rows = new_rows;
@@ -192,14 +219,14 @@
         cursor = { r, c };
     }
     function move_caret_to_eol_if_shorter_than_previous(r, c) {
-        if (c > rows[r].length) {
+        if (c > rows[r].text.length) {
             previous_c = c;
-            c = rows[r].length;
+            c = rows[r].text.length;
         }
         return c;
     }
     function move_caret_back_to_previous_if_line_is_long_enough(r, c) {
-        if (c < previous_c && previous_c <= rows[r].length) c = previous_c;
+        if (c < previous_c && previous_c <= rows[r].text.length) c = previous_c;
         return c;
     }
     function move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c) {
@@ -210,9 +237,9 @@
         return c;
     }
     function move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c) {
-        if (c < rows[r].length) {
-            c = rows[r].length;
-            previous_c = rows[r].length;
+        if (c < rows[r].text.length) {
+            c = rows[r].text.length;
+            previous_c = rows[r].text.length;
         }
         return c;
     }
@@ -224,14 +251,14 @@
             previous_c = 0;
         } else if (r > 0) {
             r = r - 1;
-            c = rows[r].length;
+            c = rows[r].text.length;
             previous_c = 0;
             cursor = { r, c };
         }
     }
     function arrow_right() {
         let { r, c } = cursor;
-        if (c < rows[cursor.r].length) {
+        if (c < rows[cursor.r].text.length) {
             c = c + 1;
             cursor = { r, c };
             previous_c = 0;
@@ -289,6 +316,7 @@
             e.preventDefault();
             if (e.deltaY < 0) scroll_up(true);
             else scroll_down(true);
+            scrollTop = main ? main.scrollTop : 0;
         };
 
         node.addEventListener("wheel", handler, { passive: false });
@@ -304,20 +332,27 @@
 <svelte:window on:keydown|preventDefault={handle_key_down} on:keyup|preventDefault={handle_key_up} use:wheel={true} />
 
 <main bind:this={main}>
-    {#each selection.rows as row}<div class="selection" style={`left: ${row.x - 5}px; width: ${row.w}px`} />{/each}
+    <div class="selection_parent" style={`top: ${-scrollTop}px;`}>
+        {#each selection.rows as row}<div
+                class="selection"
+                style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px`}
+            />{/each}
+    </div>
     {#each rows as row, r}
         <div on:mouseup={(e) => caret_update(r, 100000)} class={r == cursor.r ? "highlighted" : ""}>
             <span class="num" on:mouseup|stopPropagation={(e) => caret_update(r, 0)}>{1000 + r}: </span><span
                 class="text"
                 on:mouseup={(e) => caret_update(r, 100000)}
-                on:mouseover={(e) => selection_update(e, r, 100000)}
+                on:mouseenter={(e) => selection_update(e, r, 100000)}
                 on:focus={(e) => selection_update(e, r, 100000)}
                 ><span class="textrow"
-                    >{#each [...row, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i bind:this={caret} />{/if}<b
+                    >{#each [...row.text, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i
+                                bind:this={caret}
+                            />{/if}<b
                             style={"z-index:" + 100 + c}
                             on:mousedown={(e) => selection_start(e, r, c)}
                             on:mouseup|stopPropagation={(e) => caret_update(r, c)}
-                            on:mouseover|stopPropagation={(e) => selection_update(e, r, c)}
+                            on:mouseenter|stopPropagation={(e) => selection_update(e, r, c)}
                             on:focus|stopPropagation={(e) => selection_update(e, r, c)}><u>.</u><s>{char}</s></b
                         >{/each}</span
                 ></span
@@ -325,3 +360,4 @@
         </div>
     {/each}
 </main>
+<pre>{JSON.stringify(selection.rows)}</pre>
