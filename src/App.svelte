@@ -30,37 +30,41 @@
         let row = e.target.parentElement.parentElement;
         //let div = e.target.parentElement.parentElement.parentElement.parentElement;
         let { x, y, height } = e.target.parentElement.getBoundingClientRect();
-        selection.rows = [{ x: Math.floor(x), y, w: 0, row, h: height }];
+        selection.rows = [{ x: Math.floor(x), y, w: 0, h: height, c, r }]; //, row }];
+        cursor = { r, c };
     }
     function selection_update(e, r, c) {
-        //console.log(r, c);
         if (selection.in_progress) {
+            console.log(r, c);
             if (c > rows[r].text.length - 1) c = rows[r].text.length;
             selection.end = { r, c };
-
             let first = selection.rows[0];
             let num_rows = selection.end.r - selection.start.r;
+            let first_row = { ...first, w: (selection.end.c - selection.start.c) * CHAR_WIDTH };
             if (num_rows == 0) {
-                selection.rows = [{ ...first, w: (c - selection.start.c) * CHAR_WIDTH }];
+                selection.rows = [first_row];
             } else {
-                //console.log(first.row);
-                let { x1, y1, width, height } = first.row.getBoundingClientRect();
-                let new_rows = [{ ...first, w: Math.floor(width) - (first.x - 106) }];
-                let { x2, y2 } = e.target.getBoundingClientRect();
+                first_row = { ...first, w: (rows[selection.start.r].text.length - selection.start.c) * CHAR_WIDTH };
+                let new_rows = [first_row];
+
+                let multiline_count = 0;
                 for (let index = 0; index < num_rows; index++) {
-                    console.log(index);
                     if (index == num_rows - 1) {
-                        new_rows.push({ x: first.x - 8, y: index * 10, w: c * CHAR_WIDTH });
+                        new_rows.push({
+                            x: 105,
+                            y: first.y,
+                            w: selection.end.c * CHAR_WIDTH,
+                        });
                     } else {
-                        new_rows.push({ x: first.x - 8, y: index * 10, w: 10 });
+                        new_rows.push({
+                            x: 105,
+                            y: first.y,
+                            w: rows[selection.start.r + index + 1].text.length * CHAR_WIDTH,
+                        });
                     }
                 }
                 selection.rows = new_rows;
-                //console.log("selection_update", width, first.x - 100);
-                //
-                //selection.rows = [{ ...first, w: Math.floor(x) - first.x }];
             }
-            //console.log("selection_update", selection.rows[0]);
             cursor = { r, c };
         }
     }
@@ -360,4 +364,10 @@
         </div>
     {/each}
 </main>
-<pre>{JSON.stringify(selection.rows)}</pre>
+<pre>{JSON.stringify(selection, null, " ")
+        .replace(/: \{\n\s+/g, ": {")
+        .replace(/{\n\s+\"/g, '{ "')
+        .replace(/\n\s+}/g, "}")
+        .replace(/,\n/g, ",")
+        .replace(/},\s+{/g, "},\n  {")
+        .replace(/\n\s+\},/g, "},\r\n")}</pre>
