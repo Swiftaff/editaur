@@ -90,7 +90,6 @@ i {
 }
 .selection {
   background-color: red;
-  height: 24px;
   position: relative;
   z-index: 100;
   opacity: 0.5;

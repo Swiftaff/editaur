@@ -5,6 +5,7 @@
     });
     let main;
     let caret;
+    let max_text_width = 0;
     let selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, in_progress: false, rows: [] };
     let cursor = { r: 0, c: 0 };
     let previous_c = 0;
@@ -14,6 +15,11 @@
     const SHIFT_SCROLL_DEFAULT = 3;
     const SHIFT_SCROLL_MULTIPLIER = 5;
     const CHAR_WIDTH = 9;
+
+    $: if (main) {
+        let m = main.getBoundingClientRect();
+        max_text_width = m.width - 177;
+    }
     function caret_update(r, c) {
         //console.log("click", r, c);
         if (c > rows[r].text.length - 1) c = rows[r].text.length;
@@ -30,12 +36,14 @@
         let row = e.target.parentElement.parentElement;
         //let div = e.target.parentElement.parentElement.parentElement.parentElement;
         let { x, y, height } = e.target.parentElement.getBoundingClientRect();
-        selection.rows = [{ x: Math.floor(x), y, w: 0, h: height, c, r }]; //, row }];
+        let width = rows[r].text.length * CHAR_WIDTH;
+        let h = width > max_text_width ? Math.floor(width / max_text_width) + 1 : 1;
+        selection.rows = [{ x: Math.floor(x), y, w: 0, c, r, h }]; //, row }];
         cursor = { r, c };
     }
     function selection_update(e, r, c) {
         if (selection.in_progress) {
-            console.log(r, c);
+            //console.log(r, c);
             if (c > rows[r].text.length - 1) c = rows[r].text.length;
             selection.end = { r, c };
             let first = selection.rows[0];
@@ -44,22 +52,33 @@
             if (num_rows == 0) {
                 selection.rows = [first_row];
             } else {
-                first_row = { ...first, w: (rows[selection.start.r].text.length - selection.start.c) * CHAR_WIDTH };
+                first_row = {
+                    ...first,
+                    w: (rows[selection.start.r].text.length - selection.start.c) * CHAR_WIDTH,
+                };
                 let new_rows = [first_row];
 
-                let multiline_count = 0;
                 for (let index = 0; index < num_rows; index++) {
+                    let width = rows[selection.start.r + index + 1].text.length * CHAR_WIDTH;
+                    let h = 1;
+                    if (width > max_text_width) {
+                        h = Math.floor(width / max_text_width) + 1;
+                        width = max_text_width;
+                    }
+
                     if (index == num_rows - 1) {
                         new_rows.push({
                             x: 105,
                             y: first.y,
                             w: selection.end.c * CHAR_WIDTH,
+                            h,
                         });
                     } else {
                         new_rows.push({
                             x: 105,
                             y: first.y,
-                            w: rows[selection.start.r + index + 1].text.length * CHAR_WIDTH,
+                            w: width,
+                            h,
                         });
                     }
                 }
@@ -339,7 +358,7 @@
     <div class="selection_parent" style={`top: ${-scrollTop}px;`}>
         {#each selection.rows as row}<div
                 class="selection"
-                style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px`}
+                style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px; height: ${24 * row.h}px`}
             />{/each}
     </div>
     {#each rows as row, r}
