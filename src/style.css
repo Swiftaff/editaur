@@ -17,7 +17,8 @@ main {
   background-color: #eee;
   height: calc(100vh - 580px);
   padding: 5px;
-  overflow-y: auto;
+  overflow: auto;
+  position: relative;
 }
 div {
   user-select: none;
@@ -26,24 +27,6 @@ div {
   padding: 0px;
   margin: 0px;
   min-height: 1.5rem;
-}
-.highlighted {
-  background-color: #ddd;
-}
-/* a character with a dot to the left for overlapping with adjacent-left character for ease of selection */
-b {
-  font-weight: normal;
-  margin-left: -0.5rem;
-  position: relative;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-/* just the dot character inside the b above */
-u {
-  opacity: 0;
-  min-width: 2px;
-  background-color: rgba(200,100,100,.5);
-  text-decoration: none;
 }
 /* flashing caret */
 i {
@@ -70,18 +53,27 @@ i {
   }
 }
 .text {
-  display: inline-block;
-  /* todo fix hard-coded width with flexbox layout? */
-  width: calc(100% - 150px);
-  margin-left: 100px;
-  position: relative;
+  position: absolute;
   top: 0px;
+  left: 100px;
+  z-index: 200;
+  min-width: 100%;
 }
-.num {
-  display: inline-block;
+.text span {
+  position: relative;
+  z-index: 100;
+  min-height: 24px;
+}
+.highlighted_row {
+  background-color: #ddd;
+  position: absolute;
+  z-index: 10;
+}
+.nums {
   position: absolute;
   top: 0px;
   width: 100px;
+  z-index: 200;
 }
 .selection_parent {
   position: absolute;
@@ -93,7 +85,4 @@ i {
   position: relative;
   z-index: 100;
   opacity: 0.5;
-}
-s {
-  text-decoration: none;
 }

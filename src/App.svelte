@@ -1,10 +1,11 @@
 <script>
     import imported_rows from "./test_data.js";
     let rows = imported_rows.map((text) => {
-        return { text };
+        return { text, w: text.length * CHAR_WIDTH };
     });
     let main;
     let caret;
+    let highlighted_row;
     let max_text_width = 0;
     let selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, in_progress: false, rows: [] };
     let cursor = { r: 0, c: 0 };
@@ -14,44 +15,66 @@
     let scrollTop = 0;
     const SHIFT_SCROLL_DEFAULT = 3;
     const SHIFT_SCROLL_MULTIPLIER = 5;
+    const CHAR_HEIGHT = 24;
     const CHAR_WIDTH = 9;
+    const CHAR_WIDTH_THIRD = Math.floor(CHAR_WIDTH / 3);
+    const TEXT_LEFT = 110;
+    const TEXT_TOP = 8;
 
     $: if (main) {
         let m = main.getBoundingClientRect();
         max_text_width = m.width - 177;
     }
-    function caret_update(r, c) {
-        //console.log("click", r, c);
-        if (c > rows[r].text.length - 1) c = rows[r].text.length;
-        cursor = { r, c };
-        selection.end = { r, c };
-        selection.in_progress = false;
-        //console.log("selection_end", selection);
-    }
-    function selection_start(e, r, c) {
+    function selection_start(e) {
+        // get row and column based on mouse position and fixed width characters, but allow overlap of a third of char width to select next column so it feels right
+        const { c, r } = get_c_r_from_mouse(e);
         selection.start = { r, c };
         selection.end = { r, c };
         selection.in_progress = true;
-        //let char = e.target.parentElement;
-        let row = e.target.parentElement.parentElement;
-        //let div = e.target.parentElement.parentElement.parentElement.parentElement;
-        let { x, y, height } = e.target.parentElement.getBoundingClientRect();
+        //let { x, y, height } = e.target.parentElement.getBoundingClientRect();
         let width = rows[r].text.length * CHAR_WIDTH;
         let h = width > max_text_width ? Math.floor(width / max_text_width) + 1 : 1;
-        selection.rows = [{ x: Math.floor(x), y, w: 0, c, r, h }]; //, row }];
-        cursor = { r, c };
+        caret_update(c, r);
     }
-    function selection_update(e, r, c) {
+    function selection_stop(e) {
+        selection.in_progress = false;
+    }
+    function get_c_r_from_mouse(e) {
+        let c = Math.floor((e.clientX - TEXT_LEFT + CHAR_WIDTH_THIRD) / CHAR_WIDTH);
+        let r = Math.floor((e.clientY - TEXT_TOP) / CHAR_HEIGHT);
+        if (c > rows[r].text.length - 1) c = rows[r].text.length;
+        if (c < 0) c = 0;
+        console.log(e, c, r);
+        return { c, r };
+    }
+    function get_x_y_from(c, r) {
+        let x = (c - 1) * CHAR_WIDTH + TEXT_LEFT;
+        let y = r * CHAR_HEIGHT + TEXT_TOP;
+        return { x, y };
+    }
+    function caret_update(c, r) {
+        cursor = { r, c };
+        const { x, y } = get_x_y_from(c, r);
+        caret.style = `left: ${x}px; top: ${y}px;`;
+        highlighted_row.style = `left: 0px; top: ${y}px; min-width: 100%; height: 24px;`;
+    }
+    function selection_update(e) {
         if (selection.in_progress) {
-            //console.log(r, c);
-            if (c > rows[r].text.length - 1) c = rows[r].text.length;
+            const { c, r } = get_c_r_from_mouse(e);
             selection.end = { r, c };
-            let first = selection.rows[0];
+            cursor = { r, c };
             let num_rows = selection.end.r - selection.start.r;
-            let first_row = { ...first, w: (selection.end.c - selection.start.c) * CHAR_WIDTH };
+            console.log(num_rows);
             if (num_rows == 0) {
-                selection.rows = [first_row];
-            } else {
+                selection.rows = [
+                    {
+                        ...get_x_y_from(selection.start.c, selection.start.r),
+                        w: get_x_y_from(selection.end.c - selection.start.c).x,
+                        h: CHAR_HEIGHT,
+                    },
+                ];
+            }
+            /* else {
                 first_row = {
                     ...first,
                     w: (rows[selection.start.r].text.length - selection.start.c) * CHAR_WIDTH,
@@ -83,8 +106,7 @@
                     }
                 }
                 selection.rows = new_rows;
-            }
-            cursor = { r, c };
+            }*/
         }
     }
     function handle_key_down(e) {
@@ -190,16 +212,16 @@
         let new_rows = [...rows];
         if (c == 0) {
             //console.log("start of line");
-            new_rows.splice(r, 0, { text: "" });
+            new_rows.splice(r, 0, { text: "", w: 0 });
         } else if (c == rows[r].text.length) {
             //console.log("eol");
-            new_rows.splice(r + 1, 0, { text: "" });
+            new_rows.splice(r + 1, 0, { text: "", w: 0 });
         } else {
             //console.log("mid line");
             let first_half = new_rows[r].text.substring(0, c);
             let second_half = new_rows[r].text.substring(c, new_rows[r].text.length);
             new_rows[r].text = first_half;
-            new_rows.splice(r + 1, 0, { text: second_half });
+            new_rows.splice(r + 1, 0, { text: second_half, w: second_half.length * CHAR_WIDTH });
         }
         cursor = { r: r + 1, c: 0 };
         rows = new_rows;
@@ -352,36 +374,36 @@
     }
 </script>
 
-<svelte:window on:keydown|preventDefault={handle_key_down} on:keyup|preventDefault={handle_key_up} use:wheel={true} />
+<svelte:window
+    on:keydown|preventDefault={handle_key_down}
+    on:keyup|preventDefault={handle_key_up}
+    use:wheel={true}
+    on:mousedown={selection_start}
+    on:mouseup={selection_stop}
+    on:mousemove={selection_update}
+/>
 
 <main bind:this={main}>
     <div class="selection_parent" style={`top: ${-scrollTop}px;`}>
         {#each selection.rows as row}<div
                 class="selection"
-                style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px; height: ${24 * row.h}px`}
+                style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px; height: ${row.h}px`}
             />{/each}
+        <i bind:this={caret} />
     </div>
-    {#each rows as row, r}
-        <div on:mouseup={(e) => caret_update(r, 100000)} class={r == cursor.r ? "highlighted" : ""}>
-            <span class="num" on:mouseup|stopPropagation={(e) => caret_update(r, 0)}>{1000 + r}: </span><span
-                class="text"
-                on:mouseup={(e) => caret_update(r, 100000)}
-                on:mouseenter={(e) => selection_update(e, r, 100000)}
-                on:focus={(e) => selection_update(e, r, 100000)}
-                ><span class="textrow"
-                    >{#each [...row.text, ""] as char, c}{#if cursor.r == r && cursor.c == c}<i
-                                bind:this={caret}
-                            />{/if}<b
-                            style={"z-index:" + 100 + c}
-                            on:mousedown={(e) => selection_start(e, r, c)}
-                            on:mouseup|stopPropagation={(e) => caret_update(r, c)}
-                            on:mouseenter|stopPropagation={(e) => selection_update(e, r, c)}
-                            on:focus|stopPropagation={(e) => selection_update(e, r, c)}><u>.</u><s>{char}</s></b
-                        >{/each}</span
-                ></span
-            >
-        </div>
-    {/each}
+
+    <div class="nums">
+        {#each rows as row, r}
+            <div>{1000 + r}:</div>
+        {/each}
+    </div>
+
+    <div class="text">
+        <div class="highlighted_row" bind:this={highlighted_row} />
+        {#each rows as row, r}
+            <div style={`width: ${row.w}px`}>{row.text}</div>
+        {/each}
+    </div>
 </main>
 <pre>{JSON.stringify(selection, null, " ")
         .replace(/: \{\n\s+/g, ": {")
