@@ -1,11 +1,10 @@
 <script>
     import imported_rows from "./test_data.js";
-    let rows = imported_rows.map((text) => {
-        return { text, w: text.length * CHAR_WIDTH };
-    });
+    let rows = [];
     let main;
     let caret;
     let highlighted_row;
+    let benchmark;
     let max_text_width = 0;
     let selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, in_progress: false, rows: [] };
     let cursor = { r: 0, c: 0 };
@@ -15,62 +14,71 @@
     let scrollTop = 0;
     const SHIFT_SCROLL_DEFAULT = 3;
     const SHIFT_SCROLL_MULTIPLIER = 5;
-    const CHAR_HEIGHT = 24;
-    const CHAR_WIDTH = 9;
-    const CHAR_WIDTH_THIRD = Math.floor(CHAR_WIDTH / 3);
-    const TEXT_LEFT = 110;
-    const TEXT_TOP = 8;
+    let LINE_HEIGHT = 0;
+    let CHAR_WIDTH = 0;
+    let CHAR_WIDTH_THIRD = 0;
+    let TEXT_LEFT = 0;
+    let TEXT_TOP = 8;
 
     $: if (main) {
         let m = main.getBoundingClientRect();
         max_text_width = m.width - 177;
+
+        // get sizes based on actual font size;
+        let b = benchmark.getBoundingClientRect();
+        TEXT_LEFT = b.left;
+        TEXT_TOP = b.top;
+        CHAR_WIDTH = b.width / 5;
+        CHAR_WIDTH_THIRD = CHAR_WIDTH / 3;
+        LINE_HEIGHT = b.height / 5;
+        rows = imported_rows.map((text) => {
+            return { text, w: text.length * CHAR_WIDTH };
+        });
     }
     function selection_start(e) {
         // get row and column based on mouse position and fixed width characters, but allow overlap of a third of char width to select next column so it feels right
-        const { c, r } = get_c_r_from_mouse(e);
+        const { r, c } = get_r_c_from_mouse(e);
         selection.start = { r, c };
         selection.end = { r, c };
         selection.in_progress = true;
         //let { x, y, height } = e.target.parentElement.getBoundingClientRect();
-        let width = rows[r].text.length * CHAR_WIDTH;
-        let h = width > max_text_width ? Math.floor(width / max_text_width) + 1 : 1;
-        caret_update(c, r);
+        //let width = rows[r].text.length * CHAR_WIDTH;
+        //let h = width > max_text_width ? Math.floor(width / max_text_width) + 1 : 1;
+        caret_update(r, c);
     }
     function selection_stop(e) {
         selection.in_progress = false;
     }
-    function get_c_r_from_mouse(e) {
+    function get_r_c_from_mouse(e) {
         let c = Math.floor((e.clientX - TEXT_LEFT + CHAR_WIDTH_THIRD) / CHAR_WIDTH);
-        let r = Math.floor((e.clientY - TEXT_TOP) / CHAR_HEIGHT);
+        let r = Math.floor((e.clientY - TEXT_TOP) / LINE_HEIGHT);
         if (c > rows[r].text.length - 1) c = rows[r].text.length;
         if (c < 0) c = 0;
-        console.log(e, c, r);
         return { c, r };
     }
-    function get_x_y_from(c, r) {
+    function get_x_y_from(r, c) {
         let x = (c - 1) * CHAR_WIDTH + TEXT_LEFT;
-        let y = r * CHAR_HEIGHT + TEXT_TOP;
+        let y = r * LINE_HEIGHT + TEXT_TOP;
         return { x, y };
     }
-    function caret_update(c, r) {
+    function caret_update(r, c) {
         cursor = { r, c };
-        const { x, y } = get_x_y_from(c, r);
+        const { x, y } = get_x_y_from(r, c);
         caret.style = `left: ${x}px; top: ${y}px;`;
-        highlighted_row.style = `left: 0px; top: ${y}px; min-width: 100%; height: 24px;`;
+        highlighted_row.style = `top: ${y}px;`;
     }
     function selection_update(e) {
         if (selection.in_progress) {
-            const { c, r } = get_c_r_from_mouse(e);
+            const { r, c } = get_r_c_from_mouse(e);
             selection.end = { r, c };
             cursor = { r, c };
             let num_rows = selection.end.r - selection.start.r;
-            console.log(num_rows);
             if (num_rows == 0) {
                 selection.rows = [
                     {
-                        ...get_x_y_from(selection.start.c, selection.start.r),
-                        w: get_x_y_from(selection.end.c - selection.start.c).x,
-                        h: CHAR_HEIGHT,
+                        ...get_x_y_from(selection.start.r, selection.start.c),
+                        w: get_x_y_from(selection.end.r, selection.end.c - selection.start.c + 1).x - TEXT_LEFT,
+                        h: LINE_HEIGHT,
                     },
                 ];
             }
@@ -159,6 +167,7 @@
             rows = new_rows;
             scroll_up();
             scroll_down();
+            caret_update(r, c);
         }
     }
     function backspace() {
@@ -184,6 +193,7 @@
         rows = new_rows;
         scroll_up();
         scroll_down();
+        caret_update(r, c);
     }
     function del() {
         //console.log("Delete");
@@ -205,6 +215,7 @@
         rows = new_rows;
         scroll_up();
         scroll_down();
+        caret_update(r, c);
     }
     function enter() {
         //console.log("Enter");
@@ -226,6 +237,7 @@
         cursor = { r: r + 1, c: 0 };
         rows = new_rows;
         scroll_down();
+        caret_update(r, c);
     }
     function shift_key_down() {
         if (!pressing_shift) pressing_shift = true;
@@ -250,6 +262,7 @@
             c = move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c);
         }
         cursor = { r, c };
+        caret_update(r, c);
     }
     function arrow_up() {
         let { r, c } = cursor;
@@ -262,6 +275,7 @@
             c = move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c);
         }
         cursor = { r, c };
+        caret_update(r, c);
     }
     function move_caret_to_eol_if_shorter_than_previous(r, c) {
         if (c > rows[r].text.length) {
@@ -300,6 +314,7 @@
             previous_c = 0;
             cursor = { r, c };
         }
+        caret_update(r, c);
     }
     function arrow_right() {
         let { r, c } = cursor;
@@ -313,6 +328,7 @@
             previous_c = 0;
             cursor = { r, c };
         }
+        caret_update(r, c);
     }
     function scroll_up(wheel = false) {
         let caret_pos = caret.getBoundingClientRect();
@@ -390,6 +406,7 @@
                 style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px; height: ${row.h}px`}
             />{/each}
         <i bind:this={caret} />
+        <div class="highlighted_row" bind:this={highlighted_row} />
     </div>
 
     <div class="nums">
@@ -399,7 +416,7 @@
     </div>
 
     <div class="text">
-        <div class="highlighted_row" bind:this={highlighted_row} />
+        <div id="benchmark" bind:this={benchmark}>XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX</div>
         {#each rows as row, r}
             <div style={`width: ${row.w}px`}>{row.text}</div>
         {/each}

@@ -1,11 +1,9 @@
 :root {
   font-family: Consolas, Courier New, monospace;
   font-size: 15px;
-  line-height: 24px;
   font-weight: 400;
   color: #0f0f0f;
-  background-color: #f6f6f6;
-
+  line-height: 1.5rem;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -13,10 +11,8 @@
   -webkit-text-size-adjust: 100%;
 }
 main {
-  border: 1px solid 666;
   background-color: #eee;
-  height: calc(100vh - 580px);
-  padding: 5px;
+  height: calc(100vh - 280px);
   overflow: auto;
   position: relative;
 }
@@ -26,7 +22,6 @@ div {
   position: relative;
   padding: 0px;
   margin: 0px;
-  min-height: 1.5rem;
 }
 /* flashing caret */
 i {
@@ -35,7 +30,7 @@ i {
   position: absolute;
   margin-top: 0.02rem;
   height: 1.5rem;
-  margin-left: -0.05rem;
+
   width: 3px;
   background-color: green;
   animation: flash 1s linear infinite;
@@ -62,12 +57,12 @@ i {
 .text span {
   position: relative;
   z-index: 100;
-  min-height: 24px;
 }
 .highlighted_row {
   background-color: #ddd;
   position: absolute;
   z-index: 10;
+  min-width: 100%;
 }
 .nums {
   position: absolute;
@@ -77,12 +72,19 @@ i {
 }
 .selection_parent {
   position: absolute;
-  left: -1px;
-  margin-top: -7px;
+  left: 0px;
+  width: 100%;
 }
 .selection {
   background-color: red;
   position: relative;
   z-index: 100;
   opacity: 0.5;
+}
+#benchmark {
+  
+  opacity: 0;
+  
+  position: absolute;
+  color: red;
 }
