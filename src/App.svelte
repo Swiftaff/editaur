@@ -17,24 +17,33 @@
     let LINE_HEIGHT = 0;
     let CHAR_WIDTH = 0;
     let CHAR_WIDTH_THIRD = 0;
+    let CARET_WIDTH = 0;
     let TEXT_LEFT = 0;
-    let TEXT_TOP = 8;
+    let TEXT_TOP = 0;
+    let b;
+    let ct;
+    let m;
 
     $: if (main) {
-        let m = main.getBoundingClientRect();
+        m = main.getBoundingClientRect();
         max_text_width = m.width - 177;
 
         // get sizes based on actual font size;
-        let b = benchmark.getBoundingClientRect();
-        TEXT_LEFT = b.left;
-        TEXT_TOP = b.top;
-        CHAR_WIDTH = b.width / 5;
-        CHAR_WIDTH_THIRD = CHAR_WIDTH / 3;
-        LINE_HEIGHT = b.height / 5;
+        b = benchmark.getBoundingClientRect();
+        ct = caret.getBoundingClientRect();
+        TEXT_LEFT = Math.floor(m.left - b.left);
+        TEXT_TOP = Math.floor(m.top - b.top);
+        CHAR_WIDTH = Math.floor((m.left - b.width) / 5);
+        CHAR_WIDTH_THIRD = Math.floor(CHAR_WIDTH / 3);
+        CARET_WIDTH = Math.floor(CHAR_WIDTH / 5);
+        LINE_HEIGHT = Math.floor(b.height / 5);
         rows = imported_rows.map((text) => {
-            return { text, w: text.length * CHAR_WIDTH };
+            return { text, w: Math.floor(text.length * CHAR_WIDTH) };
         });
+        caret_update(0, 0);
     }
+
+    /*
     function selection_start(e) {
         // get row and column based on mouse position and fixed width characters, but allow overlap of a third of char width to select next column so it feels right
         const { r, c } = get_r_c_from_mouse(e);
@@ -56,17 +65,24 @@
         if (c < 0) c = 0;
         return { c, r };
     }
+    */
     function get_x_y_from(r, c) {
-        let x = (c - 1) * CHAR_WIDTH + TEXT_LEFT;
-        let y = r * LINE_HEIGHT + TEXT_TOP;
+        let x = Math.floor(c * CHAR_WIDTH + TEXT_LEFT);
+        let y = Math.floor(r * LINE_HEIGHT - TEXT_TOP);
         return { x, y };
     }
+
     function caret_update(r, c) {
         cursor = { r, c };
         const { x, y } = get_x_y_from(r, c);
-        caret.style = `left: ${x}px; top: ${y}px;`;
-        highlighted_row.style = `top: ${y}px;`;
+        caret.style = `width: ${CARET_WIDTH}px; left: ${x}px; top: ${y}px;`;
+        console.log("m", m);
+        console.log("b", b);
+        console.log("ct", ct);
+        //caret.style, TEXT_LEFT,
+        //highlighted_row.style = `top: ${y}px;`;
     }
+    /*
     function selection_update(e) {
         if (selection.in_progress) {
             const { r, c } = get_r_c_from_mouse(e);
@@ -82,7 +98,9 @@
                     },
                 ];
             }
-            /* else {
+            */
+
+    /* else {
                 first_row = {
                     ...first,
                     w: (rows[selection.start.r].text.length - selection.start.c) * CHAR_WIDTH,
@@ -115,6 +133,8 @@
                 }
                 selection.rows = new_rows;
             }*/
+
+    /*
         }
     }
     function handle_key_down(e) {
@@ -388,43 +408,51 @@
             },
         };
     }
+    */
 </script>
 
-<svelte:window
+<!--<svelte:window
     on:keydown|preventDefault={handle_key_down}
     on:keyup|preventDefault={handle_key_up}
     use:wheel={true}
     on:mousedown={selection_start}
     on:mouseup={selection_stop}
     on:mousemove={selection_update}
-/>
+/>-->
+<!-- <div class="selection_parent" style={`top: ${-scrollTop}px;`} > -->
 
 <main bind:this={main}>
-    <div class="selection_parent" style={`top: ${-scrollTop}px;`}>
-        {#each selection.rows as row}<div
+    <div class="selection_parent">
+        <!--{#each selection.rows as row}<div
                 class="selection"
                 style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px; height: ${row.h}px`}
-            />{/each}
+            />{/each}-->
         <i bind:this={caret} />
-        <div class="highlighted_row" bind:this={highlighted_row} />
+        <!--<div class="highlighted_row" bind:this={highlighted_row} />-->
     </div>
-
+    <!--
     <div class="nums">
         {#each rows as row, r}
             <div>{1000 + r}:</div>
         {/each}
     </div>
+    -->
 
     <div class="text">
         <div id="benchmark" bind:this={benchmark}>XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX</div>
-        {#each rows as row, r}
+        <!--{#each rows as row, r}
             <div style={`width: ${row.w}px`}>{row.text}</div>
-        {/each}
+        {/each}-->
     </div>
 </main>
-<pre>{JSON.stringify(selection, null, " ")
+<pre>{JSON.stringify(
+        { caret: caret && caret.style, c: ct && ct.left, b, CHAR_WIDTH, LINE_HEIGHT, selection },
+        null,
+        " "
+    )
         .replace(/: \{\n\s+/g, ": {")
         .replace(/{\n\s+\"/g, '{ "')
+        .replace(/: {+/g, ":\n{")
         .replace(/\n\s+}/g, "}")
         .replace(/,\n/g, ",")
         .replace(/},\s+{/g, "},\n  {")
