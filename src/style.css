@@ -1,9 +1,9 @@
 :root {
   font-family: Consolas, Courier New, monospace;
-  font-size: 25px;
+  font-size: 15px;
   font-weight: 400;
   color: #0f0f0f;
-  line-height: 1.5rem;
+  line-height: 1.2rem;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -38,13 +38,16 @@ i {
   font-weight: bold;
   font-style: normal;
   position: absolute;
-  margin-top: 0.02rem;
-  height: 1.5rem;
+  opacity: 1;
+  margin-top: 0;
+  height: 1.2rem;
   min-width: 0.1rem;
   background-color: green;
-  animation: flash 1s linear infinite;
   z-index: 100000;
   pointer-events: none;
+}
+.flashy {
+  animation: 1s flash 1s linear infinite;
 }
 @keyframes flash {
   0%,
