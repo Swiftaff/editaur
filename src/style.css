@@ -1,6 +1,6 @@
 :root {
   font-family: Consolas, Courier New, monospace;
-  font-size: 55px;
+  font-size: 25px;
   font-weight: 400;
   color: #0f0f0f;
   line-height: 1.5rem;
@@ -18,7 +18,7 @@ body {
 }
 main {
   background-color: #eee;
-  height: calc(100vh - 480px);
+  height: calc(100vh - 280px);
   overflow: auto;
   position: relative;
 }
@@ -27,7 +27,6 @@ main {
   left: 0px;
   width: 100%;
 }
-/*
 div {
   user-select: none;
   cursor: text;
@@ -41,7 +40,7 @@ i {
   position: absolute;
   margin-top: 0.02rem;
   height: 1.5rem;
-
+  min-width: 0.1rem;
   background-color: green;
   animation: flash 1s linear infinite;
   z-index: 100000;
@@ -64,29 +63,6 @@ i {
   z-index: 200;
   min-width: 100%;
 }
-.text span {
-  position: relative;
-  z-index: 100;
-}
-.highlighted_row {
-  background-color: #ddd;
-  position: absolute;
-  z-index: 10;
-  min-width: 100%;
-}
-.nums {
-  position: absolute;
-  top: 0px;
-  width: 100px;
-  z-index: 200;
-}
-
-.selection {
-  background-color: red;
-  position: relative;
-  z-index: 100;
-  opacity: 0.5;
-}
 #benchmark {
   
   opacity: 1;
@@ -94,8 +70,3 @@ i {
   position: absolute;
   color: red;
 }
-pre {
-  font-size: 15px;
-  line-height: 1rem;
-}
-*/
