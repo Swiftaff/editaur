@@ -6,22 +6,31 @@ function main() {
     console.log("test");
     let benchmark = document.getElementById("benchmark");
     let b = get_el_xywh(benchmark);
-    let CHAR_WIDTH = Math.floor(b.w / 5);
-    let CHAR_HEIGHT = Math.floor(b.h / 5);
-    let cursor = { r: 2, c: 1 };
-    let caret = document.getElementsByTagName("i")[0];
 
+    let cursor = {
+        r: 2,
+        c: 1,
+        flash: null,
+        CHAR_WIDTH: Math.floor(b.w / 5),
+        CHAR_HEIGHT: Math.floor(b.h / 5),
+        EL: document.getElementsByTagName("i")[0],
+        update(r, c) {
+            this.r = r;
+            this.c = c;
+            clearTimeout(this.flash);
+            this.EL.classList.remove("flashy");
+            this.EL.style.left = `${this.c * this.CHAR_WIDTH - 1}px`;
+            this.EL.style.top = `${this.r * this.CHAR_HEIGHT}px`;
+            this.flash = setTimeout(() => {
+                this.EL.className = "flashy";
+            }, 400);
+        },
+    };
+    //let c = 0;
     //setInterval(() => {
-    //cursor.c = cursor.c + 1;
-    update_caret();
-    //}, 1224);
-
-    function update_caret() {
-        caret.classList.remove("flashy");
-        caret.style.left = `${cursor.c * CHAR_WIDTH - 1}px`;
-        caret.style.top = `${cursor.r * CHAR_HEIGHT}px`;
-        caret.className = "flashy";
-    }
+    //c++;
+    cursor.update(1, 4);
+    //}, 1300);
 }
 function get_el_xywh(el) {
     let { x, y, width, height } = el.getBoundingClientRect();
