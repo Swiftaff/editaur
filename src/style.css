@@ -1,6 +1,6 @@
 :root {
-  font-family: Lucida Console;
-  font-size: 15px;
+  font-family: Consolas, Lucida Console, monospace;
+  font-size: 35px;
   font-weight: 400;
   color: #0f0f0f;
   line-height: 1.2rem;
@@ -42,7 +42,7 @@ div {
   z-index: 200;
 }
 #benchmark {
-  opacity: 0;
+  opacity: 1;
   position: absolute;
   color: red;
 }
