@@ -16,6 +16,16 @@ function init() {
                 this.el.className = "flashy";
             }, 400);
         },
+        update_from_mouse(e, rows) {
+            let TEXT_TOP = 0;
+            let TEXT_LEFT = 100;
+            let CHAR_WIDTH_THIRD = this.w / 3;
+            let c = Math.floor((e.clientX - TEXT_LEFT + CHAR_WIDTH_THIRD) / this.w);
+            let r = Math.floor((e.clientY - TEXT_TOP) / this.h);
+            if (c > rows[r].el.textContent.length - 1) c = rows[r].el.textContent.length;
+            if (c < 0) c = 0;
+            this.update(r, c);
+        },
     };
 }
 

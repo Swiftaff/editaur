@@ -8,15 +8,17 @@ import cursorlib from "./lib/cursor.js";
 
 function main() {
     console.log("test");
-    console.log(imported_rows);
     const cursor = cursorlib.init();
     const rows = text.init(imported_rows, cursor);
-    console.log(rows);
-
+    window.onmousedown = (e) => cursor.update_from_mouse(e, rows);
     cursor.update(0, 0);
-    debug.cursor_move_right(cursor, 1234);
+    //debug.cursor_move_right(cursor, 1234);
 }
 
 export default (function () {
     main();
 })();
+
+function selection_start(e) {
+    console.log(e);
+}
