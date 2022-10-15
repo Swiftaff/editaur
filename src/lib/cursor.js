@@ -8,7 +8,7 @@ function init() {
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
         update(r, c) {
-            console.log(r, c);
+            //console.log(r, c);
             this.r = r;
             this.c = c;
             clearTimeout(this.flash);
@@ -19,32 +19,31 @@ function init() {
                 this.el.className = "flashy";
             }, 400);
         },
-        selecting: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
+        selection: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
         update_from_mouse(e, text) {
-            if (this.selecting.active) {
-                console.log(e.clientX, this.text_left, this.w_overlap, this.w);
-                let { c, r } = this.get_cr_from_mouse(e, text);
+            if (this.selection.active) {
+                //console.log(e.clientX, this.text_left, this.w_overlap, this.w);
+                let { r, c } = this.get_rc_from_mouse(e, text);
                 this.update(r, c);
-                this.selecting.end = { r, c };
-                text.rows[r].select.style.width = Math.floor((c - this.selecting.start.c) * this.w) + "px";
+                this.selection.end = { r, c };
+                text.selection_update(this);
             }
         },
-        selecting_start(e, text) {
-            let { c, r } = this.get_cr_from_mouse(e, text);
-            this.selecting = { start: { r, c }, end: { r, c }, active: true };
+        selection_start(e, text) {
+            let { r, c } = this.get_rc_from_mouse(e, text);
+            this.selection = { start: { r, c }, end: { r, c }, active: true };
             this.update_from_mouse(e, text);
-            text.rows[this.r].select.style.left = c * this.w + "px";
-            text.rows[this.r].select.style.width = "0px";
+            text.selection_reset();
         },
-        selecting_stop() {
-            this.selecting = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
+        selection_stop() {
+            this.selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
         },
-        get_cr_from_mouse(e, text) {
+        get_rc_from_mouse(e, text) {
             let c = Math.floor((e.clientX - this.text_left + this.w_overlap) / this.w);
             let r = Math.floor((e.clientY - this.text_top) / this.h);
             if (c > text.rows[r].el.textContent.length - 1) c = text.rows[r].el.textContent.length;
             if (c < 0) c = 0;
-            return { c, r };
+            return { r, c };
         },
     };
 }
