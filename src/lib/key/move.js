@@ -1,24 +1,3 @@
-function down(e, cursor, text) {
-    e.preventDefault();
-    switch (e.key) {
-        case "ArrowDown":
-            arrow_down(cursor, text);
-            break;
-        case "ArrowUp":
-            arrow_up(cursor, text);
-            break;
-        case "ArrowLeft":
-            arrow_left(cursor, text);
-            break;
-        case "ArrowRight":
-            arrow_right(cursor, text);
-            break;
-        default:
-            //insert(e.key);
-            break;
-    }
-}
-
 function arrow_down(cursor, text) {
     let { r, c, previous_c } = cursor;
     //scroll_down();
@@ -114,4 +93,4 @@ function move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_lin
     return { c, previous_c };
 }
 
-export default { down };
+export default { arrow_down, arrow_up, arrow_left, arrow_right };
