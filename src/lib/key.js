@@ -10,6 +10,9 @@ function down(e, cursor, text) {
         case "ArrowLeft":
             arrow_left(cursor, text);
             break;
+        case "ArrowRight":
+            arrow_right(cursor, text);
+            break;
         default:
             //insert(e.key);
             break;
@@ -64,6 +67,19 @@ function arrow_left(cursor, text) {
     } else if (r > 0) {
         r = r - 1;
         c = text.rows[r].el.textContent.length;
+        previous_c = 0;
+    }
+    cursor.update(r, c, previous_c);
+}
+
+function arrow_right(cursor, text) {
+    let { r, c, previous_c } = cursor;
+    if (c < text.rows[r].el.textContent.length) {
+        c = c + 1;
+        previous_c = 0;
+    } else if (r < text.rows.length - 1) {
+        r = r + 1;
+        c = 0;
         previous_c = 0;
     }
     cursor.update(r, c, previous_c);
