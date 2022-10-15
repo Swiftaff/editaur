@@ -22,11 +22,6 @@ main {
   overflow: auto;
   position: relative;
 }
-.selection_parent {
-  position: relative;
-  left: 0px;
-  width: 100%;
-}
 div {
   user-select: none;
   cursor: text;
@@ -40,6 +35,15 @@ div {
   top: 0px;
   left: 100px;
   z-index: 200;
+}
+.selection{
+  z-index: -1;
+  position: absolute;
+  background-color:pink;
+  top: 0px;
+  left: 0px;
+  width: 0px;
+  height: 1.2rem;
 }
 #benchmark {
   opacity: 1;
