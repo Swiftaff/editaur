@@ -19,12 +19,6 @@
     function handle_key_down(e) {
         //console.log("key:", e.key);
         switch (e.key) {
-            case "ArrowDown":
-                arrow_down();
-                break;
-            case "ArrowUp":
-                arrow_up();
-                break;
             case "ArrowLeft":
                 arrow_left();
                 break;
@@ -149,40 +143,6 @@
     }
     function control_key_up() {
         pressing_control = false;
-    }
-    function arrow_down() {
-        let { r, c } = cursor;
-        scroll_down();
-        if (r < rows.length - 1) {
-            r = r + 1;
-            c = move_caret_to_eol_if_shorter_than_previous(r, c);
-            c = move_caret_back_to_previous_if_line_is_long_enough(r, c);
-        } else {
-            c = move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c);
-        }
-        cursor = { r, c };
-        //caret_update(r, c);
-    }
-    function arrow_up() {
-        let { r, c } = cursor;
-        scroll_up();
-        if (r > 0) {
-            r = r - 1;
-            c = move_caret_to_eol_if_shorter_than_previous(r, c);
-            c = move_caret_back_to_previous_if_line_is_long_enough(r, c);
-        } else {
-            c = move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c);
-        }
-        cursor = { r, c };
-        //caret_update(r, c);
-    }
-
-    function move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c) {
-        if (c > 0) {
-            c = 0;
-            previous_c = 0;
-        }
-        return c;
     }
 
     function arrow_left() {
