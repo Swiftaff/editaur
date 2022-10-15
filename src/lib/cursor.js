@@ -20,28 +20,31 @@ function init() {
             }, 400);
         },
         selecting: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
-        update_from_mouse(e, rows) {
+        update_from_mouse(e, text) {
             if (this.selecting.active) {
                 console.log(e.clientX, this.text_left, this.w_overlap, this.w);
-                let c = Math.floor((e.clientX - this.text_left + this.w_overlap) / this.w);
-                let r = Math.floor((e.clientY - this.text_top) / this.h);
-                if (c > rows[r].el.textContent.length - 1) c = rows[r].el.textContent.length;
-                if (c < 0) c = 0;
+                let { c, r } = this.get_cr_from_mouse(e, text);
                 this.update(r, c);
                 this.selecting.end = { r, c };
-                rows[r].select.style.width = Math.floor((c - this.selecting.start.c) * this.w) + "px";
+                text.rows[r].select.style.width = Math.floor((c - this.selecting.start.c) * this.w) + "px";
             }
         },
-        selecting_start(e, rows) {
-            let c = Math.floor((e.clientX - this.text_left + this.w_overlap) / this.w);
-            let r = Math.floor((e.clientY - this.text_top) / this.h);
+        selecting_start(e, text) {
+            let { c, r } = this.get_cr_from_mouse(e, text);
             this.selecting = { start: { r, c }, end: { r, c }, active: true };
-            this.update_from_mouse(e, rows);
-            rows[this.r].select.style.left = c * this.w + "px";
-            rows[this.r].select.style.width = "0px";
+            this.update_from_mouse(e, text);
+            text.rows[this.r].select.style.left = c * this.w + "px";
+            text.rows[this.r].select.style.width = "0px";
         },
         selecting_stop() {
             this.selecting = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
+        },
+        get_cr_from_mouse(e, text) {
+            let c = Math.floor((e.clientX - this.text_left + this.w_overlap) / this.w);
+            let r = Math.floor((e.clientY - this.text_top) / this.h);
+            if (c > text.rows[r].el.textContent.length - 1) c = text.rows[r].el.textContent.length;
+            if (c < 0) c = 0;
+            return { c, r };
         },
     };
 }

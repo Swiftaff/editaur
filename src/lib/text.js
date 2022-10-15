@@ -21,7 +21,7 @@ function init(imported_rows, cursor) {
         };
         rows.push(row);
     });
-    return rows;
+    return { rows };
 }
 
 export default { init };
