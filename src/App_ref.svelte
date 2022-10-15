@@ -14,42 +14,8 @@
     let scrollTop = 0;
     const SHIFT_SCROLL_DEFAULT = 3;
     const SHIFT_SCROLL_MULTIPLIER = 5;
-    let LINE_HEIGHT = 0;
-    let CHAR_WIDTH = 0;
-    let CHAR_WIDTH_THIRD = 0;
-    let CARET_WIDTH = 0;
-    let TEXT_LEFT = 0;
-    let TEXT_TOP = 0;
-    let b;
-    let ct;
-    let m;
-
-    $: if (main) {
-        m = main.getBoundingClientRect();
-        max_text_width = m.width - 177;
-
-        // get sizes based on actual font size;
-        b = benchmark.getBoundingClientRect();
-        ct = caret.getBoundingClientRect();
-        TEXT_LEFT = Math.floor(m.left - b.left);
-        TEXT_TOP = Math.floor(m.top - b.top);
-        CHAR_WIDTH = Math.floor((m.left - b.width) / 5);
-        CHAR_WIDTH_THIRD = Math.floor(CHAR_WIDTH / 3);
-        CARET_WIDTH = Math.floor(CHAR_WIDTH / 5);
-        LINE_HEIGHT = Math.floor(b.height / 5);
-        rows = imported_rows.map((text) => {
-            return { text, w: Math.floor(text.length * CHAR_WIDTH) };
-        });
-        caret_update(0, 0);
-    }
 
     /*
-  
-  function selection_stop(e) {
-      selection.in_progress = false;
-  }
-  
-
   function selection_update(e) {
       if (selection.in_progress) {
           const { r, c } = get_r_c_from_mouse(e);
@@ -65,9 +31,9 @@
                   },
               ];
           }
-          */
+          
 
-    /* else {
+    else {
               first_row = {
                   ...first,
                   w: (rows[selection.start.r].text.length - selection.start.c) * CHAR_WIDTH,
@@ -99,9 +65,8 @@
                   }
               }
               selection.rows = new_rows;
-          }*/
+          }
 
-    /*
       }
   }
   function handle_key_down(e) {
@@ -375,52 +340,18 @@
           },
       };
   }
-  */
+*/
 </script>
 
 <!--<svelte:window
   on:keydown|preventDefault={handle_key_down}
   on:keyup|preventDefault={handle_key_up}
   use:wheel={true}
-  on:mousedown={selection_start}
-  on:mouseup={selection_stop}
-  on:mousemove={selection_update}
 />-->
 <!-- <div class="selection_parent" style={`top: ${-scrollTop}px;`} > -->
 
 <main bind:this={main}>
     <div class="selection_parent">
-        <!--{#each selection.rows as row}<div
-              class="selection"
-              style={`left: ${row.x}px; top: ${row.y}px; width: ${row.w}px; height: ${row.h}px`}
-          />{/each}-->
-        <i bind:this={caret} />
         <!--<div class="highlighted_row" bind:this={highlighted_row} />-->
     </div>
-    <!--
-  <div class="nums">
-      {#each rows as row, r}
-          <div>{1000 + r}:</div>
-      {/each}
-  </div>
-  -->
-
-    <div class="text">
-        <div id="benchmark" bind:this={benchmark}>XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX</div>
-        <!--{#each rows as row, r}
-          <div style={`width: ${row.w}px`}>{row.text}</div>
-      {/each}-->
-    </div>
 </main>
-<pre>{JSON.stringify(
-        { caret: caret && caret.style, c: ct && ct.left, b, CHAR_WIDTH, LINE_HEIGHT, selection },
-        null,
-        " "
-    )
-        .replace(/: \{\n\s+/g, ": {")
-        .replace(/{\n\s+\"/g, '{ "')
-        .replace(/: {+/g, ":\n{")
-        .replace(/\n\s+}/g, "}")
-        .replace(/,\n/g, ",")
-        .replace(/},\s+{/g, "},\n  {")
-        .replace(/\n\s+\},/g, "},\r\n")}</pre>
