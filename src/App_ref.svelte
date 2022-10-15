@@ -44,45 +44,12 @@
     }
 
     /*
-  function selection_start(e) {
-      // get row and column based on mouse position and fixed width characters, but allow overlap of a third of char width to select next column so it feels right
-      const { r, c } = get_r_c_from_mouse(e);
-      selection.start = { r, c };
-      selection.end = { r, c };
-      selection.in_progress = true;
-      //let { x, y, height } = e.target.parentElement.getBoundingClientRect();
-      //let width = rows[r].text.length * CHAR_WIDTH;
-      //let h = width > max_text_width ? Math.floor(width / max_text_width) + 1 : 1;
-      caret_update(r, c);
-  }
+  
   function selection_stop(e) {
       selection.in_progress = false;
   }
-  function get_r_c_from_mouse(e) {
-      let c = Math.floor((e.clientX - TEXT_LEFT + CHAR_WIDTH_THIRD) / CHAR_WIDTH);
-      let r = Math.floor((e.clientY - TEXT_TOP) / LINE_HEIGHT);
-      if (c > rows[r].text.length - 1) c = rows[r].text.length;
-      if (c < 0) c = 0;
-      return { c, r };
-  }
-  */
-    function get_x_y_from(r, c) {
-        let x = Math.floor(c * CHAR_WIDTH + TEXT_LEFT);
-        let y = Math.floor(r * LINE_HEIGHT - TEXT_TOP);
-        return { x, y };
-    }
+  
 
-    function caret_update(r, c) {
-        cursor = { r, c };
-        const { x, y } = get_x_y_from(r, c);
-        caret.style = `width: ${CARET_WIDTH}px; left: ${x}px; top: ${y}px;`;
-        console.log("m", m);
-        console.log("b", b);
-        console.log("ct", ct);
-        //caret.style, TEXT_LEFT,
-        //highlighted_row.style = `top: ${y}px;`;
-    }
-    /*
   function selection_update(e) {
       if (selection.in_progress) {
           const { r, c } = get_r_c_from_mouse(e);

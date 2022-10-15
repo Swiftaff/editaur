@@ -28,7 +28,7 @@ main {
   width: 100%;
 }
 div {
-  /*user-select: none;*/
+  user-select: none;
   cursor: text;
   position: relative;
   padding: 0px;

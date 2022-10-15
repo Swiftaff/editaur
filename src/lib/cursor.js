@@ -1,11 +1,14 @@
 function init() {
     return {
-        r: 2,
-        c: 1,
+        text_top: 0,
+        text_left: 100,
+        r: 0,
+        c: 0,
         flash: null,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
         update(r, c) {
+            console.log(r, c);
             this.r = r;
             this.c = c;
             clearTimeout(this.flash);
@@ -16,15 +19,29 @@ function init() {
                 this.el.className = "flashy";
             }, 400);
         },
+        selecting: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
         update_from_mouse(e, rows) {
-            let TEXT_TOP = 0;
-            let TEXT_LEFT = 100;
-            let CHAR_WIDTH_THIRD = this.w / 3;
-            let c = Math.floor((e.clientX - TEXT_LEFT + CHAR_WIDTH_THIRD) / this.w);
-            let r = Math.floor((e.clientY - TEXT_TOP) / this.h);
-            if (c > rows[r].el.textContent.length - 1) c = rows[r].el.textContent.length;
-            if (c < 0) c = 0;
-            this.update(r, c);
+            if (this.selecting.active) {
+                console.log(e.clientX, this.text_left, this.w_overlap, this.w);
+                let c = Math.floor((e.clientX - this.text_left + this.w_overlap) / this.w);
+                let r = Math.floor((e.clientY - this.text_top) / this.h);
+                if (c > rows[r].el.textContent.length - 1) c = rows[r].el.textContent.length;
+                if (c < 0) c = 0;
+                this.update(r, c);
+                this.selecting.end = { r, c };
+                rows[r].select.style.width = Math.floor((c - this.selecting.start.c) * this.w) + "px";
+            }
+        },
+        selecting_start(e, rows) {
+            let c = Math.floor((e.clientX - this.text_left + this.w_overlap) / this.w);
+            let r = Math.floor((e.clientY - this.text_top) / this.h);
+            this.selecting = { start: { r, c }, end: { r, c }, active: true };
+            this.update_from_mouse(e, rows);
+            rows[this.r].select.style.left = c * this.w + "px";
+            rows[this.r].select.style.width = "0px";
+        },
+        selecting_stop() {
+            this.selecting = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
         },
     };
 }
@@ -37,7 +54,8 @@ function get_char_dimensions() {
     benchmark.innerHTML = "<span>XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX</span>";
     const b = get_el_xywh(benchmark);
     benchmark.remove();
-    return { w: b.w / 5, h: b.h / 5 };
+    let w_overlap = b.w / 5 / 6;
+    return { w: b.w / 5, h: b.h / 5, w_overlap };
 }
 
 function get_el_xywh(el) {
