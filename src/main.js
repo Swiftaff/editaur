@@ -7,7 +7,6 @@ import textlib from "./lib/text.js";
 import cursorlib from "./lib/cursor.js";
 
 export default (function main() {
-    console.log("test");
     const cursor = cursorlib.init();
     const text = textlib.init(imported_rows, cursor);
     window.onmousedown = (e) => cursor.selection_start(e, text);

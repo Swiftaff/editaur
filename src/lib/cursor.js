@@ -8,7 +8,6 @@ function init() {
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
         update(r, c) {
-            //console.log(r, c);
             this.r = r;
             this.c = c;
             clearTimeout(this.flash);
@@ -19,10 +18,10 @@ function init() {
                 this.el.className = "flashy";
             }, 400);
         },
+        main: document.getElementsByTagName("main")[0],
         selection: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
         update_from_mouse(e, text) {
             if (this.selection.active) {
-                //console.log(e.clientX, this.text_left, this.w_overlap, this.w);
                 let { r, c } = this.get_rc_from_mouse(e, text);
                 this.update(r, c);
                 this.selection.end = { r, c };
@@ -30,17 +29,22 @@ function init() {
             }
         },
         selection_start(e, text) {
-            let { r, c } = this.get_rc_from_mouse(e, text);
-            this.selection = { start: { r, c }, end: { r, c }, active: true };
-            this.update_from_mouse(e, text);
-            text.selection_reset();
+            let is_inside_scrollbars = e.clientX < this.main.offsetWidth - 7 && e.clientY < this.main.offsetHeight - 7;
+            if (is_inside_scrollbars) {
+                let { r, c } = this.get_rc_from_mouse(e, text);
+                this.selection = { start: { r, c }, end: { r, c }, active: true };
+                this.update_from_mouse(e, text);
+                text.selection_reset();
+            }
         },
         selection_stop() {
             this.selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
         },
         get_rc_from_mouse(e, text) {
-            let c = Math.floor((e.clientX - this.text_left + this.w_overlap) / this.w);
-            let r = Math.floor((e.clientY - this.text_top) / this.h);
+            let scrollTop = this.main.scrollTop;
+            let scrollLeft = this.main.scrollLeft;
+            let c = Math.floor((e.clientX - this.text_left + this.w_overlap + scrollLeft) / this.w);
+            let r = Math.floor((e.clientY - this.text_top + scrollTop) / this.h);
             if (c > text.rows[r].el.textContent.length - 1) c = text.rows[r].el.textContent.length;
             if (c < 0) c = 0;
             return { r, c };
