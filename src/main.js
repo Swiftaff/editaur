@@ -6,7 +6,7 @@ import debug from "./lib/debug.js";
 import text from "./lib/text.js";
 import cursorlib from "./lib/cursor.js";
 
-function main() {
+export default (function main() {
     console.log("test");
     const cursor = cursorlib.init();
     const rows = text.init(imported_rows, cursor);
@@ -15,12 +15,4 @@ function main() {
     window.onmouseup = () => cursor.selecting_stop();
     cursor.update(0, 0);
     //debug.cursor_move_right(cursor, 1234);
-}
-
-export default (function () {
-    main();
 })();
-
-function selection_start(e) {
-    console.log(e);
-}
