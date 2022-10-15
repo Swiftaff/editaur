@@ -176,17 +176,7 @@
         cursor = { r, c };
         //caret_update(r, c);
     }
-    function move_caret_to_eol_if_shorter_than_previous(r, c) {
-        if (c > rows[r].text.length) {
-            previous_c = c;
-            c = rows[r].text.length;
-        }
-        return c;
-    }
-    function move_caret_back_to_previous_if_line_is_long_enough(r, c) {
-        if (c < previous_c && previous_c <= rows[r].text.length) c = previous_c;
-        return c;
-    }
+
     function move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c) {
         if (c > 0) {
             c = 0;
@@ -194,13 +184,7 @@
         }
         return c;
     }
-    function move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c) {
-        if (c < rows[r].text.length) {
-            c = rows[r].text.length;
-            previous_c = rows[r].text.length;
-        }
-        return c;
-    }
+
     function arrow_left() {
         let { r, c } = cursor;
         if (c > 0) {
@@ -228,64 +212,6 @@
             cursor = { r, c };
         }
         //caret_update(r, c);
-    }
-    function scroll_up(wheel = false) {
-        let caret_pos = caret.getBoundingClientRect();
-        let main_pos = main.getBoundingClientRect();
-        if (!wheel && caret_pos.top < 0) scroll_offscrn_above(caret_pos);
-        else if (!wheel && caret_pos.top > main_pos.height) scroll_offscrn_below(caret_pos, main_pos);
-        else if (wheel || caret_pos.top < caret_pos.height) scroll_onscrn(caret_pos, wheel);
-    }
-    function scroll_down(wheel = false) {
-        let caret_pos = caret.getBoundingClientRect();
-        let main_pos = main.getBoundingClientRect();
-        if (!wheel && caret_pos.top < 0) scroll_offscrn_above(caret_pos, true);
-        else if (!wheel && caret_pos.top > main_pos.height) scroll_offscrn_below(caret_pos, main_pos, true);
-        else if (wheel || caret_pos.top + caret_pos.height > main_pos.height) scroll_onscrn(caret_pos, wheel, true);
-    }
-    function scroll_onscrn(caret_pos, wheel, down = false) {
-        let direction = down ? 1 : -1;
-        main.scrollTo(
-            0,
-            main.scrollTop +
-                direction *
-                    (caret_pos.height * (wheel ? (pressing_shift ? SHIFT_SCROLL_MULTIPLIER : SHIFT_SCROLL_DEFAULT) : 1))
-        );
-    }
-    function scroll_offscrn_above(caret_pos, down = false) {
-        let direction = down ? 1 : -1;
-        main.scrollTo(
-            0,
-            main.scrollTop +
-                Math.floor(caret_pos.top / caret_pos.height) * caret_pos.height +
-                caret_pos.height * direction
-        );
-    }
-    function scroll_offscrn_below(caret_pos, main_pos, down = false) {
-        let direction = down ? 2 : 1;
-        main.scrollTo(
-            0,
-            main.scrollTop +
-                Math.floor(caret_pos.top / caret_pos.height) * caret_pos.height +
-                caret_pos.height * direction -
-                main_pos.height
-        );
-    }
-    function wheel(node, _options) {
-        const handler = (e) => {
-            e.preventDefault();
-            if (e.deltaY < 0) scroll_up(true);
-            else scroll_down(true);
-            scrollTop = main ? main.scrollTop : 0;
-        };
-
-        node.addEventListener("wheel", handler, { passive: false });
-
-        return {
-            destroy() {
-                node.removeEventListener("wheel", handler, { passive: false });
-            },
-        };
     }
 </script>
 

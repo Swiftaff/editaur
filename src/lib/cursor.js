@@ -4,13 +4,16 @@ function init() {
         text_left: 100,
         r: 0,
         c: 0,
+        previous_c: 0,
         flash: null,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
-        update(r, c) {
+        update(r, c, previous_c) {
             this.r = r;
             this.c = c;
+            this.previous_c = previous_c;
             clearTimeout(this.flash);
+            // TODO if update takes cursor offscreen - scroll to cursor
             this.el.classList.remove("flashy");
             this.el.style.left = `${Math.floor(this.c * this.w - 1)}px`;
             this.el.style.top = `${Math.floor(this.r * this.h)}px`;
@@ -52,7 +55,7 @@ function init() {
             if (this.selection.active) {
                 this.scrolling_update(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
-                this.update(r, c);
+                this.update(r, c, c);
                 this.selection.end = { r, c };
                 text.selection_update(this);
             }
