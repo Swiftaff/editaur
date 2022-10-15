@@ -7,6 +7,9 @@ function down(e, cursor, text) {
         case "ArrowUp":
             arrow_up(cursor, text);
             break;
+        case "ArrowLeft":
+            arrow_left(cursor, text);
+            break;
         default:
             //insert(e.key);
             break;
@@ -49,6 +52,19 @@ function arrow_up(cursor, text) {
         const ret = move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c, previous_c);
         c = ret.c;
         previous_c = ret.previous_c;
+    }
+    cursor.update(r, c, previous_c);
+}
+
+function arrow_left(cursor, text) {
+    let { r, c, previous_c } = cursor;
+    if (c > 0) {
+        c = c - 1;
+        previous_c = 0;
+    } else if (r > 0) {
+        r = r - 1;
+        c = text.rows[r].el.textContent.length;
+        previous_c = 0;
     }
     cursor.update(r, c, previous_c);
 }

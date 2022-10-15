@@ -19,9 +19,6 @@
     function handle_key_down(e) {
         //console.log("key:", e.key);
         switch (e.key) {
-            case "ArrowLeft":
-                arrow_left();
-                break;
             case "ArrowRight":
                 arrow_right();
                 break;
@@ -145,20 +142,6 @@
         pressing_control = false;
     }
 
-    function arrow_left() {
-        let { r, c } = cursor;
-        if (c > 0) {
-            c = c - 1;
-            cursor = { r, c };
-            previous_c = 0;
-        } else if (r > 0) {
-            r = r - 1;
-            c = rows[r].text.length;
-            previous_c = 0;
-            cursor = { r, c };
-        }
-        //caret_update(r, c);
-    }
     function arrow_right() {
         let { r, c } = cursor;
         if (c < rows[cursor.r].text.length) {
