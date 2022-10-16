@@ -1,29 +1,6 @@
 function init(imported_rows, cursor) {
-    let text_div = document.getElementById("text");
-
-    let rows = [];
-    imported_rows.forEach((text) => {
-        let el = document.createElement("div");
-        el.innerHTML = text;
-        el.style.width = Math.ceil(cursor.w * text.length) + "px";
-        el.style.height = "1.2rem";
-        //el.style["background-color"] = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
-        //    Math.random() * 255
-        //}, 0.2)`;
-
-        let select = document.createElement("div");
-        select.className = "selection";
-        el.append(select);
-
-        text_div.append(el);
-        let row = {
-            el,
-            select,
-        };
-        rows.push(row);
-    });
-    return {
-        rows,
+    let obj = {
+        rows: [],
         selection_reset() {
             this.rows.forEach((_row, r) => {
                 this.selection_update_one_row(r, 0, 0, 0);
@@ -67,6 +44,26 @@ function init(imported_rows, cursor) {
                 }
             }
         },
+        get_new_row(text_content, cursor, testy) {
+            let el = document.createElement("div");
+            el.textContent = text_content;
+            el.style.width = Math.ceil(cursor.w * text_content.length) + "px";
+            el.style.height = "1.2rem";
+            if (testy) {
+                el.style["background-color"] = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+                    Math.random() * 255
+                }, 0.2)`;
+            }
+
+            let select = document.createElement("div");
+            select.className = "selection";
+            el.append(select);
+
+            return {
+                el,
+                select,
+            };
+        },
         selection_update_one_row(r, c_start, c_end, c_width) {
             let width = Math.abs(c_end - c_start);
             let start = c_start < c_end ? c_start : c_end;
@@ -74,6 +71,16 @@ function init(imported_rows, cursor) {
             this.rows[r].select.style.width = Math.floor(width * c_width) + "px";
         },
     };
+    if (!imported_rows.length) {
+        imported_rows = [""];
+    }
+    imported_rows.forEach((text_content) => {
+        let text_div = document.getElementById("text");
+        let row = obj.get_new_row(text_content, cursor);
+        text_div.append(row.el);
+        obj.rows.push(row);
+    });
+    return obj;
 }
 
 export default { init };

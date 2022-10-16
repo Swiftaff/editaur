@@ -22,6 +22,9 @@ function down(e, cursor, text) {
         case "Delete":
             edit.del(cursor, text);
             break;
+        case "Enter":
+            edit.enter(cursor, text);
+            break;
         default:
             //insert(e.key);
             break;

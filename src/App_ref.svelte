@@ -25,9 +25,6 @@
             case "Control":
                 control_key_down();
                 break;
-            case "Enter":
-                enter();
-                break;
             default:
                 insert(e.key);
                 break;
@@ -50,28 +47,6 @@
             scroll_down();
             //caret_update(r, c);
         }
-    }
-    function enter() {
-        //console.log("Enter");
-        let { r, c } = cursor;
-        let new_rows = [...rows];
-        if (c == 0) {
-            //console.log("start of line");
-            new_rows.splice(r, 0, { text: "", w: 0 });
-        } else if (c == rows[r].text.length) {
-            //console.log("eol");
-            new_rows.splice(r + 1, 0, { text: "", w: 0 });
-        } else {
-            //console.log("mid line");
-            let first_half = new_rows[r].text.substring(0, c);
-            let second_half = new_rows[r].text.substring(c, new_rows[r].text.length);
-            new_rows[r].text = first_half;
-            new_rows.splice(r + 1, 0, { text: second_half, w: second_half.length * CHAR_WIDTH });
-        }
-        cursor = { r: r + 1, c: 0 };
-        rows = new_rows;
-        scroll_down();
-        //caret_update(r, c);
     }
     function shift_key_down() {
         if (!pressing_shift) pressing_shift = true;
