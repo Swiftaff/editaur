@@ -3,7 +3,6 @@ function arrow_down(cursor, text) {
     //scroll_down();
 
     if (r < text.rows.length - 1) {
-        console.log("down2");
         r = r + 1;
         let len = text.rows[r].el.textContent.length;
         const ret = move_caret_to_eol_if_shorter_than_previous(r, c, previous_c, len);
@@ -11,13 +10,14 @@ function arrow_down(cursor, text) {
         previous_c = ret.previous_c;
         c = move_caret_back_to_previous_if_line_is_long_enough(r, c, previous_c, len);
     } else {
-        console.log("down3");
         let len = text.rows[r].el.textContent.length;
         const ret = move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c, previous_c, len);
         c = ret.c;
         previous_c = ret.previous_c;
     }
     cursor.update(r, c, previous_c);
+    cursor.selection_stop();
+    text.selection_reset();
 }
 
 function arrow_up(cursor, text) {
@@ -36,6 +36,8 @@ function arrow_up(cursor, text) {
         previous_c = ret.previous_c;
     }
     cursor.update(r, c, previous_c);
+    cursor.selection_stop();
+    text.selection_reset();
 }
 
 function arrow_left(cursor, text) {
@@ -49,6 +51,8 @@ function arrow_left(cursor, text) {
         previous_c = 0;
     }
     cursor.update(r, c, previous_c);
+    cursor.selection_stop();
+    text.selection_reset();
 }
 
 function arrow_right(cursor, text) {
@@ -62,6 +66,8 @@ function arrow_right(cursor, text) {
         previous_c = 0;
     }
     cursor.update(r, c, previous_c);
+    cursor.selection_stop();
+    text.selection_reset();
 }
 
 function move_caret_to_eol_if_shorter_than_previous(r, c, previous_c, len) {
