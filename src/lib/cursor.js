@@ -7,6 +7,7 @@ function init() {
         previous_c: 0,
         flash: null,
         pressing_shift: false,
+        multiple_clicks: 0,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
         update(r, c, previous_c) {
@@ -79,15 +80,69 @@ function init() {
         selection_start(e, text) {
             if (this.mouse_is_inside_scrollbars(e)) {
                 this.scrolling_reset(e);
-                console.log(this.scrolling);
                 let { r, c } = this.get_rc_from_mouse(e, text);
                 this.selection = { start: { r, c }, end: { r, c }, active: true };
                 this.update_from_mouse(e, text);
                 text.selection_reset();
+
+                this.multiple_clicks = this.multiple_clicks + 1;
+                this.multiple_clicks_reset();
+                let row_text = text.rows[this.r].el.textContent;
+                if (this.multiple_clicks === 3) {
+                    //console.log("multiple_clicks3", this.multiple_clicks);
+                    this.selection = {
+                        start: { r: this.r, c: 0 },
+                        end: { r: this.r, c: row_text.length },
+                        active: true,
+                    };
+                    let c = row_text.length;
+                    this.update(this.r, c, c);
+                    text.selection_update(this);
+                } else if (this.multiple_clicks === 2) {
+                    //console.log("multiple_clicks2", this.multiple_clicks);
+
+                    if (this.c > 0 && this.c < row_text.length) {
+                        let left_char = row_text.substring(this.c - 1, this.c);
+                        let right_char = row_text.slice(this.c, this.c + 1);
+                        if (left_char !== " " && right_char !== " ") {
+                            let left = row_text.slice(0, this.c);
+                            let left_split = 0;
+                            for (let index = this.c - 1; index >= 0; index--) {
+                                let char = left[index];
+                                if (left_split === 0 && char == " ") {
+                                    left_split = index + 1;
+                                    break;
+                                }
+                            }
+                            let right = row_text.slice(this.c);
+                            let right_split = right.length - 1;
+                            for (let index = 0; index < right.length - 1; index++) {
+                                let char = right[index];
+                                if (right_split === right.length - 1 && char == " ") {
+                                    right_split = index;
+                                    break;
+                                }
+                            }
+                            this.selection = {
+                                start: { r: this.r, c: left_split },
+                                end: { r: this.r, c: this.c + right_split },
+                                active: true,
+                            };
+                            let c = this.c + right_split;
+                            this.update(this.r, c, c);
+                            text.selection_update(this);
+                        }
+                    }
+                }
             }
         },
         selection_stop() {
             this.selection.active = false;
+        },
+        multiple_clicks_reset() {
+            setTimeout(() => {
+                if (this.multiple_clicks > 0) this.multiple_clicks = this.multiple_clicks - 1;
+            }, 400);
         },
         get_rc_from_mouse(e, text) {
             let scrollTop = this.main.scrollTop;
