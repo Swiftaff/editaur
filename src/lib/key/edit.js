@@ -8,17 +8,17 @@ function backspace(cursor, text) {
             let r2 = r - 1;
             let c2 = text.rows[r2].el.textContent.length;
             let text1 = text.rows[r - 1].el.textContent;
-            text.rows[r - 1].el.textContent = text1.concat(row_text);
+            text.update_text(text.rows[r - 1].el, text1.concat(row_text));
             text.rows[r].el.remove();
             text.rows.splice(r, 1);
             cursor.update(r2, c2, c2);
         }
     } else if (at_end_of_line) {
-        text.rows[r].el.textContent = row_text.slice(0, c - 1);
+        text.update_text(text.rows[r].el, row_text.slice(0, c - 1));
         cursor.update(r, c - 1, c - 1);
     } else {
         //mid-line
-        text.rows[r].el.textContent = row_text.slice(0, c - 1).concat(row_text.slice(c));
+        text.update_text(text.rows[r].el, row_text.slice(0, c - 1).concat(row_text.slice(c)));
         cursor.update(r, c - 1, c - 1);
     }
     //scroll_up();
@@ -37,17 +37,17 @@ function del(cursor, text) {
             text.rows[r].el.remove();
             text.rows.splice(r, 1);
         } else {
-            text.rows[r].el.textContent = row_text.slice(c + 1);
+            text.update_text(text.rows[r].el, row_text.slice(c + 1));
         }
     } else if (at_end_of_line) {
         if (!at_last_row) {
-            text.rows[r].el.textContent = row_text.concat(text.rows[r + 1].el.textContent);
+            text.update_text(text.rows[r].el, row_text.concat(text.rows[r + 1].el.textContent));
             text.rows[r + 1].el.remove();
             text.rows.splice(r + 1, 1);
         }
     } else {
         //mid-line
-        text.rows[r].el.textContent = row_text.slice(0, c).concat(row_text.slice(c + 1));
+        text.update_text(text.rows[r].el, row_text.slice(0, c).concat(row_text.slice(c + 1)));
     }
     //scroll_up();
     //scroll_down();
@@ -74,7 +74,7 @@ function enter(cursor, text) {
         //mid-line
         let first_half = row_text.substring(0, c);
         let second_half = row_text.substring(c, row_text.length);
-        text.rows[r].el.textContent = first_half;
+        text.update_text(text.rows[r].el, first_half);
         let new_row = text.get_new_row(second_half, cursor);
         text_div.insertBefore(new_row.el, text.rows[r + 1].el);
         text.rows.splice(r + 1, 0, new_row);
@@ -89,7 +89,7 @@ function insert(char, cursor, text) {
     if (char.length == 1) {
         let { r, c } = cursor;
         let row_text = text.rows[r].el.textContent;
-        text.rows[r].el.textContent = row_text.slice(0, c).concat(char, row_text.slice(c));
+        text.update_text(text.rows[r].el, row_text.slice(0, c).concat(char, row_text.slice(c)));
         //scroll_up();
         //scroll_down();
         cursor.update(r, c + 1, c + 1);
