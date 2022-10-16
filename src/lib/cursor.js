@@ -19,7 +19,7 @@ function init() {
             this.el.style.top = `${Math.floor(this.r * this.h)}px`;
             this.flash = setTimeout(() => {
                 this.el.className = "flashy";
-            }, 400);
+            }, 100);
         },
         scrolling: {
             scroll_left: 0,
