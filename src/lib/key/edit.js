@@ -83,4 +83,17 @@ function enter(cursor, text) {
     //scroll_down();
 }
 
-export default { backspace, del, enter };
+function insert(char, cursor, text) {
+    console.log("insert", char);
+    //if (!pressing_control && char.length == 1) {
+    if (char.length == 1) {
+        let { r, c } = cursor;
+        let row_text = text.rows[r].el.textContent;
+        text.rows[r].el.textContent = row_text.slice(0, c).concat(char, row_text.slice(c));
+        //scroll_up();
+        //scroll_down();
+        cursor.update(r, c + 1, c + 1);
+    }
+}
+
+export default { backspace, del, enter, insert };

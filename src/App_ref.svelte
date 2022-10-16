@@ -25,9 +25,6 @@
             case "Control":
                 control_key_down();
                 break;
-            default:
-                insert(e.key);
-                break;
         }
     }
     function handle_key_up(e) {
@@ -35,19 +32,7 @@
         if (e.key == "Shift") shift_key_up();
         if (e.key == "Control") control_key_up();
     }
-    function insert(char) {
-        //console.log("insert", char);
-        if (!pressing_control && char.length == 1) {
-            let { r, c } = cursor;
-            let new_rows = [...rows];
-            new_rows[r].text = new_rows[r].text.slice(0, c).concat(char, new_rows[r].text.slice(c));
-            cursor = { r, c: c + 1 };
-            rows = new_rows;
-            scroll_up();
-            scroll_down();
-            //caret_update(r, c);
-        }
-    }
+
     function shift_key_down() {
         if (!pressing_shift) pressing_shift = true;
     }
@@ -63,14 +48,5 @@
 </script>
 
 <!--<svelte:window
-  on:keydown|preventDefault={handle_key_down}
-  on:keyup|preventDefault={handle_key_up}
   use:wheel={true}
 />-->
-<!-- <div class="selection_parent" style={`top: ${-scrollTop}px;`} > -->
-
-<main bind:this={main}>
-    <div class="selection_parent">
-        <!--<div class="highlighted_row" bind:this={highlighted_row} />-->
-    </div>
-</main>

@@ -26,7 +26,7 @@ function down(e, cursor, text) {
             edit.enter(cursor, text);
             break;
         default:
-            //insert(e.key);
+            edit.insert(e.key, cursor, text);
             break;
     }
 }
