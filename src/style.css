@@ -28,13 +28,15 @@ div {
   position: relative;
   padding: 0px;
   margin: 0px;
-  white-space:nowrap;
 }
 #text {
   position: absolute;
   top: 0px;
   left: 100px;
   z-index: 200;
+}
+#text div {
+  white-space:pre;
 }
 .selection{
   z-index: -1;

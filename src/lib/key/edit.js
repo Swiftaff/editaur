@@ -84,7 +84,7 @@ function enter(cursor, text) {
 }
 
 function insert(char, cursor, text) {
-    console.log("insert", char);
+    //console.log("insert", char);
     //if (!pressing_control && char.length == 1) {
     if (char.length == 1) {
         let { r, c } = cursor;
