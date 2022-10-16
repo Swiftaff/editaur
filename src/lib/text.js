@@ -6,6 +6,7 @@ function init(imported_rows, cursor) {
         let el = document.createElement("div");
         el.innerHTML = text;
         el.style.width = Math.ceil(cursor.w * text.length) + "px";
+        el.style.height = "1.2rem";
         //el.style["background-color"] = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
         //    Math.random() * 255
         //}, 0.2)`;
