@@ -28,12 +28,6 @@
             case "Enter":
                 enter();
                 break;
-            case "Delete":
-                del();
-                break;
-            case "Backspace":
-                backspace();
-                break;
             default:
                 insert(e.key);
                 break;
@@ -56,53 +50,6 @@
             scroll_down();
             //caret_update(r, c);
         }
-    }
-    function backspace() {
-        //console.log("Backspace");
-        let { r, c } = cursor;
-        let new_rows = [...rows];
-        if (c == 0) {
-            //console.log("start of line");
-            if (r > 0) {
-                cursor = { r: r - 1, c: new_rows[r - 1].text.length };
-                new_rows[r - 1].text = new_rows[r - 1].text.concat(new_rows[r].text);
-                new_rows.splice(r, 1);
-            }
-        } else if (c == rows[r].text.length) {
-            //console.log("eol");
-            new_rows[r].text = new_rows[r].text.slice(0, c - 1).concat(new_rows[r].text.slice(c));
-            cursor = { r, c: c - 1 };
-        } else {
-            //console.log("mid line");
-            new_rows[r].text = new_rows[r].text.slice(0, c - 1).concat(new_rows[r].text.slice(c));
-            cursor = { r, c: c - 1 };
-        }
-        rows = new_rows;
-        scroll_up();
-        scroll_down();
-        //caret_update(r, c);
-    }
-    function del() {
-        //console.log("Delete");
-        let { r, c } = cursor;
-        let new_rows = [...rows];
-        if (c == 0) {
-            //console.log("start of line");
-            new_rows[r].text = new_rows[r].text.slice(c + 1);
-        } else if (c == rows[r].text.length) {
-            //console.log("eol");
-            if (new_rows.length > r + 1) {
-                new_rows[r].text = new_rows[r].text.concat(new_rows[r + 1].text);
-                new_rows.splice(r + 1, 1);
-            }
-        } else {
-            //console.log("mid line");
-            new_rows[r].text = new_rows[r].text.slice(0, c).concat(new_rows[r].text.slice(c + 1));
-        }
-        rows = new_rows;
-        scroll_up();
-        scroll_down();
-        //caret_update(r, c);
     }
     function enter() {
         //console.log("Enter");

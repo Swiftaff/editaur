@@ -19,6 +19,9 @@ function down(e, cursor, text) {
         case "Backspace":
             edit.backspace(cursor, text);
             break;
+        case "Delete":
+            edit.del(cursor, text);
+            break;
         default:
             //insert(e.key);
             break;
