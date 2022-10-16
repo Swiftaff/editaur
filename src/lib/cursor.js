@@ -54,7 +54,7 @@ function init() {
         main: document.getElementsByTagName("main")[0],
         selection: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
         update_from_mouse(e, text) {
-            if (this.selection.active) {
+            if (this.selection.active && this.multiple_clicks < 2) {
                 this.scrolling_update(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
                 this.update(r, c, c);
@@ -84,60 +84,68 @@ function init() {
                 this.selection = { start: { r, c }, end: { r, c }, active: true };
                 this.update_from_mouse(e, text);
                 text.selection_reset();
-
-                this.multiple_clicks = this.multiple_clicks + 1;
-                this.multiple_clicks_reset();
-                let row_text = text.rows[this.r].el.textContent;
-                if (this.multiple_clicks === 3) {
-                    //console.log("multiple_clicks3", this.multiple_clicks);
-                    this.selection = {
-                        start: { r: this.r, c: 0 },
-                        end: { r: this.r, c: row_text.length },
-                        active: true,
-                    };
-                    let c = row_text.length;
-                    this.update(this.r, c, c);
-                    text.selection_update(this);
-                } else if (this.multiple_clicks === 2) {
-                    //console.log("multiple_clicks2", this.multiple_clicks);
-
-                    if (this.c > 0 && this.c < row_text.length) {
-                        let left_char = row_text.substring(this.c - 1, this.c);
-                        let right_char = row_text.slice(this.c, this.c + 1);
-                        if (left_char !== " " && right_char !== " ") {
-                            let left = row_text.slice(0, this.c);
-                            let left_split = 0;
-                            for (let index = this.c - 1; index >= 0; index--) {
-                                let char = left[index];
-                                if (left_split === 0 && char == " ") {
-                                    left_split = index + 1;
-                                    break;
-                                }
+                this.handle_multiple_clicks(text);
+                //if (this.selection.active || this.multiple_clicks > 1) {
+                text.highlight_none();
+                //} else {
+                //    text.high
+                //}
+            }
+        },
+        handle_multiple_clicks(text) {
+            this.multiple_clicks = this.multiple_clicks + 1;
+            this.multiple_clicks_reset();
+            let row_text = text.rows[this.r].el.textContent;
+            if (this.multiple_clicks === 3) {
+                //console.log("multiple_clicks3", this.multiple_clicks);
+                this.selection = {
+                    start: { r: this.r, c: 0 },
+                    end: { r: this.r, c: row_text.length },
+                    active: true,
+                };
+                let c = row_text.length;
+                this.update(this.r, c, c);
+                text.selection_update(this);
+            } else if (this.multiple_clicks === 2) {
+                //console.log("multiple_clicks2", this.multiple_clicks);
+                if (this.c > 0 && this.c < row_text.length) {
+                    let left_char = row_text.substring(this.c - 1, this.c);
+                    let right_char = row_text.slice(this.c, this.c + 1);
+                    if (left_char !== " " && right_char !== " ") {
+                        let left = row_text.slice(0, this.c);
+                        let left_split = 0;
+                        for (let index = this.c - 1; index >= 0; index--) {
+                            let char = left[index];
+                            if (left_split === 0 && char == " ") {
+                                left_split = index + 1;
+                                break;
                             }
-                            let right = row_text.slice(this.c);
-                            let right_split = right.length - 1;
-                            for (let index = 0; index < right.length - 1; index++) {
-                                let char = right[index];
-                                if (right_split === right.length - 1 && char == " ") {
-                                    right_split = index;
-                                    break;
-                                }
-                            }
-                            this.selection = {
-                                start: { r: this.r, c: left_split },
-                                end: { r: this.r, c: this.c + right_split },
-                                active: true,
-                            };
-                            let c = this.c + right_split;
-                            this.update(this.r, c, c);
-                            text.selection_update(this);
                         }
+                        let right = row_text.slice(this.c);
+                        let right_split = right.length - 1;
+                        for (let index = 0; index < right.length - 1; index++) {
+                            let char = right[index];
+                            if (right_split === right.length - 1 && char == " ") {
+                                right_split = index;
+                                break;
+                            }
+                        }
+                        this.selection = {
+                            start: { r: this.r, c: left_split },
+                            end: { r: this.r, c: this.c + right_split },
+                            active: true,
+                        };
+                        let c = this.c + right_split;
+                        this.update(this.r, c, c);
+                        text.selection_update(this);
                     }
                 }
             }
         },
-        selection_stop() {
+        selection_stop(text) {
             this.selection.active = false;
+            if (this.selection.start.c === this.selection.end.c && this.selection.start.r === this.selection.end.r)
+                text.highlight_row(this);
         },
         multiple_clicks_reset() {
             setTimeout(() => {
@@ -148,7 +156,7 @@ function init() {
             let scrollTop = this.main.scrollTop;
             let scrollLeft = this.main.scrollLeft;
             let c = Math.floor((e.clientX - this.text_left + this.w_overlap + scrollLeft) / this.w);
-            let r = Math.floor((e.clientY - this.text_top + scrollTop) / this.h);
+            let r = Math.floor((e.clientY - this.text_top + scrollTop - 7) / this.h);
             if (r < 0) r = 0;
             if (r > text.rows.length - 1) r = text.rows.length - 1;
             if (c > text.rows[r].el.textContent.length - 1) c = text.rows[r].el.textContent.length;

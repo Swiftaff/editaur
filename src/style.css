@@ -47,6 +47,9 @@ div {
   width: 0px;
   height: 1.2rem;
 }
+.highlighted{
+  background-color: rgba(200,200,200,0.5);
+}
 #benchmark {
   opacity: 1;
   position: absolute;

@@ -46,8 +46,7 @@ function init(imported_rows, cursor) {
         },
         get_new_row(text_content, cursor, testy) {
             let el = document.createElement("div");
-            el.textContent = text_content;
-            el.style.width = Math.ceil(cursor.w * text_content.length) + "px";
+            this.update_text(el, text_content);
             el.style.height = "1.2rem";
             if (testy) {
                 el.style["background-color"] = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
@@ -64,11 +63,24 @@ function init(imported_rows, cursor) {
                 select,
             };
         },
+        update_text(el, text_content) {
+            el.textContent = text_content;
+            el.style.width = Math.ceil(cursor.w * text_content.length) + "px";
+        },
         selection_update_one_row(r, c_start, c_end, c_width) {
             let width = Math.abs(c_end - c_start);
             let start = c_start < c_end ? c_start : c_end;
             this.rows[r].select.style.left = Math.floor(start * c_width) + "px";
             this.rows[r].select.style.width = Math.floor(width * c_width) + "px";
+        },
+        highlight_row(cursor) {
+            this.highlight_none();
+            this.rows[cursor.r].el.className = "highlighted";
+        },
+        highlight_none() {
+            this.rows.forEach((row) => {
+                row.el.className = "";
+            });
         },
     };
     if (!imported_rows.length) {
