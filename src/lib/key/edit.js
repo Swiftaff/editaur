@@ -96,4 +96,12 @@ function insert(char, cursor, text) {
     }
 }
 
-export default { backspace, del, enter, insert };
+function shift_key_down(cursor) {
+    if (!cursor.pressing_shift) cursor.pressing_shift = true;
+}
+
+function shift_key_up(cursor) {
+    if (cursor.pressing_shift) cursor.pressing_shift = false;
+}
+
+export default { backspace, del, enter, insert, shift_key_down, shift_key_up };

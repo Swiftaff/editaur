@@ -25,10 +25,22 @@ function down(e, cursor, text) {
         case "Enter":
             edit.enter(cursor, text);
             break;
+        case "Shift":
+            edit.shift_key_down(cursor);
+            break;
         default:
             edit.insert(e.key, cursor, text);
             break;
     }
 }
 
-export default { down };
+function up(e, cursor, text) {
+    e.preventDefault();
+    switch (e.key) {
+        case "Shift":
+            edit.shift_key_up(cursor);
+            break;
+    }
+}
+
+export default { down, up };

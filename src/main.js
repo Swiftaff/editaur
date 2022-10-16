@@ -14,5 +14,6 @@ export default (function main() {
     window.onmousemove = (e) => cursor.update_from_mouse(e, text);
     window.onmouseup = () => cursor.selection_stop();
     window.onkeydown = (e) => key.down(e, cursor, text);
+    window.onkeyup = (e) => key.up(e, cursor, text);
     //debug.cursor_move_right(cursor, 1234);
 })();

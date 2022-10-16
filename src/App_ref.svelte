@@ -19,9 +19,6 @@
     function handle_key_down(e) {
         //console.log("key:", e.key);
         switch (e.key) {
-            case "Shift":
-                shift_key_down();
-                break;
             case "Control":
                 control_key_down();
                 break;
@@ -29,15 +26,7 @@
     }
     function handle_key_up(e) {
         //console.log("key:", e.key);
-        if (e.key == "Shift") shift_key_up();
         if (e.key == "Control") control_key_up();
-    }
-
-    function shift_key_down() {
-        if (!pressing_shift) pressing_shift = true;
-    }
-    function shift_key_up() {
-        pressing_shift = false;
     }
     function control_key_down() {
         if (!pressing_control) pressing_control = true;

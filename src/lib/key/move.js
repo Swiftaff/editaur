@@ -16,8 +16,13 @@ function arrow_down(cursor, text) {
         previous_c = ret.previous_c;
     }
     cursor.update(r, c, previous_c);
-    cursor.selection_stop();
-    text.selection_reset();
+    if (cursor.pressing_shift) {
+        cursor.selection.end = { r, c };
+        text.selection_update(cursor);
+    } else {
+        cursor.selection_stop();
+        text.selection_reset();
+    }
 }
 
 function arrow_up(cursor, text) {
@@ -36,8 +41,13 @@ function arrow_up(cursor, text) {
         previous_c = ret.previous_c;
     }
     cursor.update(r, c, previous_c);
-    cursor.selection_stop();
-    text.selection_reset();
+    if (cursor.pressing_shift) {
+        cursor.selection.end = { r, c };
+        text.selection_update(cursor);
+    } else {
+        cursor.selection_stop();
+        text.selection_reset();
+    }
 }
 
 function arrow_left(cursor, text) {
@@ -51,8 +61,13 @@ function arrow_left(cursor, text) {
         previous_c = 0;
     }
     cursor.update(r, c, previous_c);
-    cursor.selection_stop();
-    text.selection_reset();
+    if (cursor.pressing_shift) {
+        cursor.selection.end = { r, c };
+        text.selection_update(cursor);
+    } else {
+        cursor.selection_stop();
+        text.selection_reset();
+    }
 }
 
 function arrow_right(cursor, text) {
@@ -66,8 +81,13 @@ function arrow_right(cursor, text) {
         previous_c = 0;
     }
     cursor.update(r, c, previous_c);
-    cursor.selection_stop();
-    text.selection_reset();
+    if (cursor.pressing_shift) {
+        cursor.selection.end = { r, c };
+        text.selection_update(cursor);
+    } else {
+        cursor.selection_stop();
+        text.selection_reset();
+    }
 }
 
 function move_caret_to_eol_if_shorter_than_previous(r, c, previous_c, len) {

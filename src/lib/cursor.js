@@ -6,6 +6,7 @@ function init() {
         c: 0,
         previous_c: 0,
         flash: null,
+        pressing_shift: false,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
         update(r, c, previous_c) {
@@ -86,7 +87,7 @@ function init() {
             }
         },
         selection_stop() {
-            this.selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
+            this.selection.active = false;
         },
         get_rc_from_mouse(e, text) {
             let scrollTop = this.main.scrollTop;
