@@ -1,7 +1,7 @@
 import move from "./move.js";
 import edit from "./edit.js";
 
-async function down(e, cursor, text) {
+function down(e, cursor, text) {
     e.preventDefault();
     switch (e.key) {
         case "ArrowDown":
@@ -34,21 +34,11 @@ async function down(e, cursor, text) {
         default:
             if (cursor.pressing_control) {
                 switch (e.key) {
+                    case "c":
+                        edit.copy(cursor, text);
+                        break;
                     case "v":
-                        let clip = await navigator.clipboard.readText();
-                        let split = clip.split("\r\n");
-                        if (split.length > 1) {
-                            split.forEach((new_row, i) => {
-                                edit.insert(new_row, cursor, text);
-                                if (i < split.length - 1) {
-                                    edit.enter(cursor, text);
-                                }
-                            });
-                        } else {
-                            edit.insert(clip, cursor, text);
-                        }
-                        console.log("paste", split, text);
-
+                        edit.paste(cursor, text);
                         break;
                 }
             } else {

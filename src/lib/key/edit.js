@@ -112,4 +112,65 @@ function control_key_up(cursor) {
     if (cursor.pressing_control) cursor.pressing_control = false;
 }
 
-export default { backspace, del, enter, insert, shift_key_down, shift_key_up, control_key_down, control_key_up };
+async function paste(cursor, text) {
+    console.log(paste);
+    let clip = await navigator.clipboard.readText();
+    let split = clip.split("\r\n");
+    if (split.length > 1) {
+        split.forEach((new_row, i) => {
+            insert(new_row, cursor, text);
+            if (i < split.length - 1) {
+                enter(cursor, text);
+            }
+        });
+    } else {
+        insert(clip, cursor, text);
+    }
+}
+
+async function copy(cursor, text) {
+    let no_selection =
+        cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
+    let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
+    if (no_selection) {
+        console.log("copy whole line if no selection");
+        let cut_text = text.rows[cursor.selection.start.r].textContent;
+        await navigator.clipboard.writeText(cut_text);
+    } else if (single_line_selection) {
+        console.log("single line");
+        let start = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.start : cursor.selection.end;
+        let end = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.end : cursor.selection.start;
+        let cut_text = text.rows[start.r].textContent.slice(start.c, end.c);
+        await navigator.clipboard.writeText(cut_text);
+    } else {
+        //multi-line
+        console.log("multi-line");
+        let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
+        let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
+        let cut_text = "";
+
+        for (let index = start.r; index <= end.r; index++) {
+            if (index === end.r) {
+                cut_text += text.rows[index].textContent.slice(0, end.c);
+            } else if (index === start.r) {
+                cut_text += text.rows[index].textContent.slice(start.c, text.rows[index].textContent.length) + "\r\n";
+            } else {
+                cut_text += text.rows[index].textContent + "\r\n";
+            }
+        }
+        await navigator.clipboard.writeText(cut_text);
+    }
+}
+
+export default {
+    backspace,
+    del,
+    enter,
+    insert,
+    shift_key_down,
+    shift_key_up,
+    control_key_down,
+    control_key_up,
+    copy,
+    paste,
+};
