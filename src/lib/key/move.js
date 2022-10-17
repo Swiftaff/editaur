@@ -16,6 +16,7 @@ function arrow_down(cursor, text) {
         previous_c = ret.previous_c;
     }
     cursor.update(r, c, previous_c);
+    text.highlight_row(cursor);
     if (cursor.pressing_shift) {
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
@@ -41,6 +42,7 @@ function arrow_up(cursor, text) {
         previous_c = ret.previous_c;
     }
     cursor.update(r, c, previous_c);
+    text.highlight_row(cursor);
     if (cursor.pressing_shift) {
         cursor.selection.end = { r, c };
         text.selection_update(cursor);

@@ -74,11 +74,18 @@ function init(imported_rows, cursor) {
         },
         highlight_row(cursor) {
             this.highlight_none();
-            this.rows[cursor.r].className = "highlighted";
+            if (
+                cursor.selection.start.r !== cursor.selection.end.r ||
+                cursor.selection.start.c === cursor.selection.end.c
+            ) {
+                this.rows[cursor.r].className = "highlighted";
+                this.rows[cursor.r].style.width = "100%";
+            }
         },
         highlight_none() {
             this.rows.forEach((row) => {
                 row.className = "";
+                row.style.width = Math.ceil(cursor.w * row.textContent.length) + "px";
             });
         },
     };
