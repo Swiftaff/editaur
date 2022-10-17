@@ -83,16 +83,16 @@ function enter(cursor, text) {
     //scroll_down();
 }
 
-function insert(char, cursor, text) {
+function insert(chars, cursor, text) {
     //console.log("insert", char);
     //if (!pressing_control && char.length == 1) {
-    if (char.length == 1) {
+    if (chars.length > 0) {
         let { r, c } = cursor;
         let row_text = text.rows[r].el.textContent;
-        text.update_text(text.rows[r].el, row_text.slice(0, c).concat(char, row_text.slice(c)));
+        text.update_text(text.rows[r].el, row_text.slice(0, c).concat(chars, row_text.slice(c)));
         //scroll_up();
         //scroll_down();
-        cursor.update(r, c + 1, c + 1);
+        cursor.update(r, c + chars.length, c + chars.length);
     }
 }
 
@@ -104,4 +104,12 @@ function shift_key_up(cursor) {
     if (cursor.pressing_shift) cursor.pressing_shift = false;
 }
 
-export default { backspace, del, enter, insert, shift_key_down, shift_key_up };
+function control_key_down(cursor) {
+    if (!cursor.pressing_control) cursor.pressing_control = true;
+}
+
+function control_key_up(cursor) {
+    if (cursor.pressing_control) cursor.pressing_control = false;
+}
+
+export default { backspace, del, enter, insert, shift_key_down, shift_key_up, control_key_down, control_key_up };

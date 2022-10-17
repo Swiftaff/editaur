@@ -7,6 +7,7 @@ function init() {
         previous_c: 0,
         flash: null,
         pressing_shift: false,
+        pressing_control: false,
         multiple_clicks: 0,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
