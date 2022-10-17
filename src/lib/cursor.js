@@ -156,7 +156,7 @@ function init() {
         get_rc_from_mouse(e, text) {
             let scrollTop = this.main.scrollTop;
             let scrollLeft = this.main.scrollLeft;
-            let c = Math.floor((e.clientX - this.text_left + this.w_overlap + scrollLeft) / this.w);
+            let c = Math.floor((e.clientX - this.text_left + scrollLeft + this.w_overlap - 7) / this.w);
             let r = Math.floor((e.clientY - this.text_top + scrollTop - 7) / this.h);
             if (r < 0) r = 0;
             if (r > text.rows.length - 1) r = text.rows.length - 1;
@@ -175,8 +175,12 @@ function get_char_dimensions() {
     benchmark.innerHTML = "<span>XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX</span>";
     const b = get_el_xywh(benchmark);
     benchmark.remove();
-    let w_overlap = b.w / 5 / 6;
-    return { w: b.w / 5, h: b.h / 5, w_overlap };
+    let num_Xs = 5;
+    let one_half_of_char_width = 0.5;
+    let w_overlap = (b.w / num_Xs) * one_half_of_char_width;
+    let w = b.w / num_Xs;
+    let h = b.h / num_Xs;
+    return { w, h, w_overlap };
 }
 
 function get_el_xywh(el) {
