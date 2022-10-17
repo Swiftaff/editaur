@@ -54,13 +54,8 @@ function init(imported_rows, cursor) {
                 }, 0.2)`;
             }
 
-            let select = document.createElement("div");
-            select.className = "selection";
-            el.append(select);
-
             return {
                 el,
-                select,
             };
         },
         update_text(el, text_content) {
@@ -68,10 +63,16 @@ function init(imported_rows, cursor) {
             el.style.width = Math.ceil(cursor.w * text_content.length) + "px";
         },
         selection_update_one_row(r, c_start, c_end, c_width) {
-            let width = Math.abs(c_end - c_start);
-            let start = c_start < c_end ? c_start : c_end;
-            this.rows[r].select.style.left = Math.floor(start * c_width) + "px";
-            this.rows[r].select.style.width = Math.floor(width * c_width) + "px";
+            if (c_start === 0 && c_end === 0) {
+                this.rows[r].el.style.background = "";
+            } else {
+                let start = Math.floor((c_start < c_end ? c_start : c_end) * c_width) + "px";
+                let end = Math.floor((c_start < c_end ? c_end : c_start) * c_width) + "px";
+                let bgnd = "rgba(255, 255, 255, 0)";
+                let highlight = "rgba(255, 0, 0, 1)";
+                let style = `linear-gradient(90deg, ${bgnd} ${start}, ${highlight} ${start}, ${highlight} ${end}, ${bgnd} ${end})`;
+                this.rows[r].el.style.background = style;
+            }
         },
         highlight_row(cursor) {
             this.highlight_none();
