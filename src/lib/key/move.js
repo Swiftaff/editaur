@@ -20,7 +20,7 @@ function arrow_down(cursor, text) {
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
-        cursor.selection_stop();
+        cursor.selection_stop(text);
         text.selection_reset();
     }
 }
@@ -45,7 +45,7 @@ function arrow_up(cursor, text) {
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
-        cursor.selection_stop();
+        cursor.selection_stop(text);
         text.selection_reset();
     }
 }
@@ -65,7 +65,7 @@ function arrow_left(cursor, text) {
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
-        cursor.selection_stop();
+        cursor.selection_stop(text);
         text.selection_reset();
     }
 }
@@ -85,7 +85,7 @@ function arrow_right(cursor, text) {
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
-        cursor.selection_stop();
+        cursor.selection_stop(text);
         text.selection_reset();
     }
 }
