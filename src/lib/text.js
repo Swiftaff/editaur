@@ -61,7 +61,7 @@ function init(imported_rows, cursor) {
             el.style.width = Math.ceil(cursor.w * text_content.length) + "px";
         },
         selection_update_one_row(r, c_start, c_end, c_width) {
-            if (c_start === 0 && c_end === 0) {
+            if ((c_start === 0 && c_end === 0) || c_start === c_end) {
                 this.rows[r].style.background = "";
             } else {
                 let start = Math.floor((c_start < c_end ? c_start : c_end) * c_width) + "px";

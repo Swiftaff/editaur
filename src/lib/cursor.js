@@ -86,11 +86,7 @@ function init() {
                 this.update_from_mouse(e, text);
                 text.selection_reset();
                 this.handle_multiple_clicks(text);
-                //if (this.selection.active || this.multiple_clicks > 1) {
-                text.highlight_none();
-                //} else {
-                //    text.high
-                //}
+                text.highlight_row(this);
             }
         },
         handle_multiple_clicks(text) {
@@ -145,8 +141,6 @@ function init() {
         },
         selection_stop(text) {
             this.selection.active = false;
-            if (this.selection.start.c === this.selection.end.c && this.selection.start.r === this.selection.end.r)
-                text.highlight_row(this);
         },
         multiple_clicks_reset() {
             setTimeout(() => {
