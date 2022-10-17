@@ -96,7 +96,7 @@ function init() {
         handle_multiple_clicks(text) {
             this.multiple_clicks = this.multiple_clicks + 1;
             this.multiple_clicks_reset();
-            let row_text = text.rows[this.r].el.textContent;
+            let row_text = text.rows[this.r].textContent;
             if (this.multiple_clicks === 3) {
                 //console.log("multiple_clicks3", this.multiple_clicks);
                 this.selection = {
@@ -160,7 +160,7 @@ function init() {
             let r = Math.floor((e.clientY - this.text_top + scrollTop - 7) / this.h);
             if (r < 0) r = 0;
             if (r > text.rows.length - 1) r = text.rows.length - 1;
-            if (c > text.rows[r].el.textContent.length - 1) c = text.rows[r].el.textContent.length;
+            if (c > text.rows[r].textContent.length - 1) c = text.rows[r].textContent.length;
             if (c < 0) c = 0;
             return { r, c };
         },

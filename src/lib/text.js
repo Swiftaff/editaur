@@ -17,7 +17,7 @@ function init(imported_rows, cursor) {
                     // TODO allow for screen scrolling up/down
                     // TODO allow for screen scrolling left/right
                     let this_row = cursor.selection.start.r + (reverse_direction ? -index : index);
-                    let this_row_length = this.rows[this_row].el.textContent.length;
+                    let this_row_length = this.rows[this_row].textContent.length;
                     let first_row = reverse_direction ? index === num_rows : index === 0;
                     let last_row = reverse_direction ? index === 0 : index === num_rows;
                     let start = cursor.selection.start.c;
@@ -54,9 +54,7 @@ function init(imported_rows, cursor) {
                 }, 0.2)`;
             }
 
-            return {
-                el,
-            };
+            return el;
         },
         update_text(el, text_content) {
             el.textContent = text_content;
@@ -64,23 +62,23 @@ function init(imported_rows, cursor) {
         },
         selection_update_one_row(r, c_start, c_end, c_width) {
             if (c_start === 0 && c_end === 0) {
-                this.rows[r].el.style.background = "";
+                this.rows[r].style.background = "";
             } else {
                 let start = Math.floor((c_start < c_end ? c_start : c_end) * c_width) + "px";
                 let end = Math.floor((c_start < c_end ? c_end : c_start) * c_width) + "px";
                 let bgnd = "rgba(255, 255, 255, 0)";
                 let highlight = "rgba(255, 0, 0, 1)";
                 let style = `linear-gradient(90deg, ${bgnd} ${start}, ${highlight} ${start}, ${highlight} ${end}, ${bgnd} ${end})`;
-                this.rows[r].el.style.background = style;
+                this.rows[r].style.background = style;
             }
         },
         highlight_row(cursor) {
             this.highlight_none();
-            this.rows[cursor.r].el.className = "highlighted";
+            this.rows[cursor.r].className = "highlighted";
         },
         highlight_none() {
             this.rows.forEach((row) => {
-                row.el.className = "";
+                row.className = "";
             });
         },
     };
@@ -90,7 +88,7 @@ function init(imported_rows, cursor) {
     imported_rows.forEach((text_content) => {
         let text_div = document.getElementById("text");
         let row = obj.get_new_row(text_content, cursor);
-        text_div.append(row.el);
+        text_div.append(row);
         obj.rows.push(row);
     });
     return obj;
