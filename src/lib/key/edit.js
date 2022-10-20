@@ -12,6 +12,7 @@ function backspace(cursor, text) {
             text.rows[r].remove();
             text.rows.splice(r, 1);
             cursor.update(r2, c2, c2);
+            text.highlight_row(cursor);
         }
     } else if (at_end_of_line) {
         text.update_text(text.rows[r], row_text.slice(0, c - 1));
@@ -70,6 +71,7 @@ function enter(cursor, text) {
         text_div.insertBefore(new_row, text.rows[r + 1]);
         text.rows.splice(r + 1, 0, new_row);
         cursor.update(r + 1, 0, 0);
+        text.highlight_row(cursor);
     } else {
         //mid-line
         let first_half = row_text.substring(0, c);
@@ -79,12 +81,12 @@ function enter(cursor, text) {
         text_div.insertBefore(new_row, text.rows[r + 1]);
         text.rows.splice(r + 1, 0, new_row);
         cursor.update(r + 1, 0, 0);
+        text.highlight_row(cursor);
     }
     //scroll_down();
 }
 
 function insert(chars, cursor, text) {
-    //console.log("insert", char);
     //if (!pressing_control && char.length == 1) {
     if (chars.length > 0) {
         let { r, c } = cursor;
@@ -113,7 +115,6 @@ function control_key_up(cursor) {
 }
 
 async function paste(cursor, text) {
-    console.log(paste);
     let clip = await navigator.clipboard.readText();
     let split = clip.split("\r\n");
     if (split.length > 1) {
@@ -133,18 +134,15 @@ async function copy(cursor, text) {
         cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
     let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
     if (no_selection) {
-        console.log("copy whole line if no selection");
         let cut_text = text.rows[cursor.selection.start.r].textContent;
         await navigator.clipboard.writeText(cut_text);
     } else if (single_line_selection) {
-        console.log("single line");
         let start = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.end : cursor.selection.start;
         let cut_text = text.rows[start.r].textContent.slice(start.c, end.c);
         await navigator.clipboard.writeText(cut_text);
     } else {
         //multi-line
-        console.log("multi-line");
         let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
         let cut_text = "";
@@ -162,6 +160,37 @@ async function copy(cursor, text) {
     }
 }
 
+function tab_in(cursor, text) {
+    let no_selection =
+        cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
+    let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
+    if (no_selection) {
+        insert(" ".repeat(text.tab_spaces), cursor, text);
+    } else if (single_line_selection) {
+        //replace selection
+        let start = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.start : cursor.selection.end;
+        let end = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.end : cursor.selection.start;
+        let left = text.rows[start.r].textContent.slice(0, start.c);
+        let right = text.rows[start.r].textContent.slice(end.c);
+        text.update_text(text.rows[start.r], left + " ".repeat(text.tab_spaces) + right);
+        text.selection_reset();
+        cursor.selection_reset();
+        cursor.update(start.r, start.c + 4, start.c + 4);
+        //text.selection_update(cursor);
+    } else {
+        //multi-line
+        let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
+        let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
+        for (let index = start.r; index <= end.r; index++) {
+            text.rows[index].textContent = " ".repeat(text.tab_spaces) + text.rows[index].textContent;
+        }
+        cursor.selection.start.c = start.c + text.tab_spaces;
+        cursor.selection.end.c = end.c + text.tab_spaces;
+        cursor.update(end.r, end.c, end.c);
+        //text.selection_update(cursor);
+    }
+}
+
 export default {
     backspace,
     del,
@@ -173,4 +202,5 @@ export default {
     control_key_up,
     copy,
     paste,
+    tab_in,
 };

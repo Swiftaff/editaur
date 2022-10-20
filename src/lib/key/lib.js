@@ -31,6 +31,9 @@ function down(e, cursor, text) {
         case "Control":
             edit.control_key_down(cursor);
             break;
+        case "Tab":
+            edit.tab_in(cursor, text);
+            break;
         default:
             if (cursor.pressing_control) {
                 switch (e.key) {

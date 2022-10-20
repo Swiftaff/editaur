@@ -68,6 +68,7 @@ function arrow_left(cursor, text) {
         text.selection_update(cursor);
     } else {
         cursor.selection_stop(text);
+        cursor.selection_reset_to_cursor();
         text.selection_reset();
     }
 }
@@ -88,6 +89,7 @@ function arrow_right(cursor, text) {
         text.selection_update(cursor);
     } else {
         cursor.selection_stop(text);
+        cursor.selection_reset_to_cursor();
         text.selection_reset();
     }
 }

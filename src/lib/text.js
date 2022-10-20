@@ -1,6 +1,7 @@
 function init(imported_rows, cursor) {
     let obj = {
         rows: [],
+        tab_spaces: 4,
         selection_reset() {
             this.rows.forEach((_row, r) => {
                 this.selection_update_one_row(r, 0, 0, 0);
@@ -13,7 +14,7 @@ function init(imported_rows, cursor) {
             if (num_rows === 0) {
                 this.selection_update_one_row(cursor.r, cursor.selection.start.c, cursor.c, cursor.w);
             } else {
-                for (let index = 0; index < num_rows + 1; index++) {
+                for (let index = 0; index <= num_rows; index++) {
                     // TODO allow for screen scrolling up/down
                     // TODO allow for screen scrolling left/right
                     let this_row = cursor.selection.start.r + (reverse_direction ? -index : index);
@@ -74,13 +75,8 @@ function init(imported_rows, cursor) {
         },
         highlight_row(cursor) {
             this.highlight_none();
-            if (
-                cursor.selection.start.r !== cursor.selection.end.r ||
-                cursor.selection.start.c === cursor.selection.end.c
-            ) {
-                this.rows[cursor.r].className = "highlighted";
-                this.rows[cursor.r].style.width = "100%";
-            }
+            this.rows[cursor.r].className = "highlighted";
+            this.rows[cursor.r].style.width = "100%";
         },
         highlight_none() {
             this.rows.forEach((row) => {

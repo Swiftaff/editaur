@@ -8,6 +8,8 @@ function init() {
         flash: null,
         pressing_shift: false,
         pressing_control: false,
+        pressing_mouseleft: false,
+        pressing_mouseright: false,
         multiple_clicks: 0,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
@@ -54,13 +56,17 @@ function init() {
         },
         main: document.getElementsByTagName("main")[0],
         selection: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
+        selection_reset() {
+            this.selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
+        },
         update_from_mouse(e, text) {
             if (this.selection.active && this.multiple_clicks < 2) {
                 this.scrolling_update(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
-                this.update(r, c, c);
+                this.update(r, c);
                 this.selection.end = { r, c };
                 text.selection_update(this);
+                text.highlight_row(this);
             }
         },
         mouse_is_inside_scrollbars(e) {
@@ -78,23 +84,44 @@ function init() {
         mouse_is_offscreen_bottom(e) {
             return e.clientY >= this.main.offsetHeight - 40;
         },
+        selection_in_progress() {
+            return this.selection.start.r !== this.selection.end.r || this.selection.start.c !== this.selection.end.c;
+        },
+        selection_reset_to_cursor(optional_bool = null) {
+            this.selection = {
+                start: { r: this.r, c: this.c },
+                end: { r: this.r, c: this.c },
+                active: optional_bool !== null ? optional_bool : this.selection.active,
+            };
+        },
         selection_start(e, text) {
+            this.pressing_mouseleft = true;
             if (this.mouse_is_inside_scrollbars(e)) {
                 this.scrolling_reset(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
-                this.selection = { start: { r, c }, end: { r, c }, active: true };
-                this.update_from_mouse(e, text);
-                text.selection_reset();
+                this.update(r, c);
+
+                if (this.pressing_shift) {
+                    this.selection = { start: this.selection.start, end: { r: this.r, c: this.c }, active: true };
+                    text.selection_update(this);
+                } else {
+                    this.selection_reset_to_cursor(true);
+                    text.selection_reset();
+                    text.highlight_row(this);
+                }
                 this.handle_multiple_clicks(text);
-                text.highlight_row(this);
             }
+        },
+        selection_stop(text) {
+            this.pressing_mouseleft = false;
+            this.selection = { start: this.selection.start, end: { r: this.r, c: this.c }, active: false };
+            text.highlight_row(this);
         },
         handle_multiple_clicks(text) {
             this.multiple_clicks = this.multiple_clicks + 1;
             this.multiple_clicks_reset();
             let row_text = text.rows[this.r].textContent;
             if (this.multiple_clicks === 3) {
-                //console.log("multiple_clicks3", this.multiple_clicks);
                 this.selection = {
                     start: { r: this.r, c: 0 },
                     end: { r: this.r, c: row_text.length },
@@ -104,7 +131,6 @@ function init() {
                 this.update(this.r, c, c);
                 text.selection_update(this);
             } else if (this.multiple_clicks === 2) {
-                //console.log("multiple_clicks2", this.multiple_clicks);
                 if (this.c > 0 && this.c < row_text.length) {
                     let left_char = row_text.substring(this.c - 1, this.c);
                     let right_char = row_text.slice(this.c, this.c + 1);
@@ -138,9 +164,6 @@ function init() {
                     }
                 }
             }
-        },
-        selection_stop(text) {
-            this.selection.active = false;
         },
         multiple_clicks_reset() {
             setTimeout(() => {
