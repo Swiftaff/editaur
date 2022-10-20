@@ -176,7 +176,7 @@ function tab_in(cursor, text) {
         text.selection_reset();
         cursor.selection_reset();
         cursor.update(start.r, start.c + 4, start.c + 4);
-        //text.selection_update(cursor);
+        text.selection_update(cursor);
     } else {
         //multi-line
         let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
@@ -187,7 +187,7 @@ function tab_in(cursor, text) {
         cursor.selection.start.c = start.c + text.tab_spaces;
         cursor.selection.end.c = end.c + text.tab_spaces;
         cursor.update(end.r, end.c, end.c);
-        //text.selection_update(cursor);
+        text.selection_update(cursor);
     }
 }
 
