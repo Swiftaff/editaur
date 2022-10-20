@@ -2,6 +2,21 @@
 
 A simple javascript text editor, without using textarea or any dependencies - embedded in a tauri window to eventually allow file editing
 
+```
+⠀⠀⠀⠀⢀⣴⣿⣿⣿⣷⣄⠠⣤⣤⣤⣤⣤⣤⣄⣀⡀⠀⠀⠀  ⠀
+⠀⠀⠀⣀⣼⣿⡟⠉⡉⠻⣿⣷⣮⣿⣿⣿⣿⣿⣿⡿⠿⢷⣦⠀⠀⠀
+⠀⢠⣾⣿⣿⣿⣷⡀⣿⠀⣹⣿⣿⣿⣿⣿⣿⣿⣿⣇⠀⣸⣿⣧⠀⠀⠀
+⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀
+⢰⣿⣿⣿⣿⣿⣿⣍⠉⠿⠋⠹⠟⠛⢿⡿⢿⣿⠿⢿⡿⠻⠟⠀
+⢸⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠘⠁⠀⡿⠀⠘⠁⠀⠀⠀    e d i t a u r
+⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣴⣶⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣤⣤⣀⣠⡄⠀⠀⠀
+⠀⣿⣿⣿⣟⡿⣿⣿⣿⣿⣿⡿⠿⢿⣿⣿⣿⣿⣿⣿⠿⠃⠀⠀
+⠀⠘⣿⣿⣿⣿⣶⣶⣦⣤⣶⣶⣶⣆⠈⠉⠉⠉⠉⠁⠀⠀⠀⠀
+⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠙⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠄
+```
+
 ## Things editaur does:
 
 -   [x] clicking or arrowing to a row highlights it
