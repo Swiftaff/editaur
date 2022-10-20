@@ -24,16 +24,23 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] using left and right arrow or other cursor moving functions (e.g. paste) will reset this column starting point for future up down moves
 -   [x] copy selected text, including mulitline to the clipboard
 -   [x] paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)
+-   [x] tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original
 
-## Things editaur does not do yet to get to "table-stakes" for a basic text editor:
+## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
--   [-] WIP tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original
+-   [ ] shift-tabbing while a single or multiline select is active, will outdent the line by removing up to 4 spaces from the start of the line(s)
+-   [ ] Undo once
+-   [ ] Multiple Undo
 -   [ ] double & triple clicking while holding shift will extend selection
 -   [ ] using tab or paste into a selection will replace it
 -   [ ] cut text
 -   [ ] navigate folders and files
 -   [ ] open or save text files
 -   [ ] tabs for multiple files
+-   [ ] line numbers
+
+## Things editaur would like to do when it grows up:
+
 -   [ ] save favourite project locations
 -   [ ] code colouring
--   [ ] line numbers
+-   [ ] Multiple Undo with tree-based history?

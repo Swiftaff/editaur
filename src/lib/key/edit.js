@@ -181,7 +181,7 @@ function tab_in(cursor, text) {
         let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
         for (let index = start.r; index <= end.r; index++) {
-            text.rows[index].textContent = " ".repeat(text.tab_spaces) + text.rows[index].textContent;
+            text.update_text(text.rows[index], " ".repeat(text.tab_spaces) + text.rows[index].textContent);
         }
         cursor.selection.start.c = start.c + text.tab_spaces;
         cursor.selection.end.c = end.c + text.tab_spaces;
