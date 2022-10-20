@@ -1,5 +1,6 @@
 function init(imported_rows, cursor) {
     let obj = {
+        el: document.getElementById("text"),
         rows: [],
         tab_spaces: 4,
         selection_reset() {

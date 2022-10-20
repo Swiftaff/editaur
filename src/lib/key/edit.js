@@ -59,16 +59,15 @@ function enter(cursor, text) {
     let at_start_of_line = c === 0;
     let row_text = text.rows[r].textContent;
     let at_end_of_line = c === row_text.length;
-    let text_div = document.getElementById("text");
 
     if (at_start_of_line) {
         let new_row = text.get_new_row("", cursor);
-        text_div.insertBefore(new_row, text.rows[r]);
+        text.el.insertBefore(new_row, text.rows[r]);
         text.rows.splice(r, 0, new_row);
         cursor.update(r + 1, c, c);
     } else if (at_end_of_line) {
         let new_row = text.get_new_row("", cursor);
-        text_div.insertBefore(new_row, text.rows[r + 1]);
+        text.el.insertBefore(new_row, text.rows[r + 1]);
         text.rows.splice(r + 1, 0, new_row);
         cursor.update(r + 1, 0, 0);
         text.highlight_row(cursor);
@@ -78,7 +77,7 @@ function enter(cursor, text) {
         let second_half = row_text.substring(c, row_text.length);
         text.update_text(text.rows[r], first_half);
         let new_row = text.get_new_row(second_half, cursor);
-        text_div.insertBefore(new_row, text.rows[r + 1]);
+        text.el.insertBefore(new_row, text.rows[r + 1]);
         text.rows.splice(r + 1, 0, new_row);
         cursor.update(r + 1, 0, 0);
         text.highlight_row(cursor);
@@ -174,7 +173,7 @@ function tab_in(cursor, text) {
         let right = text.rows[start.r].textContent.slice(end.c);
         text.update_text(text.rows[start.r], left + " ".repeat(text.tab_spaces) + right);
         text.selection_reset();
-        cursor.selection_reset();
+        cursor.selection.reset();
         cursor.update(start.r, start.c + 4, start.c + 4);
         text.selection_update(cursor);
     } else {

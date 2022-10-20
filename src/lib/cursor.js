@@ -8,8 +8,6 @@ function init() {
         flash: null,
         pressing_shift: false,
         pressing_control: false,
-        pressing_mouseleft: false,
-        pressing_mouseright: false,
         multiple_clicks: 0,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
@@ -26,42 +24,20 @@ function init() {
                 this.el.className = "flashy";
             }, 100);
         },
-        scrolling: {
-            scroll_left: 0,
-            scroll_top: 0,
-            mouse_x: 0,
-            mouse_y: 0,
-        },
-        scrolling_reset(e) {
-            this.scrolling = {
-                scroll_left: this.main.scrollLeft,
-                scroll_top: this.main.scrollTop,
-                mouse_x: e.clientX,
-                mouse_y: e.clientY,
-            };
-        },
-        scrolling_update(e) {
-            if (this.mouse_is_offscreen_right(e) || this.mouse_is_offscreen_left(e)) {
-                let dx = e.clientX - this.scrolling.mouse_x;
-                let left = dx - this.scrolling.scroll_left;
-                this.main.scrollLeft = left;
-                this.scrolling.scroll_left = this.scrolling.scroll_left - dx / 10;
-            }
-            if (this.mouse_is_offscreen_bottom(e) || this.mouse_is_offscreen_top(e)) {
-                let dy = e.clientY - this.scrolling.mouse_y;
-                let top = dy - this.scrolling.scroll_top;
-                this.main.scrollTop = top;
-                this.scrolling.scroll_top = this.scrolling.scroll_top - dy / 10;
-            }
-        },
-        main: document.getElementsByTagName("main")[0],
-        selection: { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false },
-        selection_reset() {
-            this.selection = { start: { r: 0, c: 0 }, end: { r: 0, c: 0 }, active: false };
+        get_rc_from_mouse(e, text) {
+            let scrollTop = this.scrolling.main.scrollTop;
+            let scrollLeft = this.scrolling.main.scrollLeft;
+            let c = Math.floor((e.clientX - this.text_left + scrollLeft + this.w_overlap - 7) / this.w);
+            let r = Math.floor((e.clientY - this.text_top + scrollTop - 7) / this.h);
+            if (r < 0) r = 0;
+            if (r > text.rows.length - 1) r = text.rows.length - 1;
+            if (c > text.rows[r].textContent.length - 1) c = text.rows[r].textContent.length;
+            if (c < 0) c = 0;
+            return { r, c };
         },
         update_from_mouse(e, text) {
             if (this.selection.active && this.multiple_clicks < 2) {
-                this.scrolling_update(e);
+                this.scrolling.update(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
                 this.update(r, c);
                 this.selection.end = { r, c };
@@ -69,40 +45,73 @@ function init() {
                 text.highlight_row(this);
             }
         },
-        mouse_is_inside_scrollbars(e) {
-            return !this.mouse_is_offscreen_right(e) && !this.mouse_is_offscreen_bottom(e);
+        scrolling: {
+            main: document.getElementsByTagName("main")[0],
+            scroll_left: 0,
+            scroll_top: 0,
+            mouse_x: 0,
+            mouse_y: 0,
+            reset(e) {
+                this.scroll_left = this.main.scrollLeft;
+                this.scroll_top = this.main.scrollTop;
+                this.mouse_x = e.clientX;
+                this.mouse_y = e.clientY;
+            },
+            update(e) {
+                if (this.mouse_is_offscreen_right(e) || this.mouse_is_offscreen_left(e)) {
+                    let dx = e.clientX - this.mouse_x;
+                    let left = dx - this.scroll_left;
+                    this.main.scrollLeft = left;
+                    this.scroll_left = this.scroll_left - dx / 10;
+                }
+                if (this.mouse_is_offscreen_bottom(e) || this.mouse_is_offscreen_top(e)) {
+                    let dy = e.clientY - this.mouse_y;
+                    let top = dy - this.scroll_top;
+                    this.main.scrollTop = top;
+                    this.scroll_top = this.scroll_top - dy / 10;
+                }
+            },
+            mouse_is_offscreen_right(e) {
+                return e.clientX >= this.main.offsetWidth - 40;
+            },
+            mouse_is_offscreen_left(e) {
+                return e.clientX < 40;
+            },
+            mouse_is_offscreen_top(e) {
+                return e.clientY < 40;
+            },
+            mouse_is_offscreen_bottom(e) {
+                return e.clientY >= this.main.offsetHeight - 40;
+            },
+            mouse_is_inside_scrollbars(e) {
+                return !this.mouse_is_offscreen_right(e) && !this.mouse_is_offscreen_bottom(e);
+            },
         },
-        mouse_is_offscreen_left(e) {
-            return e.clientX < 40;
-        },
-        mouse_is_offscreen_right(e) {
-            return e.clientX >= this.main.offsetWidth - 40;
-        },
-        mouse_is_offscreen_top(e) {
-            return e.clientY < 40;
-        },
-        mouse_is_offscreen_bottom(e) {
-            return e.clientY >= this.main.offsetHeight - 40;
-        },
-        selection_in_progress() {
-            return this.selection.start.r !== this.selection.end.r || this.selection.start.c !== this.selection.end.c;
+        selection: {
+            start: { r: 0, c: 0 },
+            end: { r: 0, c: 0 },
+            active: false,
+            reset() {
+                this.start = { r: 0, c: 0 };
+                this.end = { r: 0, c: 0 };
+                this.active = false;
+            },
         },
         selection_reset_to_cursor(optional_bool = null) {
-            this.selection = {
-                start: { r: this.r, c: this.c },
-                end: { r: this.r, c: this.c },
-                active: optional_bool !== null ? optional_bool : this.selection.active,
-            };
+            this.selection.start = { r: this.r, c: this.c };
+            this.selection.end = { r: this.r, c: this.c };
+            this.selection.active = optional_bool !== null ? optional_bool : this.selection.active;
         },
         selection_start(e, text) {
-            this.pressing_mouseleft = true;
-            if (this.mouse_is_inside_scrollbars(e)) {
-                this.scrolling_reset(e);
+            if (this.scrolling.mouse_is_inside_scrollbars(e)) {
+                this.scrolling.reset(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
                 this.update(r, c);
 
                 if (this.pressing_shift) {
-                    this.selection = { start: this.selection.start, end: { r: this.r, c: this.c }, active: true };
+                    this.selection.start = this.selection.start;
+                    this.selection.end = { r: this.r, c: this.c };
+                    this.selection.active = true;
                     text.selection_update(this);
                 } else {
                     this.selection_reset_to_cursor(true);
@@ -113,8 +122,8 @@ function init() {
             }
         },
         selection_stop(text) {
-            this.pressing_mouseleft = false;
-            this.selection = { start: this.selection.start, end: { r: this.r, c: this.c }, active: false };
+            this.selection.end = { r: this.r, c: this.c };
+            this.selection.active = false;
             text.highlight_row(this);
         },
         handle_multiple_clicks(text) {
@@ -122,11 +131,9 @@ function init() {
             this.multiple_clicks_reset();
             let row_text = text.rows[this.r].textContent;
             if (this.multiple_clicks === 3) {
-                this.selection = {
-                    start: { r: this.r, c: 0 },
-                    end: { r: this.r, c: row_text.length },
-                    active: true,
-                };
+                this.selection.start = { r: this.r, c: 0 };
+                this.selection.end = { r: this.r, c: row_text.length };
+                this.selection.active = true;
                 let c = row_text.length;
                 this.update(this.r, c, c);
                 text.selection_update(this);
@@ -153,11 +160,9 @@ function init() {
                                 break;
                             }
                         }
-                        this.selection = {
-                            start: { r: this.r, c: left_split },
-                            end: { r: this.r, c: this.c + right_split },
-                            active: true,
-                        };
+                        this.selection.start = { r: this.r, c: left_split };
+                        this.selection.end = { r: this.r, c: this.c + right_split };
+                        this.selection.active = true;
                         let c = this.c + right_split;
                         this.update(this.r, c, c);
                         text.selection_update(this);
@@ -169,17 +174,6 @@ function init() {
             setTimeout(() => {
                 if (this.multiple_clicks > 0) this.multiple_clicks = this.multiple_clicks - 1;
             }, 400);
-        },
-        get_rc_from_mouse(e, text) {
-            let scrollTop = this.main.scrollTop;
-            let scrollLeft = this.main.scrollLeft;
-            let c = Math.floor((e.clientX - this.text_left + scrollLeft + this.w_overlap - 7) / this.w);
-            let r = Math.floor((e.clientY - this.text_top + scrollTop - 7) / this.h);
-            if (r < 0) r = 0;
-            if (r > text.rows.length - 1) r = text.rows.length - 1;
-            if (c > text.rows[r].textContent.length - 1) c = text.rows[r].textContent.length;
-            if (c < 0) c = 0;
-            return { r, c };
         },
     };
 }
