@@ -11,7 +11,7 @@ function init() {
         multiple_clicks: 0,
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
-        update(r, c, previous_c) {
+        update(r, c, previous_c, reset_cursor = true) {
             this.r = r;
             this.c = c;
             this.previous_c = previous_c;
@@ -23,6 +23,7 @@ function init() {
             this.flash = setTimeout(() => {
                 this.el.className = "flashy";
             }, 100);
+            if (reset_cursor) this.selection_reset_to_cursor();
         },
         get_rc_from_mouse(e, text) {
             let scrollTop = this.scrolling.main.scrollTop;
@@ -39,7 +40,7 @@ function init() {
             if (this.selection.active && this.multiple_clicks < 2) {
                 this.scrolling.update(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
-                this.update(r, c);
+                this.update(r, c, c, false);
                 this.selection.end = { r, c };
                 text.selection_update(this);
                 text.highlight_row(this);
@@ -91,6 +92,9 @@ function init() {
             start: { r: 0, c: 0 },
             end: { r: 0, c: 0 },
             active: false,
+            is_in_progress() {
+                return this.start.r !== this.end.r || this.start.c !== this.end.c;
+            },
             reset() {
                 this.start = { r: 0, c: 0 };
                 this.end = { r: 0, c: 0 };
@@ -106,12 +110,13 @@ function init() {
             if (this.scrolling.mouse_is_inside_scrollbars(e)) {
                 this.scrolling.reset(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
-                this.update(r, c);
+                this.update(r, c, c, false);
 
                 if (this.pressing_shift) {
-                    this.selection.start = this.selection.start;
+                    //this.selection.start = this.selection.start;
                     this.selection.end = { r: this.r, c: this.c };
                     this.selection.active = true;
+                    //this.selection_reset_to_cursor();
                     text.selection_update(this);
                 } else {
                     this.selection_reset_to_cursor(true);

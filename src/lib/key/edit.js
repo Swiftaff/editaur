@@ -27,31 +27,68 @@ function backspace(cursor, text) {
 }
 
 function del(cursor, text) {
-    let { r, c } = cursor;
-    let at_start_of_line = c === 0;
-    let row_text = text.rows[r].textContent;
-    let at_end_of_line = c === row_text.length;
-    let at_last_row = r === text.rows.length;
-    let current_line_has_no_text = row_text.length === 0;
-    if (at_start_of_line) {
-        if (current_line_has_no_text) {
-            text.rows[r].remove();
-            text.rows.splice(r, 1);
+    if (cursor.selection.is_in_progress()) {
+        let start = cursor.selection.start;
+        let end = cursor.selection.end;
+        if (start.r === end.r) {
+            if (start.c > end.c) {
+                start = cursor.selection.end;
+                end = cursor.selection.start;
+            }
+            let new_text =
+                text.rows[start.r].textContent.slice(0, start.c) + text.rows[start.r].textContent.slice(end.c);
+            text.update_text(text.rows[start.r], new_text);
+            cursor.update(start.r, start.c, start.c);
+            cursor.selection_reset_to_cursor();
+            text.selection_update(cursor);
         } else {
-            text.update_text(text.rows[r], row_text.slice(c + 1));
+            if (start.r > end.r) {
+                start = cursor.selection.end;
+                end = cursor.selection.start;
+            }
+            for (let index = start.r; index <= end.r; index++) {
+                if (index === start.r) {
+                    let new_text =
+                        text.rows[start.r].textContent.slice(0, start.c) + text.rows[end.r].textContent.slice(end.c);
+                    text.update_text(text.rows[start.r], new_text);
+                    cursor.update(start.r, start.c, start.c);
+                    cursor.selection_reset_to_cursor();
+                    text.selection_update(cursor);
+                } else {
+                    // end or middle rows
+                    text.rows[index].remove();
+                    text.rows.splice(index, 1);
+                }
+            }
         }
-    } else if (at_end_of_line) {
-        if (!at_last_row) {
-            text.update_text(text.rows[r], row_text.concat(text.rows[r + 1].textContent));
-            text.rows[r + 1].remove();
-            text.rows.splice(r + 1, 1);
-        }
+        text.highlight_row(cursor);
     } else {
-        //mid-line
-        text.update_text(text.rows[r], row_text.slice(0, c).concat(row_text.slice(c + 1)));
+        let { r, c } = cursor;
+        let at_start_of_line = c === 0;
+        let row_text = text.rows[r].textContent;
+        let at_end_of_line = c === row_text.length;
+        let at_last_row = r === text.rows.length;
+        let current_line_has_no_text = row_text.length === 0;
+        if (at_start_of_line) {
+            if (current_line_has_no_text) {
+                text.rows[r].remove();
+                text.rows.splice(r, 1);
+            } else {
+                text.update_text(text.rows[r], row_text.slice(c + 1));
+            }
+        } else if (at_end_of_line) {
+            if (!at_last_row) {
+                text.update_text(text.rows[r], row_text.concat(text.rows[r + 1].textContent));
+                text.rows[r + 1].remove();
+                text.rows.splice(r + 1, 1);
+            }
+        } else {
+            //mid-line
+            text.update_text(text.rows[r], row_text.slice(0, c).concat(row_text.slice(c + 1)));
+        }
+        //scroll_up();
+        //scroll_down();
     }
-    //scroll_up();
-    //scroll_down();
 }
 
 function enter(cursor, text) {
@@ -94,10 +131,12 @@ function insert(chars, cursor, text) {
         //scroll_up();
         //scroll_down();
         cursor.update(r, c + chars.length, c + chars.length);
+        //cursor.selection_reset_to_cursor();
     }
 }
 
 function shift_key_down(cursor) {
+    console.log("shift");
     if (!cursor.pressing_shift) cursor.pressing_shift = true;
 }
 
@@ -160,12 +199,15 @@ async function copy(cursor, text) {
 }
 
 function tab_in(cursor, text) {
-    let no_selection =
-        cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
+    //let no_selection =
+    //    cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
     let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
-    if (no_selection) {
-        insert(" ".repeat(text.tab_spaces), cursor, text);
-    } else if (single_line_selection) {
+    //if (no_selection) {
+    //    console.log("none");
+    //    insert(" ".repeat(text.tab_spaces), cursor, text);
+    //} else
+    if (single_line_selection) {
+        console.log("single");
         //replace selection
         let start = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.end : cursor.selection.start;
@@ -173,11 +215,13 @@ function tab_in(cursor, text) {
         let right = text.rows[start.r].textContent.slice(end.c);
         text.update_text(text.rows[start.r], left + " ".repeat(text.tab_spaces) + right);
         text.selection_reset();
-        cursor.selection.reset();
         cursor.update(start.r, start.c + 4, start.c + 4);
+        //cursor.selection_reset_to_cursor();
         text.selection_update(cursor);
+        console.log("tab_in", JSON.stringify({ a: cursor.r, b: cursor.c, c: cursor.selection }));
     } else {
         //multi-line
+        console.log("mulit");
         let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
         for (let index = start.r; index <= end.r; index++) {
@@ -186,7 +230,47 @@ function tab_in(cursor, text) {
         cursor.selection.start.c = start.c + text.tab_spaces;
         cursor.selection.end.c = end.c + text.tab_spaces;
         cursor.update(end.r, end.c, end.c);
+        //cursor.selection.reset();
         text.selection_update(cursor);
+    }
+}
+
+function tab_out(cursor, text) {
+    let no_selection =
+        cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
+    let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
+    let first_char = cursor.c === 0;
+    if (first_char) {
+        //noop
+    } else if (no_selection || single_line_selection) {
+        let current_text = text.rows[cursor.selection.start.r].textContent;
+        let outdented = 0;
+        for (let index = 0; index < text.tab_spaces; index++) {
+            if (current_text.length && current_text[0] === " ") {
+                outdented++;
+                current_text = current_text.slice(1);
+            }
+        }
+        console.log("tab_out", outdented, JSON.stringify(cursor.selection));
+        text.update_text(text.rows[cursor.selection.start.r], current_text);
+        cursor.update(
+            cursor.selection.start.r,
+            cursor.selection.start.c - outdented,
+            cursor.selection.start.c - outdented
+        );
+        //cursor.selection_reset_to_cursor();
+        console.log("tab_out", outdented, JSON.stringify(cursor.selection));
+    } else {
+        //multi-line
+        /*let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
+        let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
+        for (let index = start.r; index <= end.r; index++) {
+            text.update_text(text.rows[index], " ".repeat(text.tab_spaces) + text.rows[index].textContent);
+        }
+        cursor.selection.start.c = start.c + text.tab_spaces;
+        cursor.selection.end.c = end.c + text.tab_spaces;
+        cursor.update(end.r, end.c, end.c);
+        text.selection_update(cursor);*/
     }
 }
 
@@ -202,4 +286,5 @@ export default {
     copy,
     paste,
     tab_in,
+    tab_out,
 };

@@ -76,8 +76,10 @@ function init(imported_rows, cursor) {
         },
         highlight_row(cursor) {
             this.highlight_none();
-            this.rows[cursor.r].className = "highlighted";
-            this.rows[cursor.r].style.width = "100%";
+            if (!cursor.selection.is_in_progress()) {
+                this.rows[cursor.r].className = "highlighted";
+                this.rows[cursor.r].style.width = "100%";
+            }
         },
         highlight_none() {
             this.rows.forEach((row) => {

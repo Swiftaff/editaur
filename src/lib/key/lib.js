@@ -3,64 +3,60 @@ import edit from "./edit.js";
 
 function down(e, cursor, text) {
     e.preventDefault();
-    switch (e.key) {
-        case "ArrowDown":
-            move.arrow_down(cursor, text);
-            break;
-        case "ArrowUp":
-            move.arrow_up(cursor, text);
-            break;
-        case "ArrowLeft":
-            move.arrow_left(cursor, text);
-            break;
-        case "ArrowRight":
-            move.arrow_right(cursor, text);
-            break;
-        case "Backspace":
-            edit.backspace(cursor, text);
-            break;
-        case "Delete":
-            edit.del(cursor, text);
-            break;
-        case "Enter":
-            edit.enter(cursor, text);
-            break;
-        case "Shift":
-            edit.shift_key_down(cursor);
-            break;
-        case "Control":
-            edit.control_key_down(cursor);
-            break;
-        case "Tab":
-            edit.tab_in(cursor, text);
-            break;
-        default:
-            if (cursor.pressing_control) {
-                switch (e.key) {
-                    case "c":
-                        edit.copy(cursor, text);
-                        break;
-                    case "v":
-                        edit.paste(cursor, text);
-                        break;
-                }
-            } else {
-                edit.insert(e.key, cursor, text);
-            }
-            break;
+    let key_combination = e.key.toLowerCase();
+    //console.log(key_combination);
+    if (cursor.pressing_control) {
+        key_combination = "shift_" + e.key.toLowerCase();
+        if (key_combination in down_functions) {
+            down_functions[key_combination](cursor, text);
+        }
+    } else if (cursor.pressing_control) {
+        key_combination = "control_" + e.key.toLowerCase();
+        if (key_combination in down_functions) {
+            down_functions[key_combination](cursor, text);
+        }
+    } else {
+        if (key_combination in down_functions) {
+            down_functions[key_combination](cursor, text);
+        } else {
+            edit.insert(e.key, cursor, text);
+        }
     }
 }
+const noop = () => {};
+
+const down_functions = {
+    shift: edit.shift_key_down,
+    control: edit.control_key_down,
+    capslock: noop,
+    //
+    control_v: edit.paste,
+    control_c: edit.copy,
+    control_tab: edit.tab_in,
+    //
+    shift_tab: edit.tab_out,
+    //
+    arrowdown: move.arrow_down,
+    arrowup: move.arrow_up,
+    arrowleft: move.arrow_left,
+    arrowright: move.arrow_right,
+    backspace: edit.backspace,
+    delete: edit.del,
+    enter: edit.enter,
+    tab: edit.tab_in,
+};
 
 function up(e, cursor, text) {
     e.preventDefault();
-    switch (e.key) {
-        case "Shift":
-            edit.shift_key_up(cursor);
-            break;
-        case "Control":
-            edit.control_key_up(cursor);
-            break;
+    let key_combination = e.key.toLowerCase();
+    if (key_combination in up_functions) {
+        up_functions[key_combination](cursor);
     }
 }
+
+const up_functions = {
+    shift: edit.shift_key_up,
+    control: edit.control_key_up,
+};
 
 export default { down, up };
