@@ -101,3 +101,34 @@ test("cursor blink animation restarts after each action", async ({ page }) => {
         await expect(cursor).toHaveClass("flashy");
     }
 });
+
+test("clicking right of last character on a row, puts cursor after last character", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+
+        // get leftmost and topmost position of #text wrapper
+        let text = await page.locator("#text");
+        let { x, y } = await text.boundingBox();
+
+        // get width and height of 1 character
+        let row3 = await page.locator("#text div").nth(2);
+        let { width, height } = await row3.boundingBox();
+
+        // click left of second row of text
+        page.mouse.click(x + 100, y + height);
+
+        // get count of chars in 2nd row
+        let row2 = await page.locator("#text div").nth(1);
+        let row2_text = await row2.textContent();
+        let chars = row2_text.length;
+
+        //cursor should be within a couple of pixels of calculated position
+        let cursor = await page.locator("i").nth(0);
+        let { x: cursor_x, y: cursor_y } = await cursor.boundingBox();
+        //console.log(x, chars, width, cursor_x);
+        expect(x + chars * width - cursor_x < 2).toBeTruthy();
+        expect(y + height - cursor_y < 2).toBeTruthy();
+        //await page.pause();
+    }
+});

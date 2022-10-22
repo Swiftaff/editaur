@@ -23,7 +23,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ clicking somewhere puts the cursor between two characters
 -   [x] ✅ clicking left of a row puts cursor before first character
 -   [x] ✅ cursor blink animation restarts after each action
--   [x] clicking right of last character on a row, puts cursor after last character
+-   [x] ✅ clicking right of last character on a row, puts cursor after last character
 -   [x] click and drag to the right and release on a single line, selects some characters
 -   [x] click and drag to the left and release on a single line, selects some characters
 -   [x] click and drag to the right and down and release on multiple lines, selects to the end of first line, all of intermediate lines, and to the end selection of last line
