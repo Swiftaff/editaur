@@ -19,7 +19,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 
 ## Things editaur does:
 
--   [x] clicking or arrowing to a row highlights it
+-   [x] clicking or arrowing to a row highlights it. The highlight should be full width regardless of length of row text.
 -   [x] clicking somewhere puts the cursor between two characters
 -   [x] clicking left of a row puts cursor before first character
 -   [x] cursor blink animation restarts after each action
@@ -55,6 +55,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] open or save text files
 -   [ ] tabs for multiple files
 -   [ ] line numbers
+-   [ ] Ctrl-A select all
 
 ## Things editaur would like to do when it grows up:
 
