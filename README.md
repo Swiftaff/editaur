@@ -17,9 +17,9 @@ A simple javascript text editor, without using textarea or any dependencies - em
 ⠀⠀⠀⠙⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠄
 ```
 
-## Things editaur does:
+## Things editaur does (extra checkbox if tested):
 
--   [x] clicking or arrowing to a row highlights it. The highlight should be full width regardless of length of row text.
+-   [x][x] clicking or arrowing to a row highlights it. The highlight should be full width regardless of length of row text.
 -   [x] clicking somewhere puts the cursor between two characters
 -   [x] clicking left of a row puts cursor before first character
 -   [x] cursor blink animation restarts after each action

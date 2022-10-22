@@ -79,11 +79,11 @@ function init(imported_rows, cursor) {
             if (!cursor.selection.is_in_progress()) {
                 this.rows[cursor.r].className = "highlighted";
                 this.rows[cursor.r].style.width = "100%";
-                let { width } = cursor.scrolling.main.getBoundingClientRect();
-                this.el.style.width = width + "px";
             }
         },
         highlight_none() {
+            let { width } = cursor.scrolling.main.getBoundingClientRect();
+            this.el.style.width = width + "px";
             this.rows.forEach((row) => {
                 row.className = "";
                 row.style.width = Math.ceil(cursor.w * row.textContent.length) + "px";
