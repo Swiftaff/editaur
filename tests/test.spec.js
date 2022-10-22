@@ -64,9 +64,8 @@ test("clicking somewhere puts the cursor between two characters", async ({ page 
 });
 
 test("clicking left of a row puts cursor before first character", async ({ page }) => {
-    await this_test(page, "http://127.0.0.1:1420?testname=test1", 2);
-    //await this_test(page, "http://127.0.0.1:1420?testname=test2", 10);
-    async function this_test(page, url, characters) {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
         await page.goto(url);
 
         // get leftmost and topmost position of #text wrapper
@@ -87,5 +86,18 @@ test("clicking left of a row puts cursor before first character", async ({ page 
         expect(x - cursor_x < 2).toBeTruthy();
         expect(y + height - cursor_y < 2).toBeTruthy();
         //await page.pause();
+    }
+});
+
+test("cursor blink animation restarts after each action", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+
+        //after arrowdown, cursor should have no class, then flashy class
+        let cursor = await page.locator("i").nth(0);
+        await page.keyboard.press("ArrowDown");
+        await expect(cursor).toHaveClass("");
+        await expect(cursor).toHaveClass("flashy");
     }
 });
