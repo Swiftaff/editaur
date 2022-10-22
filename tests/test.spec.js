@@ -62,3 +62,30 @@ test("clicking somewhere puts the cursor between two characters", async ({ page 
         expect(x && width && x + width * characters - cursor_x < 2).toBeTruthy();
     }
 });
+
+test("clicking left of a row puts cursor before first character", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1", 2);
+    //await this_test(page, "http://127.0.0.1:1420?testname=test2", 10);
+    async function this_test(page, url, characters) {
+        await page.goto(url);
+
+        // get leftmost and topmost position of #text wrapper
+        let text = await page.locator("#text");
+        let { x, y } = await text.boundingBox();
+
+        // get width and height of 1 character
+        let row3 = await page.locator("#text div").nth(2);
+        let { width, height } = await row3.boundingBox();
+
+        // click left of second row of text
+        page.mouse.click(x - 10, y + height);
+
+        //cursor should be within a couple of pixels of calculated position
+        let cursor = await page.locator("i").nth(0);
+        let { x: cursor_x, y: cursor_y } = await cursor.boundingBox();
+        //console.log(x, y, width, height, cursor_x, cursor_y);
+        expect(x - cursor_x < 2).toBeTruthy();
+        expect(y + height - cursor_y < 2).toBeTruthy();
+        //await page.pause();
+    }
+});
