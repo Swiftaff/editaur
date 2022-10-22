@@ -65,13 +65,20 @@ function init(imported_rows, cursor) {
         selection_update_one_row(r, c_start, c_end, c_width) {
             if ((c_start === 0 && c_end === 0) || c_start === c_end) {
                 this.rows[r].style.background = "";
+                delete this.rows[r].dataset.start;
+                delete this.rows[r].dataset.end;
             } else {
-                let start = Math.floor((c_start < c_end ? c_start : c_end) * c_width) + "px";
-                let end = Math.floor((c_start < c_end ? c_end : c_start) * c_width) + "px";
+                let c_start2 = c_start < c_end ? c_start : c_end;
+                let c_end2 = c_start < c_end ? c_end : c_start;
+                let start = Math.floor(c_start * c_width) + "px";
+                let end = Math.floor(c_end * c_width) + "px";
                 let bgnd = "rgba(255, 255, 255, 0)";
                 let highlight = "rgba(255, 0, 0, 1)";
                 let style = `linear-gradient(90deg, ${bgnd} ${start}, ${highlight} ${start}, ${highlight} ${end}, ${bgnd} ${end})`;
                 this.rows[r].style.background = style;
+                // added below for easier testing
+                this.rows[r].dataset.start = c_start2;
+                this.rows[r].dataset.end = c_end2;
             }
         },
         highlight_row(cursor) {
