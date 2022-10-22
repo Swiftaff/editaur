@@ -12,6 +12,11 @@ export default (function main() {
     const cursor = cursorlib.init();
     const urlParams = new URLSearchParams(window.location.search);
     const testname = urlParams.get("testname");
+    if (testname) {
+        //turn off animations when testing
+        let sheet = window.document.styleSheets[0];
+        sheet.insertRule(".flashy { animation: none !important }", sheet.cssRules.length);
+    }
     let data = testname ? test_data[testname] : imported_rows;
     const text = textlib.init(data, cursor);
     window.onmousedown = (e) => cursor.selection_start(e, text);

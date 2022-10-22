@@ -20,7 +20,7 @@ test("clicking or arrowing to a row highlights it. The highlight should be full 
         let boxtext = await text.boundingBox();
         let box1 = await row1.boundingBox();
         let box2 = await row2.boundingBox();
-        await expect(boxtext && box1 && boxtext.width === box1.width).toBeTruthy();
+        expect(boxtext && box1 && boxtext.width === box1.width).toBeTruthy();
 
         //both rows are unhighlighted
         await expect(row1).toHaveClass("");
@@ -35,5 +35,30 @@ test("clicking or arrowing to a row highlights it. The highlight should be full 
         await page.keyboard.press("ArrowDown");
         await expect(row1).toHaveClass("");
         await expect(row2).toHaveClass("highlighted");
+    }
+});
+
+test("clicking somewhere puts the cursor between two characters", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1", 2);
+    await this_test(page, "http://127.0.0.1:1420?testname=test2", 10);
+    async function this_test(page, url, characters) {
+        await page.goto(url);
+
+        // get leftmost position of #text wrapper
+        let text = await page.locator("#text");
+        let { x } = await text.boundingBox();
+
+        // get width of 1 character
+        let row3 = await page.locator("#text div").nth(2);
+        let { width } = await row3.boundingBox();
+
+        // click 2 characters into 1st row of text
+        page.mouse.click(x + width * characters, 10);
+
+        //cursor should be within a couple of pixels of calculated position
+        let cursor = await page.locator("i").nth(0);
+        let { x: cursor_x } = await cursor.boundingBox();
+        //console.log(x, width, characters, cursor_x);
+        expect(x && width && x + width * characters - cursor_x < 2).toBeTruthy();
     }
 });
