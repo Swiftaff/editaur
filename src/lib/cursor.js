@@ -16,7 +16,6 @@ function init() {
             this.c = c;
             this.previous_c = previous_c;
             clearTimeout(this.flash);
-            // TODO if update takes cursor offscreen - scroll to cursor
             this.el.classList.remove("flashy");
             this.el.style.left = `${Math.floor(this.c * this.w - 1)}px`;
             this.el.style.top = `${Math.floor(this.r * this.h)}px`;

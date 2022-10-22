@@ -44,6 +44,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
+-   [ ] if a cursor update takes cursor offscreen, as in hitting return at end of page - scroll to cursor
 -   [ ] shift-tabbing while a single or multiline select is active, will outdent the line by removing up to 4 spaces from the start of the line(s)
 -   [ ] Undo once
 -   [ ] Multiple Undo
