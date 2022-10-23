@@ -167,3 +167,38 @@ test("click and drag to the right and release on a single line, selects some cha
         //await page.pause();
     }
 });
+
+test("click and drag to the left and release on a single line, selects some characters", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+
+        // get leftmost and topmost position of #text wrapper
+        let text = await page.locator("#text");
+        let { x, y } = await text.boundingBox();
+
+        // get width and height of 1 character
+        let row3 = await page.locator("#text div").nth(2);
+        let { width, height } = await row3.boundingBox();
+
+        // get count of chars in 2nd row
+        let row2 = await page.locator("#text div").nth(1);
+        let row2_text = await row2.textContent();
+        let chars = row2_text.length;
+
+        // mousedown right of end of text, drag to left of second row of text, and mouseup
+        await page.mouse.move(chars * width + x + 10, y + height + 10);
+        await page.mouse.down();
+        await page.mouse.move(x - 10, y + height + 10);
+        await page.mouse.up();
+
+        //selection should be 0 to num chars
+        let start = await row2.getAttribute("data-start");
+        let end = await row2.getAttribute("data-end");
+
+        //console.log(chars, width, height, start, end);
+        expect(start === "0").toBeTruthy();
+        expect(end === "" + chars).toBeTruthy();
+        //await page.pause();
+    }
+});
