@@ -250,6 +250,55 @@ test("holding shift after a selection allows the end point of the selection to b
     }
 });
 
+test("WIP - clicking and dragging a selection to the top, right or bottom of the scrolling window, will scroll it - albeit too fast", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test3");
+    async function this_test(page, url) {
+        // assumes playwright standard viewport size 1280x720, and default font Consolas, size: 20px, line-height: 1.2rem
+
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        //let row1 = await page.locator("#text div").nth(0);
+
+        // mousedown left of first row of text, drag down to bottom of viewport
+        await page.mouse.move(x - 10, y + 10);
+        await page.mouse.down();
+        await page.mouse.move(x + w, 680);
+
+        // the last row of text should be selected, although it wasn't originally onscreen
+        await page.locator('#text div >> nth=55 data-start="0" data-end="1"');
+
+        // text panel should not be scrolled right, but should be scrolled offscreen at top
+        let { x: x1, y: y1 } = await get_text_xy(page);
+        expect(x1 > 0).toBeTruthy();
+        expect(y1 < 0).toBeTruthy();
+        //console.log(x1, y1);
+
+        // drag to bottom right of viewport
+        await page.mouse.move(1260, 680);
+
+        // text panel should be scrolled offscreen at left, and still scrolled offscreen at top
+        let { x: x2, y: y2 } = await get_text_xy(page);
+        expect(x2 < 0).toBeTruthy();
+        expect(y2 < 0).toBeTruthy();
+        //console.log(x2, y2);
+
+        // drag to top right of viewport
+        await page.mouse.move(1260, 5);
+        await page.waitForTimeout(500); //flaky, any other way to do it?
+
+        // text panel should be scrolled offscreen at left, but no longer scrolled offscreen at top
+        let { x: x3, y: y3 } = await get_text_xy(page);
+        expect(x3 < 0).toBeTruthy();
+        expect(y3 > -100).toBeTruthy();
+        //console.log(x3, y3);
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper
