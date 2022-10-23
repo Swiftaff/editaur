@@ -250,7 +250,7 @@ test("holding shift after a selection allows the end point of the selection to b
     }
 });
 
-test("WIP - clicking and dragging a selection to the top, right or bottom of the scrolling window, will scroll it - albeit too fast", async ({
+test("clicking and dragging a selection to the top, right or bottom of the scrolling window, will scroll it - albeit too fast", async ({
     page,
 }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test3");
@@ -294,6 +294,22 @@ test("WIP - clicking and dragging a selection to the top, right or bottom of the
         expect(x3 < 0).toBeTruthy();
         expect(y3 > -100).toBeTruthy();
         //console.log(x3, y3);
+
+        //await page.pause();
+    }
+});
+
+test("double-clicking a word (between two non-space characters) will select that word", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test2");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let row1 = await page.locator("#text div").nth(0);
+
+        // mousedown in middle of first word of first row of text = selection should be 0 to 10
+        await page.mouse.dblclick(x + w, y + 10);
+        await page.locator('#text div >> nth=0 data-start="0" data-end="10"');
 
         //await page.pause();
     }
