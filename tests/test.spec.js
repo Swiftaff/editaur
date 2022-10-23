@@ -203,6 +203,46 @@ test("click and drag to the right and down and release on multiple lines, select
     }
 });
 
+test("click and drag to the left and up and release on multiple lines, selects from the end selection to the end of first line, all of intermediate lines, and to the start selection of last line", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let row1 = await page.locator("#text div").nth(0);
+        let row2 = await page.locator("#text div").nth(1);
+        let row3 = await page.locator("#text div").nth(2);
+        let chars_in_row1 = await get_row_char_count(row1);
+        let chars_in_row2 = await get_row_char_count(row2);
+        let chars_in_row3 = await get_row_char_count(row3);
+
+        // mousedown to middle of third row of text, drag to left of first row of text, and mouseup
+        await page.mouse.move(2 * w + x, y + h * 2 + 10);
+        await page.mouse.down();
+        await page.mouse.move(x - 10, y + 10);
+        await page.mouse.up();
+
+        //selection should be 0 to num chars
+        let start1 = await row1.getAttribute("data-start");
+        let end1 = await row1.getAttribute("data-end");
+        let start2 = await row2.getAttribute("data-start");
+        let end2 = await row2.getAttribute("data-end");
+        let start3 = await row3.getAttribute("data-start");
+        let end3 = await row3.getAttribute("data-end");
+
+        //console.log(start1, end1, start2, end2, start3, end3);
+        expect(start1 === "0").toBeTruthy();
+        expect(end1 === "" + chars_in_row1).toBeTruthy();
+        expect(start2 === "0").toBeTruthy();
+        expect(end2 === "" + chars_in_row2).toBeTruthy();
+        expect(start3 === "0").toBeTruthy();
+        expect(end3 === "" + chars_in_row3).toBeTruthy();
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper

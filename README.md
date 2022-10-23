@@ -26,8 +26,8 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ clicking right of last character on a row, puts cursor after last character
 -   [x] ✅ click and drag to the right and release on a single line, selects some characters
 -   [x] ✅ click and drag to the left and release on a single line, selects some characters
--   [x] click and drag to the right and down and release on multiple lines, selects to the end of first line, all of intermediate lines, and to the end selection of last line
--   [x] click and drag to the left and up and release on multiple lines, selects from the end selection to the end of first line, all of intermediate lines, and to the start selection of last line
+-   [x] ✅ click and drag to the right and down and release on multiple lines, selects to the end of first line, all of intermediate lines, and to the end selection of last line
+-   [x] ✅ click and drag to the left and up and release on multiple lines, selects from the end selection to the end of first line, all of intermediate lines, and to the start selection of last line
 -   [x] holding shift after a selection allows the end point of the selection to be changed forwards or backwards, releasing finishes the selection
 -   [x] clicking and dragging a selection to the top, right or bottom of the scrolling window, will scroll it - albeit too fast
 -   [x] double-clicking a word (between two non-space characters) will select that word
