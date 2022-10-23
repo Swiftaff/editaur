@@ -5,7 +5,8 @@ function init() {
         r: 0,
         c: 0,
         previous_c: 0,
-        flash: null,
+        flash1: null,
+        flash2: null,
         pressing_shift: false,
         pressing_control: false,
         multiple_clicks: 0,
@@ -15,12 +16,17 @@ function init() {
             this.r = r;
             this.c = c;
             this.previous_c = previous_c;
-            clearTimeout(this.flash);
+            clearTimeout(this.flash1);
+            clearTimeout(this.flash2);
             this.el.classList.remove("flashy");
             this.el.style.left = `${Math.floor(this.c * this.w - 1)}px`;
             this.el.style.top = `${Math.floor(this.r * this.h)}px`;
-            this.flash = setTimeout(() => {
-                this.el.className = "flashy";
+            this.flash1 = setTimeout(() => {
+                this.el.className = "flashy moved";
+                //added for easier testing
+                this.flash2 = setTimeout(() => {
+                    this.el.className = "flashy";
+                }, 200);
             }, 100);
             if (reset_cursor) this.selection_reset_to_cursor();
         },

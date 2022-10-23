@@ -72,6 +72,7 @@ test("clicking left of a row puts cursor before first character", async ({ page 
         //console.log(x, y, width, height, cursor_x, cursor_y);
         expect(x - cursor_x < 2).toBeTruthy();
         expect(y + h - cursor_y < 2).toBeTruthy();
+
         //await page.pause();
     }
 });
@@ -80,11 +81,11 @@ test("cursor blink animation restarts after each action", async ({ page }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test1");
     async function this_test(page, url) {
         await page.goto(url);
-
-        //after arrowdown, cursor should have no class, then flashy class
-        await page.keyboard.press("ArrowDown");
         let cursor = await page.locator("i").nth(0);
-        await expect(cursor).toHaveClass("");
+
+        //after arrowdown, cursor should have "flashy moved" class, then just "flashy" class
+        await page.keyboard.press("ArrowDown");
+        await expect(cursor).toHaveClass("flashy moved");
         await expect(cursor).toHaveClass("flashy");
     }
 });
@@ -96,7 +97,7 @@ test("clicking right of last character on a row, puts cursor after last characte
         let { x, y } = await get_text_xy(page);
         let { w, h } = await get_char_wh(page);
         let row2 = await page.locator("#text div").nth(1);
-        let chars_in_2nd_row = await get_row_char_count(row2);
+        let chars_in_row2 = await get_row_char_count(row2);
 
         // click right of second row of text
         page.mouse.click(x + 100, y + h);
@@ -105,8 +106,9 @@ test("clicking right of last character on a row, puts cursor after last characte
         let cursor = await page.locator("i").nth(0);
         let { x: cursor_x, y: cursor_y } = await cursor.boundingBox();
         //console.log(x, chars, width, cursor_x);
-        expect(x + chars_in_2nd_row * w - cursor_x < 2).toBeTruthy();
+        expect(x + chars_in_row2 * w - cursor_x < 2).toBeTruthy();
         expect(y + h - cursor_y < 2).toBeTruthy();
+
         //await page.pause();
     }
 });
@@ -118,21 +120,17 @@ test("click and drag to the right and release on a single line, selects some cha
         let { x, y } = await get_text_xy(page);
         let { w, h } = await get_char_wh(page);
         let row2 = await page.locator("#text div").nth(1);
-        let chars_in_2nd_row = await get_row_char_count(row2);
+        let chars_in_row2 = await get_row_char_count(row2);
 
         // mousedown left of second row of text, drag to right of end of text and mouseup
         await page.mouse.move(x - 10, y + h + 10);
         await page.mouse.down();
-        await page.mouse.move(chars_in_2nd_row * w + x + 10, y + h + 10);
+        await page.mouse.move(chars_in_row2 * w + x + 10, y + h + 10);
         await page.mouse.up();
 
         //selection should be 0 to num chars
-        let start = await row2.getAttribute("data-start");
-        let end = await row2.getAttribute("data-end");
+        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
 
-        //console.log(chars, width, height, start, end);
-        expect(start === "0").toBeTruthy();
-        expect(end === "" + chars_in_2nd_row).toBeTruthy();
         //await page.pause();
     }
 });
@@ -144,21 +142,17 @@ test("click and drag to the left and release on a single line, selects some char
         let { x, y } = await get_text_xy(page);
         let { w, h } = await get_char_wh(page);
         let row2 = await page.locator("#text div").nth(1);
-        let chars_in_2nd_row = await get_row_char_count(row2);
+        let chars_in_row2 = await get_row_char_count(row2);
 
         // mousedown right of end of text, drag to left of second row of text, and mouseup
-        await page.mouse.move(chars_in_2nd_row * w + x + 10, y + h + 10);
+        await page.mouse.move(chars_in_row2 * w + x + 10, y + h + 10);
         await page.mouse.down();
         await page.mouse.move(x - 10, y + h + 10);
         await page.mouse.up();
 
         //selection should be 0 to num chars
-        let start = await row2.getAttribute("data-start");
-        let end = await row2.getAttribute("data-end");
+        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
 
-        //console.log(chars, width, height, start, end);
-        expect(start === "0").toBeTruthy();
-        expect(end === "" + chars_in_2nd_row).toBeTruthy();
         //await page.pause();
     }
 });
@@ -184,21 +178,11 @@ test("click and drag to the right and down and release on multiple lines, select
         await page.mouse.move(2 * w + x, y + h * 2 + 10);
         await page.mouse.up();
 
-        //selection should be 0 to num chars
-        let start1 = await row1.getAttribute("data-start");
-        let end1 = await row1.getAttribute("data-end");
-        let start2 = await row2.getAttribute("data-start");
-        let end2 = await row2.getAttribute("data-end");
-        let start3 = await row3.getAttribute("data-start");
-        let end3 = await row3.getAttribute("data-end");
+        //selection should be 0 to num chars in all rows
+        await page.locator(`#text div >> nth=0 data-start="0" data-end="${"" + chars_in_row1}"`);
+        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
+        await page.locator(`#text div >> nth=2 data-start="0" data-end="${"" + chars_in_row3}"`);
 
-        //console.log(start1, end1, start2, end2, start3, end3);
-        expect(start1 === "0").toBeTruthy();
-        expect(end1 === "" + chars_in_row1).toBeTruthy();
-        expect(start2 === "0").toBeTruthy();
-        expect(end2 === "" + chars_in_row2).toBeTruthy();
-        expect(start3 === "0").toBeTruthy();
-        expect(end3 === "" + chars_in_row3).toBeTruthy();
         //await page.pause();
     }
 });
@@ -224,21 +208,44 @@ test("click and drag to the left and up and release on multiple lines, selects f
         await page.mouse.move(x - 10, y + 10);
         await page.mouse.up();
 
-        //selection should be 0 to num chars
-        let start1 = await row1.getAttribute("data-start");
-        let end1 = await row1.getAttribute("data-end");
-        let start2 = await row2.getAttribute("data-start");
-        let end2 = await row2.getAttribute("data-end");
-        let start3 = await row3.getAttribute("data-start");
-        let end3 = await row3.getAttribute("data-end");
+        //selection should be 0 to num chars in all rows
+        await page.locator(`#text div >> nth=0 data-start="0" data-end="${"" + chars_in_row1}"`);
+        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
+        await page.locator(`#text div >> nth=2 data-start="0" data-end="${"" + chars_in_row3}"`);
 
-        //console.log(start1, end1, start2, end2, start3, end3);
-        expect(start1 === "0").toBeTruthy();
-        expect(end1 === "" + chars_in_row1).toBeTruthy();
-        expect(start2 === "0").toBeTruthy();
-        expect(end2 === "" + chars_in_row2).toBeTruthy();
-        expect(start3 === "0").toBeTruthy();
-        expect(end3 === "" + chars_in_row3).toBeTruthy();
+        //await page.pause();
+    }
+});
+
+test("holding shift after a selection allows the end point of the selection to be changed forwards or backwards, releasing finishes the selection", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test2");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let row1 = await page.locator("#text div").nth(0);
+
+        // mousedown left of second row of text, drag to right and mouseup = selection should be 0 to 2
+        await page.mouse.move(x - 10, y + 10);
+        await page.mouse.down();
+        await page.mouse.move(2 * w + x, y + 10);
+        await page.mouse.up();
+        await page.locator('#text div >> nth=0 data-start="0" data-end="2"');
+
+        // Hold down shift, and click mouse 2 chars to the right, release shift = selection should be 0 to 4
+        await page.keyboard.down("Shift");
+        await page.waitForTimeout(500); //flaky, any other way to do it?
+        await page.mouse.click(4 * w + x, y + 10);
+        await page.locator('#text div >> nth=0 data-start="0" data-end="4"');
+
+        // Hold down shift, and click mouse 1 char to the left, release shift = selection should be 0 to 3
+        await page.keyboard.down("Shift");
+        await page.waitForTimeout(500); //flaky, any other way to do it?
+        await page.mouse.click(3 * w + x, y + 10);
+        await page.locator('#text div >> nth=0 data-start="0" data-end="3"');
+
         //await page.pause();
     }
 });
