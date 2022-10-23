@@ -307,9 +307,25 @@ test("double-clicking a word (between two non-space characters) will select that
         let { w, h } = await get_char_wh(page);
         let row1 = await page.locator("#text div").nth(0);
 
-        // mousedown in middle of first word of first row of text = selection should be 0 to 10
+        // doubleclick in middle of first word of first row of text = selection should be 0 to 10
         await page.mouse.dblclick(x + w, y + 10);
         await page.locator('#text div >> nth=0 data-start="0" data-end="10"');
+
+        //await page.pause();
+    }
+});
+test("triple-clicking anywhere on a line will select the whole line", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test2");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let row1 = await page.locator("#text div").nth(0);
+
+        // tripleclick in middle of first word of first row of text = selection should be whole line
+        await page.mouse.dblclick(x + w, y + 10);
+        await page.mouse.click(x + w, y + 10);
+        await page.locator('#text div >> nth=0 data-start="0" data-end="219"');
 
         //await page.pause();
     }
