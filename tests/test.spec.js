@@ -402,6 +402,45 @@ test("left arrow at start of a row, moves cursor to end of previous row, except 
     }
 });
 
+test.only("right arrow at end of a row, moves cursor to start of next row, except last row", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let cursor = await page.locator("i").nth(0);
+
+        //move down 1 row
+        await page.keyboard.press("ArrowDown");
+        let cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 && cursor_box.y === y + h).toBeTruthy(); // x = 109 not 110?
+
+        //move right 3 chars, is at end of first row
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 3 && cursor_box.y === y + h).toBeTruthy();
+
+        //move right 1 times, is at start of third row
+        await page.keyboard.press("ArrowRight");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //move right 1 time, is at end of third row
+        await page.keyboard.press("ArrowRight");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //move right 1 time again, is still at end of third row
+        await page.keyboard.press("ArrowRight");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper
