@@ -314,6 +314,7 @@ test("double-clicking a word (between two non-space characters) will select that
         //await page.pause();
     }
 });
+
 test("triple-clicking anywhere on a line will select the whole line", async ({ page }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test2");
     async function this_test(page, url) {
@@ -326,6 +327,42 @@ test("triple-clicking anywhere on a line will select the whole line", async ({ p
         await page.mouse.dblclick(x + w, y + 10);
         await page.mouse.click(x + w, y + 10);
         await page.locator('#text div >> nth=0 data-start="0" data-end="219"');
+
+        //await page.pause();
+    }
+});
+
+test("use arrow keys to move up, down, left, right", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let cursor = await page.locator("i").nth(0);
+
+        //starts in top left position
+        let cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x && cursor_box.y === y).toBeTruthy();
+
+        //move down 1 row
+        await page.keyboard.press("ArrowDown");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 && cursor_box.y === y + h).toBeTruthy(); // x = 109 not 110?
+
+        //move right 1 char
+        await page.keyboard.press("ArrowRight");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h).toBeTruthy();
+
+        //move up 1 row
+        await page.keyboard.press("ArrowUp");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y).toBeTruthy();
+
+        //move left 1 char
+        await page.keyboard.press("ArrowLeft");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 && cursor_box.y === y).toBeTruthy();
 
         //await page.pause();
     }

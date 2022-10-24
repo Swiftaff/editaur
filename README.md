@@ -32,7 +32,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ clicking and dragging a selection to the top, right or bottom of the scrolling window, will scroll it - albeit too fast
 -   [x] ✅ double-clicking a word (between two non-space characters) will select that word
 -   [x] ✅ triple-clicking anywhere on a line will select the whole line
--   [x] use arrow keys to move up, down, left, right
+-   [x] ✅ use arrow keys to move up, down, left, right
 -   [x] left arrow at start of a row, moves cursor to end of previous row
 -   [x] right arrow at end of a row, moves cursor to start of next row
 -   [x] using up and down arrow keys will remember the current column starting point across lines of differing lengths
