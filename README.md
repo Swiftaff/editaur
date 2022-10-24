@@ -33,7 +33,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ double-clicking a word (between two non-space characters) will select that word
 -   [x] ✅ triple-clicking anywhere on a line will select the whole line
 -   [x] ✅ use arrow keys to move up, down, left, right
--   [x] left arrow at start of a row, moves cursor to end of previous row
+-   [x] ✅ left arrow at start of a row, moves cursor to end of previous row, except first row
 -   [x] right arrow at end of a row, moves cursor to start of next row
 -   [x] using up and down arrow keys will remember the current column starting point across lines of differing lengths
 -   [x] using left and right arrow or other cursor moving functions (e.g. paste) will reset this column starting point for future up down moves
