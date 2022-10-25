@@ -5,23 +5,16 @@ function down(e, cursor, text) {
     e.preventDefault();
     let key_combination = e.key.toLowerCase();
     //console.log(key_combination);
-    if (cursor.pressing_control) {
-        key_combination = "shift_" + e.key.toLowerCase();
-        if (key_combination in down_functions) {
-            down_functions[key_combination](cursor, text);
-        }
-    } else if (cursor.pressing_control) {
-        key_combination = "control_" + e.key.toLowerCase();
-        if (key_combination in down_functions) {
-            down_functions[key_combination](cursor, text);
-        }
+    if (cursor.pressing_shift && "shift_" + key_combination in down_functions) {
+        down_functions["shift_" + key_combination](cursor, text);
+    } else if (cursor.pressing_control && "control_" + key_combination in down_functions) {
+        down_functions["control_" + key_combination](cursor, text);
+    } else if (key_combination in down_functions) {
+        down_functions[key_combination](cursor, text);
     } else {
-        if (key_combination in down_functions) {
-            down_functions[key_combination](cursor, text);
-        } else {
-            edit.insert(e.key, cursor, text);
-        }
+        edit.insert(e.key, cursor, text);
     }
+    //}
 }
 const noop = () => {};
 
