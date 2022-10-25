@@ -635,6 +635,68 @@ test("copy selected text, including mulitline to the clipboard, paste clipboard,
     }
 });
 
+test("tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let row1 = page.locator("#text div").nth(0);
+        let row2 = page.locator("#text div").nth(1);
+        let row3 = page.locator("#text div").nth(2);
+
+        expect((await row1.textContent()) === "123").toBeTruthy();
+        expect((await row2.textContent()) === "abc").toBeTruthy();
+        expect((await row3.textContent()) === "x").toBeTruthy();
+
+        // select 1st 2 full rows, tab in
+        await page.keyboard.down("Shift");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.up("Shift");
+        await page.keyboard.press("Tab");
+        await page.waitForTimeout(500);
+
+        expect((await row1.textContent()) === "    123").toBeTruthy();
+        expect((await row2.textContent()) === "    abc").toBeTruthy();
+        expect((await row3.textContent()) === "x").toBeTruthy();
+
+        // select last 2 rows, tab in
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.down("Shift");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.up("Shift");
+        await page.keyboard.press("Tab");
+        await page.waitForTimeout(500);
+
+        expect((await row1.textContent()) === "    123").toBeTruthy();
+        expect((await row2.textContent()) === "        abc").toBeTruthy();
+        expect((await row3.textContent()) === "    x").toBeTruthy();
+
+        // select all 3 rows, tab in
+        await page.keyboard.press("ArrowUp");
+        await page.keyboard.down("Shift");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.up("Shift");
+        await page.keyboard.press("Tab");
+        await page.waitForTimeout(500);
+
+        expect((await row1.textContent()) === "        123").toBeTruthy();
+        expect((await row2.textContent()) === "            abc").toBeTruthy();
+        expect((await row3.textContent()) === "        x").toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper

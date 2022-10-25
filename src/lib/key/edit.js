@@ -228,39 +228,25 @@ async function copy(cursor, text) {
 }
 
 function tab_in(cursor, text) {
-    //let no_selection =
-    //    cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
     let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
-    //if (no_selection) {
-    //    console.log("none");
-    //    insert(" ".repeat(text.tab_spaces), cursor, text);
-    //} else
+    let { start, end } = cursor.selection.normalised_start_end();
     if (single_line_selection) {
-        console.log("single");
         //replace selection
-        let start = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.start : cursor.selection.end;
-        let end = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.end : cursor.selection.start;
         let left = text.rows[start.r].textContent.slice(0, start.c);
         let right = text.rows[start.r].textContent.slice(end.c);
         text.update_text(text.rows[start.r], left + " ".repeat(text.tab_spaces) + right);
         text.selection_reset();
         cursor.update(start.r, start.c + 4, start.c + 4);
-        //cursor.selection_reset_to_cursor();
         text.selection_update(cursor);
-        console.log("tab_in", JSON.stringify({ a: cursor.r, b: cursor.c, c: cursor.selection }));
     } else {
         //multi-line
-        console.log("mulit");
-        let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
-        let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
         for (let index = start.r; index <= end.r; index++) {
             text.update_text(text.rows[index], " ".repeat(text.tab_spaces) + text.rows[index].textContent);
         }
-        cursor.selection.start.c = start.c + text.tab_spaces;
-        cursor.selection.end.c = end.c + text.tab_spaces;
-        cursor.update(end.r, end.c, end.c);
-        //cursor.selection.reset();
+        cursor.selection.start = { r: cursor.selection.start.r, c: cursor.selection.start.c + text.tab_spaces };
+        cursor.selection.end = { r: cursor.selection.end.r, c: cursor.selection.end.c + text.tab_spaces };
         text.selection_update(cursor);
+        cursor.update(cursor.selection.end.r, cursor.selection.end.c, cursor.selection.end.c, false);
     }
 }
 

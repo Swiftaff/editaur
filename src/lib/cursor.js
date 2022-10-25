@@ -105,6 +105,19 @@ function init() {
                 this.end = { r: 0, c: 0 };
                 this.active = false;
             },
+            normalised_start_end() {
+                if (this.start.r < this.end.r) {
+                    return { start: this.start, end: this.end };
+                } else if (this.start.r === this.end.r) {
+                    if (this.start.c <= this.end.c) {
+                        return { start: this.start, end: this.end };
+                    } else {
+                        return { start: this.end, end: this.start };
+                    }
+                } else {
+                    return { start: this.end, end: this.start };
+                }
+            },
         },
         selection_reset_to_cursor(optional_bool = null) {
             this.selection.start = { r: this.r, c: this.c };
