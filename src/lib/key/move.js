@@ -12,15 +12,17 @@ function arrow_down(cursor, text) {
         c = ret.c;
         previous_c = ret.previous_c;
     }
-    cursor.update(r, c, previous_c);
-    text.highlight_row(cursor);
+
     if (cursor.pressing_shift) {
+        cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
+        cursor.update(r, c, previous_c);
         cursor.selection_stop(text);
         text.selection_reset();
     }
+    text.highlight_row(cursor);
 }
 
 function arrow_up(cursor, text) {
@@ -35,34 +37,40 @@ function arrow_up(cursor, text) {
         c = ret.c;
         previous_c = ret.previous_c;
     }
-    cursor.update(r, c, previous_c);
-    text.highlight_row(cursor);
+
     if (cursor.pressing_shift) {
+        cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
+        cursor.update(r, c, previous_c);
         cursor.selection_stop(text);
         text.selection_reset();
     }
+    text.highlight_row(cursor);
 }
 
 function arrow_left(cursor, text) {
     let { r, c, previous_c } = cursor;
-    if (c > 0) {
+    let is_not_first_char = c > 0;
+    let is_not_first_row = r > 0;
+    if (is_not_first_char) {
         c = c - 1;
         previous_c = c;
-    } else if (r > 0) {
+    } else if (is_not_first_row) {
         r = r - 1;
         c = text.rows[r].textContent.length;
         previous_c = 0;
     }
-    cursor.update(r, c, previous_c);
+
     if (cursor.pressing_shift) {
+        console.log(cursor.selection.start, cursor.selection.end);
+        cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
+        cursor.update(r, c, previous_c);
         cursor.selection_stop(text);
-        cursor.selection_reset_to_cursor();
         text.selection_reset();
     }
 }
@@ -78,13 +86,14 @@ function arrow_right(cursor, text) {
         c = 0;
         previous_c = 0;
     }
-    cursor.update(r, c, previous_c);
+
     if (cursor.pressing_shift) {
+        cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
     } else {
+        cursor.update(r, c, previous_c);
         cursor.selection_stop(text);
-        cursor.selection_reset_to_cursor();
         text.selection_reset();
     }
 }

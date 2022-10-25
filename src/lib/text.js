@@ -10,10 +10,18 @@ function init(imported_rows, cursor) {
         },
         selection_update(cursor) {
             let num_rows = Math.abs(cursor.selection.end.r - cursor.selection.start.r);
-            let reverse_direction = cursor.selection.start.r > cursor.selection.end.r;
+            let reverse_direction =
+                cursor.selection.start.r > cursor.selection.end.r ||
+                (cursor.selection.start.r === cursor.selection.end.r &&
+                    cursor.selection.start.c > cursor.selection.end.c);
+            console.log(reverse_direction);
             this.selection_reset();
             if (num_rows === 0) {
-                this.selection_update_one_row(cursor.r, cursor.selection.start.c, cursor.c, cursor.w);
+                if (reverse_direction) {
+                    this.selection_update_one_row(cursor.r, cursor.selection.end.c, cursor.selection.start.c, cursor.w);
+                } else {
+                    this.selection_update_one_row(cursor.r, cursor.selection.start.c, cursor.c, cursor.w);
+                }
             } else {
                 for (let index = 0; index <= num_rows; index++) {
                     // TODO allow for screen scrolling up/down
@@ -63,7 +71,7 @@ function init(imported_rows, cursor) {
             el.style.width = Math.ceil(cursor.w * text_content.length) + "px";
         },
         selection_update_one_row(r, c_start, c_end, c_width) {
-            if ((c_start === 0 && c_end === 0) || c_start === c_end) {
+            if (c_start === c_end) {
                 this.rows[r].style.background = "";
                 delete this.rows[r].dataset.start;
                 delete this.rows[r].dataset.end;
