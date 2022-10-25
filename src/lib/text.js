@@ -14,7 +14,6 @@ function init(imported_rows, cursor) {
                 cursor.selection.start.r > cursor.selection.end.r ||
                 (cursor.selection.start.r === cursor.selection.end.r &&
                     cursor.selection.start.c > cursor.selection.end.c);
-            console.log(reverse_direction);
             this.selection_reset();
             if (num_rows === 0) {
                 if (reverse_direction) {

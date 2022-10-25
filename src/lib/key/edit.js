@@ -2,25 +2,19 @@ const clipboard = {
     // allow for testing in a plain browser window where there is no ability to readText
     // this just adds a global window variable to read and write to instead of standard clipboard
     readText: async () => {
-        console.log("readText");
         let clip = "";
         if (navigator.clipboard.readText) {
-            console.log("browser");
             clip = await navigator.clipboard.readText();
         } else if (window["__EDITAUR__"] && "clipboard" in window["__EDITAUR__"]) {
-            console.log("custom");
             clip = window["__EDITAUR__"].clipboard;
         }
         return clip;
     },
     writeText: async (clip) => {
-        console.log("writeText", clip);
         if (typeof clip === "string") {
             if (navigator.clipboard.readText) {
-                console.log("browser");
                 await navigator.clipboard.writeText(clip);
             } else {
-                console.log("custom");
                 if (!window["__EDITAUR__"] || !window["__EDITAUR__"].clipboard) {
                     window["__EDITAUR__"] = { clipboard: "" };
                 }
@@ -185,7 +179,6 @@ function control_key_up(cursor) {
 }
 
 async function paste(cursor, text) {
-    console.log("paste");
     let clip = await clipboard.readText();
     let split = clip.split("\r\n");
     if (split.length > 1) {
@@ -201,7 +194,6 @@ async function paste(cursor, text) {
 }
 
 async function copy(cursor, text) {
-    console.log("copy");
     let no_selection =
         cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
     let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;

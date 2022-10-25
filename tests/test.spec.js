@@ -570,8 +570,6 @@ test("using left and right arrow or other cursor moving functions (e.g. paste) w
 test("copy selected text, including mulitline to the clipboard, paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)", async ({
     page,
 }) => {
-    // window["__TAURI_IPC__"] = { writeText: (txt) => console.log("testy", txt) };
-
     await this_test(page, "http://127.0.0.1:1420?testname=test1");
     async function this_test(page, url) {
         await page.goto(url);

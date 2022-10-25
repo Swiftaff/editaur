@@ -64,7 +64,6 @@ function arrow_left(cursor, text) {
     }
 
     if (cursor.pressing_shift) {
-        console.log(cursor.selection.start, cursor.selection.end);
         cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
         text.selection_update(cursor);
