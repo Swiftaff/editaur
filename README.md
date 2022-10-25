@@ -17,7 +17,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 ⠀⠀⠀⠙⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠄
 ```
 
-## Things editaur does (extra checkbox if tested):
+## Things editaur does (extra checkbox if tested in playwright by default or (s)elenium):
 
 -   [x] ✅ clicking or arrowing to a row highlights it. The highlight should be full width regardless of length of row text.
 -   [x] ✅ clicking somewhere puts the cursor between two characters
@@ -37,8 +37,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ right arrow at end of a row, moves cursor to start of next row, except last row
 -   [x] ✅ using up and down arrow keys will remember the current column starting point across lines of differing lengths
 -   [x] ✅ using left and right arrow or other cursor moving functions (e.g. typing characters) will reset this column starting point for future up down moves
--   [x] copy selected text, including mulitline to the clipboard
--   [x] paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)
+-   [x] ✅ copy selected text, including mulitline to the clipboard, paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)
 -   [x] tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original
 -   [x] using delete on a selection will delete it all, and leave cursor at leftmost point
 

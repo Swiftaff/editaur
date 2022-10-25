@@ -567,6 +567,76 @@ test("using left and right arrow or other cursor moving functions (e.g. paste) w
     }
 });
 
+test("copy selected text, including mulitline to the clipboard, paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)", async ({
+    page,
+}) => {
+    // window["__TAURI_IPC__"] = { writeText: (txt) => console.log("testy", txt) };
+
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let row2 = page.locator("#text div").nth(1);
+        let row2_text = await row2.textContent();
+        expect(row2_text === "abc").toBeTruthy();
+
+        //copy 3 chars from first row
+        await page.keyboard.down("Shift");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.up("Shift");
+        await page.waitForTimeout(500);
+        await page.keyboard.down("Control");
+        await page.keyboard.press("C");
+
+        //paste into end of second row
+        await page.keyboard.press("ArrowDown");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("V");
+        await page.keyboard.up("Control");
+
+        row2_text = await row2.textContent();
+        expect(row2_text === "abc123").toBeTruthy();
+
+        //move cursor back to start
+        await page.keyboard.press("ArrowUp");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.press("ArrowLeft");
+
+        //copy first 3 chars of 2 lines, plus line break of first line
+        await page.keyboard.down("Shift");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.up("Shift");
+        await page.waitForTimeout(500);
+        await page.keyboard.down("Control");
+        await page.keyboard.press("C");
+
+        //paste into end of third row
+        await page.keyboard.press("ArrowDown");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("V");
+        await page.keyboard.up("Control");
+
+        let row3 = page.locator("#text div").nth(2);
+        let row4 = page.locator("#text div").nth(3);
+        let row3_text = await row3.textContent();
+        let row4_text = await row4.textContent();
+        expect(row3_text === "x123").toBeTruthy();
+        expect(row4_text === "abc").toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper

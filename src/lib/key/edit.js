@@ -1,3 +1,35 @@
+const clipboard = {
+    // allow for testing in a plain browser window where there is no ability to readText
+    // this just adds a global window variable to read and write to instead of standard clipboard
+    readText: async () => {
+        console.log("readText");
+        let clip = "";
+        if (navigator.clipboard.readText) {
+            console.log("browser");
+            clip = await navigator.clipboard.readText();
+        } else if (window["__EDITAUR__"] && "clipboard" in window["__EDITAUR__"]) {
+            console.log("custom");
+            clip = window["__EDITAUR__"].clipboard;
+        }
+        return clip;
+    },
+    writeText: async (clip) => {
+        console.log("writeText", clip);
+        if (typeof clip === "string") {
+            if (navigator.clipboard.readText) {
+                console.log("browser");
+                await navigator.clipboard.writeText(clip);
+            } else {
+                console.log("custom");
+                if (!window["__EDITAUR__"] || !window["__EDITAUR__"].clipboard) {
+                    window["__EDITAUR__"] = { clipboard: "" };
+                }
+                window["__EDITAUR__"].clipboard = clip;
+            }
+        }
+    },
+};
+
 function backspace(cursor, text) {
     let { r, c } = cursor;
     let at_start_of_line = c === 0;
@@ -153,7 +185,8 @@ function control_key_up(cursor) {
 }
 
 async function paste(cursor, text) {
-    let clip = await navigator.clipboard.readText();
+    console.log("paste");
+    let clip = await clipboard.readText();
     let split = clip.split("\r\n");
     if (split.length > 1) {
         split.forEach((new_row, i) => {
@@ -168,17 +201,20 @@ async function paste(cursor, text) {
 }
 
 async function copy(cursor, text) {
+    console.log("copy");
     let no_selection =
         cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
     let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
     if (no_selection) {
         let cut_text = text.rows[cursor.selection.start.r].textContent;
-        await navigator.clipboard.writeText(cut_text);
+        //await writeText(cut_text);
+        await clipboard.writeText(cut_text);
     } else if (single_line_selection) {
         let start = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.end : cursor.selection.start;
         let cut_text = text.rows[start.r].textContent.slice(start.c, end.c);
-        await navigator.clipboard.writeText(cut_text);
+        //await writeText(cut_text);
+        await clipboard.writeText(cut_text);
     } else {
         //multi-line
         let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
@@ -194,7 +230,8 @@ async function copy(cursor, text) {
                 cut_text += text.rows[index].textContent + "\r\n";
             }
         }
-        await navigator.clipboard.writeText(cut_text);
+        //await writeText(cut_text);
+        await clipboard.writeText(cut_text);
     }
 }
 
