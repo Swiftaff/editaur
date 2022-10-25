@@ -738,6 +738,65 @@ test("tabbing while a single line select is active, will replace that selection 
     }
 });
 
+test("using delete on a selection will delete it all, and leave cursor at leftmost point", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let row1 = page.locator("#text div").nth(0);
+        let row2 = page.locator("#text div").nth(1);
+        let row3 = page.locator("#text div").nth(2);
+
+        expect((await row1.textContent()) === "123").toBeTruthy();
+        expect((await row2.textContent()) === "abc").toBeTruthy();
+        expect((await row3.textContent()) === "x").toBeTruthy();
+
+        // select 1st 2 chars of 1st row, Delete
+        await page.keyboard.down("Shift");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.up("Shift");
+        await page.keyboard.press("Delete");
+        await page.waitForTimeout(500);
+
+        expect((await row1.textContent()) === "3").toBeTruthy();
+        expect((await row2.textContent()) === "abc").toBeTruthy();
+        expect((await row3.textContent()) === "x").toBeTruthy();
+
+        // select 2nd char of 2nd row, Delete
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.down("Shift");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.up("Shift");
+        await page.keyboard.press("Delete");
+        await page.waitForTimeout(500);
+
+        expect((await row1.textContent()) === "3").toBeTruthy();
+        expect((await row2.textContent()) === "ac").toBeTruthy();
+        expect((await row3.textContent()) === "x").toBeTruthy();
+
+        //select 1st and 2nd row, Delete
+        await page.keyboard.press("ArrowUp");
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.down("Shift");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.up("Shift");
+        await page.keyboard.press("Delete");
+        await page.waitForTimeout(500);
+
+        row1 = page.locator("#text div").nth(0);
+        row2 = page.locator("#text div").nth(1);
+
+        expect((await row1.textContent()) === "").toBeTruthy();
+        expect((await row2.textContent()) === "x").toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper

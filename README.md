@@ -40,7 +40,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ copy selected text, including mulitline to the clipboard, paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)
 -   [x] ✅ tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original
 -   [x] ✅ tabbing while a single line select is active, will replace that selection with [4] spaces
--   [x] using delete on a selection will delete it all, and leave cursor at leftmost point
+-   [x] ✅ using delete on a selection will delete it all, and leave cursor at leftmost point
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
