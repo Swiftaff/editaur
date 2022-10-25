@@ -506,6 +506,67 @@ test("using up and down arrow keys will remember the current column starting poi
     }
 });
 
+test("using left and right arrow or other cursor moving functions (e.g. paste) will reset this column starting point for future up down moves", async ({
+    page,
+}) => {
+    //same as above test - replacing the ArrowRight/Left reset with two kepresses inserting "XY"
+
+    await this_test(page, "http://127.0.0.1:1420?testname=test4");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let cursor = await page.locator("i").nth(0);
+
+        //move right 3 chars, is at 3rd char of first row
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        let cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 3 && cursor_box.y === y).toBeTruthy();
+
+        //move down 1 row, is at end of second 2 char row
+        await page.keyboard.press("ArrowDown");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 2 && cursor_box.y === y + h).toBeTruthy();
+
+        //move down 1 row, is at end of third 1 char row
+        await page.keyboard.press("ArrowDown");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //move down 1 row, is at 3rd char of last 4 char row - not the end, but same as starting point 3rd char
+        await page.keyboard.press("ArrowDown");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 3 && cursor_box.y === y + h * 3).toBeTruthy();
+
+        //type 2 chars, is at 5th char of last row
+        await page.keyboard.press("X");
+        await page.keyboard.press("Y");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 5 && cursor_box.y === y + h * 3).toBeTruthy();
+
+        // go back up after resetting the previous column position (previous_c)
+
+        //move up 1 row, is at end of third 1 char row
+        await page.keyboard.press("ArrowUp");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //move up 1 row, is at end of second 2 char row
+        await page.keyboard.press("ArrowUp");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 2 && cursor_box.y === y + h).toBeTruthy();
+
+        //move up 1 row, is back to 5th char of first row
+        await page.keyboard.press("ArrowUp");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 5 && cursor_box.y === y).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper
