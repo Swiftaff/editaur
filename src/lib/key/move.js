@@ -1,13 +1,10 @@
 function arrow_down(cursor, text) {
     let { r, c, previous_c } = cursor;
-    //scroll_down();
-
-    if (r < text.rows.length - 1) {
+    let is_not_last_row = r < text.rows.length - 1;
+    if (is_not_last_row) {
         r = r + 1;
         let len = text.rows[r].textContent.length;
-        const ret = move_caret_to_eol_if_shorter_than_previous(r, c, previous_c, len);
-        c = ret.c;
-        previous_c = ret.previous_c;
+        c = move_caret_to_eol_if_shorter_than_previous(c, previous_c, len);
         c = move_caret_back_to_previous_if_line_is_long_enough(r, c, previous_c, len);
     } else {
         let len = text.rows[r].textContent.length;
@@ -28,13 +25,10 @@ function arrow_down(cursor, text) {
 
 function arrow_up(cursor, text) {
     let { r, c, previous_c } = cursor;
-    //scroll_up();
     if (r > 0) {
         r = r - 1;
         let len = text.rows[r].textContent.length;
-        const ret = move_caret_to_eol_if_shorter_than_previous(r, c, previous_c, len);
-        c = ret.c;
-        previous_c = ret.previous_c;
+        c = move_caret_to_eol_if_shorter_than_previous(c, previous_c, len);
         c = move_caret_back_to_previous_if_line_is_long_enough(r, c, previous_c, len);
     } else {
         const ret = move_caret_to_start_and_reset_previous_if_moving_up_from_within_top_line(r, c, previous_c);
@@ -56,7 +50,7 @@ function arrow_left(cursor, text) {
     let { r, c, previous_c } = cursor;
     if (c > 0) {
         c = c - 1;
-        previous_c = 0;
+        previous_c = c;
     } else if (r > 0) {
         r = r - 1;
         c = text.rows[r].textContent.length;
@@ -75,10 +69,11 @@ function arrow_left(cursor, text) {
 
 function arrow_right(cursor, text) {
     let { r, c, previous_c } = cursor;
+    let is_not_last_row = r < text.rows.length - 1;
     if (c < text.rows[r].textContent.length) {
         c = c + 1;
-        previous_c = 0;
-    } else if (r < text.rows.length - 1) {
+        previous_c = c;
+    } else if (is_not_last_row) {
         r = r + 1;
         c = 0;
         previous_c = 0;
@@ -94,12 +89,16 @@ function arrow_right(cursor, text) {
     }
 }
 
-function move_caret_to_eol_if_shorter_than_previous(r, c, previous_c, len) {
+function move_caret_to_eol_if_shorter_than_previous(c, previous_c, len) {
     if (c > len) {
-        previous_c = c;
         c = len;
+    } else if (previous_c > len) {
+        c = previous_c;
+        if (c > len) {
+            c = len;
+        }
     }
-    return { c, previous_c };
+    return c;
 }
 
 function move_caret_back_to_previous_if_line_is_long_enough(r, c, previous_c, len) {

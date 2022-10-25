@@ -27,13 +27,17 @@ test("clicking or arrowing to a row highlights it. The highlight should be full 
 
         //click first row highlights it only
         row1.click();
+        page.waitForTimeout(500);
         await expect(row1).toHaveClass("highlighted");
         await expect(row2).toHaveClass("");
 
         //arrowdown highlights second row only
         await page.keyboard.press("ArrowDown");
+        page.waitForTimeout(500);
         await expect(row1).toHaveClass("");
         await expect(row2).toHaveClass("highlighted");
+
+        //await page.pause();
     }
 });
 
@@ -402,7 +406,7 @@ test("left arrow at start of a row, moves cursor to end of previous row, except 
     }
 });
 
-test.only("right arrow at end of a row, moves cursor to start of next row, except last row", async ({ page }) => {
+test("right arrow at end of a row, moves cursor to start of next row, except last row", async ({ page }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test1");
     async function this_test(page, url) {
         await page.goto(url);
@@ -436,6 +440,67 @@ test.only("right arrow at end of a row, moves cursor to start of next row, excep
         await page.keyboard.press("ArrowRight");
         cursor_box = await cursor.boundingBox();
         expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
+test("using up and down arrow keys will remember the current column starting point across lines of differing lengths", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test4");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let cursor = await page.locator("i").nth(0);
+
+        //move right 3 chars, is at 3rd char of first row
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        let cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 3 && cursor_box.y === y).toBeTruthy();
+
+        //move down 1 row, is at end of second 2 char row
+        await page.keyboard.press("ArrowDown");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 2 && cursor_box.y === y + h).toBeTruthy();
+
+        //move down 1 row, is at end of third 1 char row
+        await page.keyboard.press("ArrowDown");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //move down 1 row, is at 3rd char of last 4 char row - not the end, but same as starting point 3rd char
+        await page.keyboard.press("ArrowDown");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 3 && cursor_box.y === y + h * 3).toBeTruthy();
+
+        //move right 3 chars, and left 1 char, is at 5th char of last row
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowLeft");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 5 && cursor_box.y === y + h * 3).toBeTruthy();
+
+        // go back up after resetting the previous column position (previous_c)
+
+        //move up 1 row, is at end of third 1 char row
+        await page.keyboard.press("ArrowUp");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w && cursor_box.y === y + h * 2).toBeTruthy();
+
+        //move up 1 row, is at end of second 2 char row
+        await page.keyboard.press("ArrowUp");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 2 && cursor_box.y === y + h).toBeTruthy();
+
+        //move up 1 row, is back to 5th char of first row
+        await page.keyboard.press("ArrowUp");
+        cursor_box = await cursor.boundingBox();
+        expect(cursor_box.x === x - 1 + w * 5 && cursor_box.y === y).toBeTruthy();
 
         //await page.pause();
     }
