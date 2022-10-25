@@ -41,9 +41,17 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original
 -   [x] ✅ tabbing while a single line select is active, will replace that selection with [4] spaces
 -   [x] ✅ using delete on a selection will delete it all, and leave cursor at leftmost point
+-   [x] Backspace will remove the character to the left, and at beginning of 2nd or lower line will join that line with previous, pulling it onto same line
+-   [x] Delete will remove character to the right, and at end of 2nd last line or higher will join that line with the next, pulling it onto same line (bug when zero chars remaining)
+-   [x] Typing a character from these keys will insert it at the cursor and move cursor on 1 character
+    -   `` [US-Keyboard] [abcdefghijklmnopqrstuvwxyz] [`] [1234567890] [-=] [[]] [;'] [,./] ``
+-   [x] Shift-typing a character from these keys will insert it at the cursor and move cursor on 1 character
+    -   `[US-Keyboard] [ABCDEFGHIJKLMNOPQRSTUVWXYZ] [~] [!@#$%^&*()] [_+] [{}] [:"] [<>?]`
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
+-   [ ] Capslock should capitalise text
+-   [ ] using backspace on a selection will delete it all, and leave cursor at leftmost point
 -   [ ] if a cursor update takes cursor offscreen, as in hitting return at end of page - scroll to cursor
 -   [ ] shift-tabbing while a single or multiline select is active, will outdent the line by removing up to 4 spaces from the start of the line(s)
 -   [ ] Undo once
