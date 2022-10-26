@@ -797,6 +797,52 @@ test("using delete on a selection will delete it all, and leave cursor at leftmo
     }
 });
 
+test("Backspace will remove the character to the left, and at beginning of 2nd or lower line will join that line with previous, pulling it onto same line", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let row1 = page.locator("#text div").nth(0);
+        let row2 = page.locator("#text div").nth(1);
+        let row3 = page.locator("#text div").nth(2);
+
+        expect((await row1.textContent()) === "123").toBeTruthy();
+        expect((await row2.textContent()) === "abc").toBeTruthy();
+        expect((await row3.textContent()) === "x").toBeTruthy();
+
+        // move to start of last row, Backspace brings x to end of row above
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("Backspace");
+        await page.waitForTimeout(500);
+
+        expect((await row1.textContent()) === "123").toBeTruthy();
+        expect((await row2.textContent()) === "abcx").toBeTruthy();
+        let rows = await page.$$("#text div");
+        expect(rows.length === 2).toBeTruthy();
+
+        //individual backspaces remove 1 char each
+        await page.keyboard.press("Backspace");
+        expect((await row2.textContent()) === "abx").toBeTruthy();
+
+        await page.keyboard.press("Backspace");
+        expect((await row2.textContent()) === "ax").toBeTruthy();
+
+        await page.keyboard.press("Backspace");
+        expect((await row2.textContent()) === "x").toBeTruthy();
+
+        //another backspace onto line above
+        await page.keyboard.press("Backspace");
+        expect((await row1.textContent()) === "123x").toBeTruthy();
+
+        rows = await page.$$("#text div");
+        expect(rows.length === 1).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper
