@@ -42,7 +42,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ tabbing while a single line select is active, will replace that selection with [4] spaces
 -   [x] ✅ using delete on a selection will delete it all, and leave cursor at leftmost point
 -   [x] ✅ Backspace will remove the character to the left, and at beginning of 2nd or lower line will join that line with previous, pulling it onto same line
--   [x] Delete will remove character to the right, and at end of 2nd last line or higher will join that line with the next, pulling it onto same line (bug when zero chars remaining)
+-   [x] ✅ Delete will remove character to the right, and at end of 2nd last line or higher will join that line with the next, pulling it onto same line
 -   [x] Typing a character from these keys will insert it at the cursor and move cursor on 1 character
     -   `` [US-Keyboard] [abcdefghijklmnopqrstuvwxyz] [`] [1234567890] [-=] [[]] [;'] [,./] ``
 -   [x] Shift-typing a character from these keys will insert it at the cursor and move cursor on 1 character

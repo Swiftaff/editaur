@@ -843,6 +843,57 @@ test("Backspace will remove the character to the left, and at beginning of 2nd o
     }
 });
 
+test.only("Delete will remove character to the right, and at end of 2nd last line or higher will join that line with the next, pulling it onto same line", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let row1 = page.locator("#text div").nth(0);
+        let row2 = page.locator("#text div").nth(1);
+        let row3 = page.locator("#text div").nth(2);
+
+        expect((await row1.textContent()) === "123").toBeTruthy();
+        expect((await row2.textContent()) === "abc").toBeTruthy();
+        expect((await row3.textContent()) === "x").toBeTruthy();
+
+        // individual deletes remove 1 char each
+        await page.keyboard.press("Delete");
+        expect((await row1.textContent()) === "23").toBeTruthy();
+
+        await page.keyboard.press("Delete");
+        expect((await row1.textContent()) === "3").toBeTruthy();
+
+        await page.keyboard.press("Delete");
+        expect((await row1.textContent()) === "").toBeTruthy();
+
+        //last delete on first line brings next row up
+        await page.keyboard.press("Delete");
+        expect((await row1.textContent()) === "abc").toBeTruthy();
+        expect((await row2.textContent()) === "x").toBeTruthy();
+        let rows = await page.$$("#text div");
+        expect(rows.length === 2).toBeTruthy();
+
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        expect((await row1.textContent()) === "x").toBeTruthy();
+        rows = await page.$$("#text div");
+        expect(rows.length === 1).toBeTruthy();
+
+        //does't remove last row after deleting to end of file
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("a");
+        expect((await row1.textContent()) === "a").toBeTruthy();
+        rows = await page.$$("#text div");
+        expect(rows.length === 1).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper

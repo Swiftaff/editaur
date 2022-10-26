@@ -93,12 +93,14 @@ function del(cursor, text) {
         let at_start_of_line = c === 0;
         let row_text = text.rows[r].textContent;
         let at_end_of_line = c === row_text.length;
-        let at_last_row = r === text.rows.length;
+        let at_last_row = r === text.rows.length - 1;
         let current_line_has_no_text = row_text.length === 0;
         if (at_start_of_line) {
             if (current_line_has_no_text) {
-                text.rows[r].remove();
-                text.rows.splice(r, 1);
+                if (!at_last_row) {
+                    text.rows[r].remove();
+                    text.rows.splice(r, 1);
+                }
             } else {
                 text.update_text(text.rows[r], row_text.slice(c + 1));
             }
