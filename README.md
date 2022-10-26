@@ -45,7 +45,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ Delete will remove character to the right, and at end of 2nd last line or higher will join that line with the next, pulling it onto same line
 -   [x] ✅ Typing a character from these keys will insert it at the cursor and move cursor on 1 character
     -   `` [US-Keyboard] [abcdefghijklmnopqrstuvwxyz] [`] [1234567890] [-=] [[]] [;'] [,./] ``
--   [x] Shift-typing a character from these keys will insert it at the cursor and move cursor on 1 character
+-   [x] ✅ Shift-typing a character from these keys will insert it at the cursor and move cursor on 1 character
     -   `[US-Keyboard] [ABCDEFGHIJKLMNOPQRSTUVWXYZ] [~] [!@#$%^&*()] [_+] [{}] [:"] [<>?]`
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:

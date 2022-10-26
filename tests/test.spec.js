@@ -81,7 +81,7 @@ test("clicking left of a row puts cursor before first character", async ({ page 
     }
 });
 
-test.only("cursor blink animation restarts after each action", async ({ page }) => {
+test("cursor blink animation restarts after each action", async ({ page }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test1");
     async function this_test(page, url) {
         await page.goto(url);
@@ -922,6 +922,42 @@ test("Typing a character from these keys will insert it at the cursor and move c
             await page.keyboard.press(char);
         }
         expect((await row1.textContent()) === chars1).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
+test("Shift-typing a character from these keys will insert it at the cursor and move cursor on 1 character", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let row1 = page.locator("#text div").nth(0);
+
+        // remove existing text
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+
+        await page.keyboard.down("Shift");
+
+        //[US-Keyboard] [ABCDEFGHIJKLMNOPQRSTUVWXYZ] [~] [!@#$%^&*()] [_+] [{}] [:"] [<>?] ``
+        let chars1 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}:"<>?';
+        for (const char of [...chars1]) {
+            await page.keyboard.press(char);
+        }
+        let foundtext = await row1.textContent();
+        console.log(foundtext);
+        expect(foundtext === chars1).toBeTruthy();
+
+        await page.keyboard.up("Shift");
 
         //await page.pause();
     }
