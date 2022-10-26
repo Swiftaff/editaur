@@ -81,7 +81,7 @@ test("clicking left of a row puts cursor before first character", async ({ page 
     }
 });
 
-test("cursor blink animation restarts after each action", async ({ page }) => {
+test.only("cursor blink animation restarts after each action", async ({ page }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test1");
     async function this_test(page, url) {
         await page.goto(url);
@@ -89,8 +89,11 @@ test("cursor blink animation restarts after each action", async ({ page }) => {
 
         //after arrowdown, cursor should have "flashy moved" class, then just "flashy" class
         await page.keyboard.press("ArrowDown");
-        await expect(cursor).toHaveClass("flashy moved");
-        await expect(cursor).toHaveClass("flashy");
+        cursor = await page.locator("i").nth(0);
+        expect(cursor).toHaveClass("flashy moved");
+        expect(cursor).toHaveClass("flashy");
+
+        await page.pause();
     }
 });
 
@@ -843,7 +846,7 @@ test("Backspace will remove the character to the left, and at beginning of 2nd o
     }
 });
 
-test.only("Delete will remove character to the right, and at end of 2nd last line or higher will join that line with the next, pulling it onto same line", async ({
+test("Delete will remove character to the right, and at end of 2nd last line or higher will join that line with the next, pulling it onto same line", async ({
     page,
 }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test1");
@@ -889,6 +892,36 @@ test.only("Delete will remove character to the right, and at end of 2nd last lin
         expect((await row1.textContent()) === "a").toBeTruthy();
         rows = await page.$$("#text div");
         expect(rows.length === 1).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
+test("Typing a character from these keys will insert it at the cursor and move cursor on 1 character", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let row1 = page.locator("#text div").nth(0);
+
+        // remove existing text
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+
+        //[US-Keyboard] [abcdefghijklmnopqrstuvwxyz] [`] [1234567890] [-=] [[]] [;'] [,./] ``
+        let chars1 = "abcdefghijklmnopqrstuvwxyz`1234567890-=[];',./";
+        for (const char of [...chars1]) {
+            await page.keyboard.press(char);
+        }
+        expect((await row1.textContent()) === chars1).toBeTruthy();
 
         //await page.pause();
     }
