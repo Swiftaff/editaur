@@ -25,6 +25,7 @@ const down_functions = {
     //
     control_v: edit.paste,
     control_c: edit.copy,
+    control_x: edit.cut,
     control_tab: edit.tab_in,
     //
     shift_tab: edit.tab_out,

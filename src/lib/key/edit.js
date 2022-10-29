@@ -72,10 +72,12 @@ function del(cursor, text) {
                 start = cursor.selection.end;
                 end = cursor.selection.start;
             }
-            for (let index = start.r; index <= end.r; index++) {
+            //delete from bottom up so index always refers to an existing row
+            for (let index = end.r; index >= start.r; index--) {
                 if (index === start.r) {
                     let new_text =
-                        text.rows[start.r].textContent.slice(0, start.c) + text.rows[end.r].textContent.slice(end.c);
+                        text.rows[start.r].textContent.slice(0, start.c) +
+                        (text.rows[index + 1] ? text.rows[index + 1].textContent.slice(end.c) : "");
                     text.update_text(text.rows[start.r], new_text);
                     cursor.update(start.r, start.c, start.c);
                     cursor.selection_reset_to_cursor();
@@ -229,6 +231,11 @@ async function copy(cursor, text) {
     }
 }
 
+async function cut(cursor, text) {
+    await copy(cursor, text);
+    await del(cursor, text);
+}
+
 function tab_in(cursor, text) {
     let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
     let { start, end } = cursor.selection.normalised_start_end();
@@ -301,6 +308,7 @@ export default {
     control_key_down,
     control_key_up,
     copy,
+    cut,
     paste,
     tab_in,
     tab_out,

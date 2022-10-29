@@ -638,6 +638,77 @@ test("copy selected text, including mulitline to the clipboard, paste clipboard,
     }
 });
 
+test("cut selected text, including mulitline to the clipboard, paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)", async ({
+    page,
+}) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+        let row1 = page.locator("#text div").nth(0);
+        let row2 = page.locator("#text div").nth(1);
+        let row1_text = await row1.textContent();
+        let row2_text = await row2.textContent();
+        expect(row2_text === "abc").toBeTruthy();
+
+        //cut 3 chars from first row
+
+        await page.keyboard.down("Shift");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.up("Shift");
+        await page.waitForTimeout(500);
+        await page.keyboard.down("Control");
+        await page.keyboard.press("X");
+
+        //paste into end of second row
+        await page.keyboard.press("ArrowDown");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("V");
+        await page.keyboard.up("Control");
+
+        row1_text = await row1.textContent();
+        row2_text = await row2.textContent();
+        expect(row1_text === "").toBeTruthy();
+        expect(row2_text === "123abc").toBeTruthy();
+
+        //move cursor back to start, cut all lines
+        await page.waitForTimeout(500);
+        await page.keyboard.press("ArrowUp");
+        await page.keyboard.down("Shift");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.up("Shift");
+        await page.waitForTimeout(500);
+        await page.keyboard.down("Control");
+        await page.keyboard.press("X");
+        row1_text = await row1.textContent();
+        expect(row1_text === "").toBeTruthy();
+
+        //paste into first row
+        await page.waitForTimeout(500);
+        await page.keyboard.press("V");
+        await page.keyboard.up("Control");
+
+        row1 = page.locator("#text div").nth(0);
+        row2 = page.locator("#text div").nth(1);
+        let row3 = page.locator("#text div").nth(2);
+        row1_text = await row1.textContent();
+        row2_text = await row2.textContent();
+        let row3_text = await row3.textContent();
+        expect(row1_text === "").toBeTruthy();
+        expect(row2_text === "123abc").toBeTruthy();
+        expect(row3_text === "x").toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 test("tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original", async ({
     page,
 }) => {

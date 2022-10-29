@@ -38,6 +38,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ using up and down arrow keys will remember the current column starting point across lines of differing lengths
 -   [x] ✅ using left and right arrow or other cursor moving functions (e.g. typing characters) will reset this column starting point for future up down moves
 -   [x] ✅ copy selected text, including mulitline to the clipboard, paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)
+-   [x] ✅ cut selected text, including mulitline to the clipboard, paste clipboard, including multiline, starting at the current cursor (not yet replacing selection)
 -   [x] ✅ tabbing while a multiline select is active, will insert [4] spaces at the start of all selected rows - and shift the selection to match original
 -   [x] ✅ tabbing while a single line select is active, will replace that selection with [4] spaces
 -   [x] ✅ using delete on a selection will delete it all, and leave cursor at leftmost point
@@ -58,7 +59,6 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] Multiple Undo
 -   [ ] double & triple clicking while holding shift will extend selection
 -   [ ] using tab or paste into a selection will replace it
--   [ ] cut text
 -   [ ] navigate folders and files
 -   [ ] open or save text files
 -   [ ] tabs for multiple files
