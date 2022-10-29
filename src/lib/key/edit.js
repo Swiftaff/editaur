@@ -25,31 +25,35 @@ const clipboard = {
 };
 
 function backspace(cursor, text) {
-    let { r, c } = cursor;
-    let at_start_of_line = c === 0;
-    let at_end_of_line = c === text.rows[r].textContent.length;
-    let row_text = text.rows[r].textContent;
-    if (at_start_of_line) {
-        if (r > 0) {
-            let r2 = r - 1;
-            let c2 = text.rows[r2].textContent.length;
-            let text1 = text.rows[r - 1].textContent;
-            text.update_text(text.rows[r - 1], text1.concat(row_text));
-            text.rows[r].remove();
-            text.rows.splice(r, 1);
-            cursor.update(r2, c2, c2);
-            text.highlight_row(cursor);
-        }
-    } else if (at_end_of_line) {
-        text.update_text(text.rows[r], row_text.slice(0, c - 1));
-        cursor.update(r, c - 1, c - 1);
+    if (cursor.selection.is_in_progress()) {
+        del(cursor, text);
     } else {
-        //mid-line
-        text.update_text(text.rows[r], row_text.slice(0, c - 1).concat(row_text.slice(c)));
-        cursor.update(r, c - 1, c - 1);
+        let { r, c } = cursor;
+        let at_start_of_line = c === 0;
+        let at_end_of_line = c === text.rows[r].textContent.length;
+        let row_text = text.rows[r].textContent;
+        if (at_start_of_line) {
+            if (r > 0) {
+                let r2 = r - 1;
+                let c2 = text.rows[r2].textContent.length;
+                let text1 = text.rows[r - 1].textContent;
+                text.update_text(text.rows[r - 1], text1.concat(row_text));
+                text.rows[r].remove();
+                text.rows.splice(r, 1);
+                cursor.update(r2, c2, c2);
+                text.highlight_row(cursor);
+            }
+        } else if (at_end_of_line) {
+            text.update_text(text.rows[r], row_text.slice(0, c - 1));
+            cursor.update(r, c - 1, c - 1);
+        } else {
+            //mid-line
+            text.update_text(text.rows[r], row_text.slice(0, c - 1).concat(row_text.slice(c)));
+            cursor.update(r, c - 1, c - 1);
+        }
+        //scroll_up();
+        //scroll_down();
     }
-    //scroll_up();
-    //scroll_down();
 }
 
 function del(cursor, text) {
