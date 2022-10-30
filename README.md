@@ -50,6 +50,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ Shift-typing a character from these keys will insert it at the cursor and move cursor on 1 character
     -   `[US-Keyboard] [ABCDEFGHIJKLMNOPQRSTUVWXYZ] [~] [!@#$%^&*()] [_+] [{}] [:"] [<>?]`
 -   [x] ✅ Capslock should capitalise text
+-   [x] ✅ Ctrl-A select all
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
@@ -63,7 +64,6 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] open or save text files
 -   [ ] tabs for multiple files
 -   [ ] line numbers
--   [ ] Ctrl-A select all
 -   [ ] Enter creates a new line at start, middle or end of current line depending on cursor
 
 ## Things editaur would like to do when it grows up:

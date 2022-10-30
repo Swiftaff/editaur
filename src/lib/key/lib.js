@@ -23,6 +23,7 @@ const down_functions = {
     control: edit.control_key_down,
     capslock: noop,
     //
+    control_a: edit.select_all,
     control_v: edit.paste,
     control_c: edit.copy,
     control_x: edit.cut,

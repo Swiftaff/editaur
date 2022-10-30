@@ -1133,7 +1133,45 @@ test("Capslock should capitalise lowercase letters a-z", async ({ page }) => {
     }
 });
 
+test("Ctrl-A select all", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let { x, y } = await get_text_xy(page);
+        let { w, h } = await get_char_wh(page);
+
+        // at start selection should be 0 to 0 in all 3 rows
+        await expect_row_selection(page, 0, 0, 0);
+        await expect_row_selection(page, 1, 0, 0);
+        await expect_row_selection(page, 2, 0, 0);
+
+        // Ctrl-A = selection should select all, i.e. 0 to 3, 0 to 3, 0 to 1
+        await page.keyboard.down("Control");
+        await page.keyboard.down("A");
+        await page.keyboard.up("Control");
+        await expect_row_selection(page, 0, 0, 3);
+        await expect_row_selection(page, 1, 0, 3);
+        await expect_row_selection(page, 2, 0, 1);
+
+        await page.pause();
+    }
+});
+
 // helpers
+async function expect_row_selection(page, row_index, start, end) {
+    let row = await page.locator(`#text div >> nth=${row_index}`);
+    let row_exists = await row.count();
+    let data_start = await row.getAttribute("data-start");
+    let data_end = await row.getAttribute("data-end");
+    console.log(row_exists, data_start, start, data_end, end);
+    if (start === 0 && end === 0) {
+        //check for data-start and data-end NOT being there, i.e. being null
+        expect(row_exists && !data_start && !data_end).toBeTruthy();
+    } else {
+        expect(row_exists && data_start === "" + start && data_end === "" + end).toBeTruthy();
+    }
+}
+
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper
     let text = await page.locator("#text");
