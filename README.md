@@ -49,10 +49,10 @@ A simple javascript text editor, without using textarea or any dependencies - em
     -   `` [US-Keyboard] [abcdefghijklmnopqrstuvwxyz] [`] [1234567890] [-=] [[]] [;'] [,./] ``
 -   [x] ✅ Shift-typing a character from these keys will insert it at the cursor and move cursor on 1 character
     -   `[US-Keyboard] [ABCDEFGHIJKLMNOPQRSTUVWXYZ] [~] [!@#$%^&*()] [_+] [{}] [:"] [<>?]`
+-   [x] ✅ Capslock should capitalise text
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
--   [ ] Capslock should capitalise text
 -   [ ] if a cursor update takes cursor offscreen, as in hitting return at end of page - scroll to cursor
 -   [ ] shift-tabbing while a single or multiline select is active, will outdent the line by removing up to 4 spaces from the start of the line(s)
 -   [ ] Undo once
@@ -64,6 +64,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] tabs for multiple files
 -   [ ] line numbers
 -   [ ] Ctrl-A select all
+-   [ ] Enter creates a new line at start, middle or end of current line depending on cursor
 
 ## Things editaur would like to do when it grows up:
 

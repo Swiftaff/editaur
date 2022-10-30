@@ -1093,6 +1093,46 @@ test("Shift-typing a character from these keys will insert it at the cursor and 
     }
 });
 
+test("Capslock should capitalise lowercase letters a-z", async ({ page }) => {
+    await this_test(page, "http://127.0.0.1:1420?testname=test1");
+    async function this_test(page, url) {
+        await page.goto(url);
+        let row1 = page.locator("#text div").nth(0);
+
+        // remove existing text
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+        await page.keyboard.press("Delete");
+
+        // first row is lowercase by default
+        //[US-Keyboard] [ABCDEFGHIJKLMNOPQRSTUVWXYZ]
+        let chars1 = "abcdefghijklmnopqrstuvwxyz";
+        let chars2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        for (const char of [...chars2]) {
+            await page.keyboard.press("Key" + char);
+        }
+        expect((await row1.textContent()) === chars1).toBeTruthy();
+
+        //second row is uppercase with CapsLock
+        await page.keyboard.press("Enter");
+        await page.keyboard.press("CapsLock");
+        for (const char of [...chars2]) {
+            //mocking the CapsLock key. Playwright doesn't apply it?
+            await page.keyboard.press("Shift+Key" + char);
+        }
+        let row2 = page.locator("#text div").nth(1);
+        expect((await row2.textContent()) === chars2).toBeTruthy();
+
+        //await page.pause();
+    }
+});
+
 // helpers
 async function get_text_xy(page) {
     // get leftmost and topmost position of #text wrapper
