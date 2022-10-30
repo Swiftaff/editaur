@@ -27,13 +27,13 @@ test("clicking or arrowing to a row highlights it. The highlight should be full 
 
         //click first row highlights it only
         row1.click();
-        page.waitForTimeout(500);
+        await page.waitForTimeout(500);
         await expect(row1).toHaveClass("highlighted");
         await expect(row2).toHaveClass("");
 
         //arrowdown highlights second row only
         await page.keyboard.press("ArrowDown");
-        page.waitForTimeout(500);
+        await page.waitForTimeout(500);
         await expect(row1).toHaveClass("");
         await expect(row2).toHaveClass("highlighted");
 
@@ -85,15 +85,14 @@ test("cursor blink animation restarts after each action", async ({ page }) => {
     await this_test(page, "http://127.0.0.1:1420?testname=test1");
     async function this_test(page, url) {
         await page.goto(url);
-        let cursor = await page.locator("i").nth(0);
+        let cursor = await page.locator("i");
 
         //after arrowdown, cursor should have "flashy moved" class, then just "flashy" class
         await page.keyboard.press("ArrowDown");
-        cursor = await page.locator("i").nth(0);
-        expect(cursor).toHaveClass("flashy moved");
-        expect(cursor).toHaveClass("flashy");
+        await expect(cursor).toHaveClass("flashy moved");
+        await expect(cursor).toHaveClass("flashy");
 
-        await page.pause();
+        //await page.pause();
     }
 });
 
@@ -136,7 +135,7 @@ test("click and drag to the right and release on a single line, selects some cha
         await page.mouse.up();
 
         //selection should be 0 to num chars
-        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
+        await expect_row_selection(page, 1, 0, chars_in_row2);
 
         //await page.pause();
     }
@@ -158,7 +157,7 @@ test("click and drag to the left and release on a single line, selects some char
         await page.mouse.up();
 
         //selection should be 0 to num chars
-        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
+        await expect_row_selection(page, 1, 0, chars_in_row2);
 
         //await page.pause();
     }
@@ -186,9 +185,9 @@ test("click and drag to the right and down and release on multiple lines, select
         await page.mouse.up();
 
         //selection should be 0 to num chars in all rows
-        await page.locator(`#text div >> nth=0 data-start="0" data-end="${"" + chars_in_row1}"`);
-        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
-        await page.locator(`#text div >> nth=2 data-start="0" data-end="${"" + chars_in_row3}"`);
+        await expect_row_selection(page, 0, 0, chars_in_row1);
+        await expect_row_selection(page, 1, 0, chars_in_row2);
+        await expect_row_selection(page, 2, 0, chars_in_row3);
 
         //await page.pause();
     }
@@ -216,9 +215,9 @@ test("click and drag to the left and up and release on multiple lines, selects f
         await page.mouse.up();
 
         //selection should be 0 to num chars in all rows
-        await page.locator(`#text div >> nth=0 data-start="0" data-end="${"" + chars_in_row1}"`);
-        await page.locator(`#text div >> nth=1 data-start="0" data-end="${"" + chars_in_row2}"`);
-        await page.locator(`#text div >> nth=2 data-start="0" data-end="${"" + chars_in_row3}"`);
+        await expect_row_selection(page, 0, 0, chars_in_row1);
+        await expect_row_selection(page, 1, 0, chars_in_row2);
+        await expect_row_selection(page, 2, 0, chars_in_row3);
 
         //await page.pause();
     }
@@ -239,19 +238,19 @@ test("holding shift after a selection allows the end point of the selection to b
         await page.mouse.down();
         await page.mouse.move(2 * w + x, y + 10);
         await page.mouse.up();
-        await page.locator('#text div >> nth=0 data-start="0" data-end="2"');
+        await expect_row_selection(page, 0, 0, 2);
 
         // Hold down shift, and click mouse 2 chars to the right, release shift = selection should be 0 to 4
         await page.keyboard.down("Shift");
         await page.waitForTimeout(500); //flaky, any other way to do it?
         await page.mouse.click(4 * w + x, y + 10);
-        await page.locator('#text div >> nth=0 data-start="0" data-end="4"');
+        await expect_row_selection(page, 0, 0, 4);
 
         // Hold down shift, and click mouse 1 char to the left, release shift = selection should be 0 to 3
         await page.keyboard.down("Shift");
         await page.waitForTimeout(500); //flaky, any other way to do it?
         await page.mouse.click(3 * w + x, y + 10);
-        await page.locator('#text div >> nth=0 data-start="0" data-end="3"');
+        await expect_row_selection(page, 0, 0, 3);
 
         //await page.pause();
     }
@@ -267,15 +266,15 @@ test("clicking and dragging a selection to the top, right or bottom of the scrol
         await page.goto(url);
         let { x, y } = await get_text_xy(page);
         let { w, h } = await get_char_wh(page);
-        //let row1 = await page.locator("#text div").nth(0);
 
         // mousedown left of first row of text, drag down to bottom of viewport
         await page.mouse.move(x - 10, y + 10);
         await page.mouse.down();
         await page.mouse.move(x + w, 680);
+        await page.waitForTimeout(500); //flaky, any other way to do it?
 
         // the last row of text should be selected, although it wasn't originally onscreen
-        await page.locator('#text div >> nth=55 data-start="0" data-end="1"');
+        await expect_row_selection(page, 49, 0, 1);
 
         // text panel should not be scrolled right, but should be scrolled offscreen at top
         let { x: x1, y: y1 } = await get_text_xy(page);
@@ -285,6 +284,7 @@ test("clicking and dragging a selection to the top, right or bottom of the scrol
 
         // drag to bottom right of viewport
         await page.mouse.move(1260, 680);
+        await page.waitForTimeout(500); //flaky, any other way to do it?
 
         // text panel should be scrolled offscreen at left, and still scrolled offscreen at top
         let { x: x2, y: y2 } = await get_text_xy(page);
@@ -294,7 +294,7 @@ test("clicking and dragging a selection to the top, right or bottom of the scrol
 
         // drag to top right of viewport
         await page.mouse.move(1260, 5);
-        await page.waitForTimeout(500); //flaky, any other way to do it?
+        await page.waitForTimeout(1000); //flaky, any other way to do it?
 
         // text panel should be scrolled offscreen at left, but no longer scrolled offscreen at top
         let { x: x3, y: y3 } = await get_text_xy(page);
@@ -312,11 +312,10 @@ test("double-clicking a word (between two non-space characters) will select that
         await page.goto(url);
         let { x, y } = await get_text_xy(page);
         let { w, h } = await get_char_wh(page);
-        let row1 = await page.locator("#text div").nth(0);
 
         // doubleclick in middle of first word of first row of text = selection should be 0 to 10
         await page.mouse.dblclick(x + w, y + 10);
-        await page.locator('#text div >> nth=0 data-start="0" data-end="10"');
+        await expect_row_selection(page, 0, 0, 10);
 
         //await page.pause();
     }
@@ -328,12 +327,11 @@ test("triple-clicking anywhere on a line will select the whole line", async ({ p
         await page.goto(url);
         let { x, y } = await get_text_xy(page);
         let { w, h } = await get_char_wh(page);
-        let row1 = await page.locator("#text div").nth(0);
 
         // tripleclick in middle of first word of first row of text = selection should be whole line
         await page.mouse.dblclick(x + w, y + 10);
         await page.mouse.click(x + w, y + 10);
-        await page.locator('#text div >> nth=0 data-start="0" data-end="219"');
+        await expect_row_selection(page, 0, 0, 219);
 
         //await page.pause();
     }
@@ -1084,7 +1082,6 @@ test("Shift-typing a character from these keys will insert it at the cursor and 
             await page.keyboard.press(char);
         }
         let foundtext = await row1.textContent();
-        console.log(foundtext);
         expect(foundtext === chars1).toBeTruthy();
 
         await page.keyboard.up("Shift");
@@ -1153,7 +1150,7 @@ test("Ctrl-A select all", async ({ page }) => {
         await expect_row_selection(page, 1, 0, 3);
         await expect_row_selection(page, 2, 0, 1);
 
-        await page.pause();
+        //await page.pause();
     }
 });
 
@@ -1163,7 +1160,6 @@ async function expect_row_selection(page, row_index, start, end) {
     let row_exists = await row.count();
     let data_start = await row.getAttribute("data-start");
     let data_end = await row.getAttribute("data-end");
-    console.log(row_exists, data_start, start, data_end, end);
     if (start === 0 && end === 0) {
         //check for data-start and data-end NOT being there, i.e. being null
         expect(row_exists && !data_start && !data_end).toBeTruthy();

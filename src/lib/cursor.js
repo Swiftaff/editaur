@@ -158,7 +158,7 @@ function init() {
                 this.selection.end = { r: this.r, c: row_text.length };
                 this.selection.active = true;
                 let c = row_text.length;
-                this.update(this.r, c, c);
+                this.update(this.r, c, c, false);
                 text.selection_update(this);
             } else if (this.multiple_clicks === 2) {
                 if (this.c > 0 && this.c < row_text.length) {
@@ -169,16 +169,17 @@ function init() {
                         let left_split = 0;
                         for (let index = this.c - 1; index >= 0; index--) {
                             let char = left[index];
-                            if (left_split === 0 && char == " ") {
+                            if (char === " ") {
                                 left_split = index + 1;
                                 break;
                             }
                         }
                         let right = row_text.slice(this.c);
-                        let right_split = right.length - 1;
+
+                        let right_split = right.length;
                         for (let index = 0; index < right.length - 1; index++) {
                             let char = right[index];
-                            if (right_split === right.length - 1 && char == " ") {
+                            if (char === " ") {
                                 right_split = index;
                                 break;
                             }
@@ -187,7 +188,7 @@ function init() {
                         this.selection.end = { r: this.r, c: this.c + right_split };
                         this.selection.active = true;
                         let c = this.c + right_split;
-                        this.update(this.r, c, c);
+                        this.update(this.r, c, c, false);
                         text.selection_update(this);
                     }
                 }
