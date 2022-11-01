@@ -38,15 +38,6 @@ div {
 #text div {
   white-space:pre;
 }
-.selection{
-  z-index: -1;
-  position: absolute;
-  background-color:pink;
-  top: 0px;
-  left: 0px;
-  width: 0px;
-  height: 1.2rem;
-}
 .highlighted{
   background-color: rgba(200,200,200,0.5);
 }

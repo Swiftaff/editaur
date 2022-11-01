@@ -56,9 +56,8 @@ function init(imported_rows, cursor) {
         get_new_row(text_content, cursor, testy) {
             let el = document.createElement("div");
             this.update_text(el, text_content);
-            el.style.height = "1.2rem";
             if (testy) {
-                el.style["background-color"] = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+                el.style.backgroundColor = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
                     Math.random() * 255
                 }, 0.2)`;
             }
@@ -99,7 +98,7 @@ function init(imported_rows, cursor) {
             let { width } = cursor.scrolling.main.getBoundingClientRect();
             this.el.style.width = width + "px";
             this.rows.forEach((row) => {
-                row.className = "";
+                row.removeAttribute("class");
                 row.style.width = Math.ceil(cursor.w * row.textContent.length) + "px";
             });
         },
