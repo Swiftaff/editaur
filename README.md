@@ -51,6 +51,8 @@ A simple javascript text editor, without using textarea or any dependencies - em
     -   `[US-Keyboard] [ABCDEFGHIJKLMNOPQRSTUVWXYZ] [~] [!@#$%^&*()] [_+] [{}] [:"] [<>?]`
 -   [x] ✅ Capslock should capitalise text
 -   [x] ✅ Ctrl-A select all
+-   [x] double clicking while holding shift will extend selection
+-   [ ] triple clicking while holding shift will extend selection
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
@@ -58,16 +60,18 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] shift-tabbing while a single or multiline select is active, will outdent the line by removing up to 4 spaces from the start of the line(s)
 -   [ ] Undo once
 -   [ ] Multiple Undo
--   [ ] double & triple clicking while holding shift will extend selection
+
 -   [ ] using tab or paste into a selection will replace it
 -   [ ] navigate folders and files
 -   [ ] open or save text files
 -   [ ] tabs for multiple files
 -   [ ] line numbers
 -   [ ] Enter creates a new line at start, middle or end of current line depending on cursor
+-   [ ] quadruple click selects all
 
 ## Things editaur would like to do when it grows up:
 
 -   [ ] save favourite project locations
 -   [ ] code colouring
 -   [ ] Multiple Undo with tree-based history?
+-   [ ] Search & replace

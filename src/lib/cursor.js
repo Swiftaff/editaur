@@ -118,6 +118,9 @@ function init() {
                     return { start: this.end, end: this.start };
                 }
             },
+            is_reversed() {
+                return this.start.r > this.end.r || (this.is_single_line && this.start.c > this.end.c);
+            },
         },
         selection_reset_to_cursor(optional_bool = null) {
             this.selection.start = { r: this.r, c: this.c };
@@ -135,7 +138,7 @@ function init() {
                     this.selection.end = { r: this.r, c: this.c };
                     this.selection.active = true;
                     //this.selection_reset_to_cursor();
-                    text.selection_update(this);
+                    //text.selection_update(this);
                 } else {
                     this.selection_reset_to_cursor(true);
                     text.selection_reset();
@@ -154,44 +157,66 @@ function init() {
             this.multiple_clicks_reset();
             let row_text = text.rows[this.r].textContent;
             if (this.multiple_clicks === 3) {
-                this.selection.start = { r: this.r, c: 0 };
-                this.selection.end = { r: this.r, c: row_text.length };
-                this.selection.active = true;
                 let c = row_text.length;
-                this.update(this.r, c, c, false);
+                let r = this.r;
+                if (this.pressing_shift) {
+                    console.log(3);
+                    if (this.selection.is_reversed()) {
+                        console.log("rev");
+                        this.selection.end = this.selection.start;
+                        this.selection.start = { r, c: 0 };
+                    } else {
+                        console.log("forward");
+                        this.selection.end = { r, c };
+                    }
+                } else {
+                    this.selection.start = { r, c: 0 };
+                    this.selection.end = { r, c };
+                }
+                this.selection.active = true;
+                this.update(r, c, c, false);
                 text.selection_update(this);
             } else if (this.multiple_clicks === 2) {
-                if (this.c > 0 && this.c < row_text.length) {
-                    let left_char = row_text.substring(this.c - 1, this.c);
-                    let right_char = row_text.slice(this.c, this.c + 1);
-                    if (left_char !== " " && right_char !== " ") {
-                        let left = row_text.slice(0, this.c);
-                        let left_split = 0;
-                        for (let index = this.c - 1; index >= 0; index--) {
-                            let char = left[index];
-                            if (char === " ") {
-                                left_split = index + 1;
-                                break;
-                            }
+                let left_char = row_text.substring(this.c - 1, this.c);
+                let right_char = row_text.slice(this.c, this.c + 1);
+                let clicked_within_word = left_char !== " " && right_char !== " ";
+                if (clicked_within_word) {
+                    //get word_start, either start of line or after first space
+                    let left = row_text.slice(0, this.c);
+                    let left_split = 0;
+                    for (let index = this.c - 1; index >= 0; index--) {
+                        let char = left[index];
+                        if (char === " ") {
+                            left_split = index + 1;
+                            break;
                         }
-                        let right = row_text.slice(this.c);
-
-                        let right_split = right.length;
-                        for (let index = 0; index < right.length - 1; index++) {
-                            let char = right[index];
-                            if (char === " ") {
-                                right_split = index;
-                                break;
-                            }
-                        }
-                        this.selection.start = { r: this.r, c: left_split };
-                        this.selection.end = { r: this.r, c: this.c + right_split };
-                        this.selection.active = true;
-                        let c = this.c + right_split;
-                        this.update(this.r, c, c, false);
-                        text.selection_update(this);
                     }
+
+                    //get word_end, either end of line or before first space
+                    let right = row_text.slice(this.c);
+                    let right_split = right.length;
+                    for (let index = 0; index < right.length - 1; index++) {
+                        let char = right[index];
+                        if (char === " ") {
+                            right_split = index;
+                            break;
+                        }
+                    }
+
+                    let c = this.c + right_split;
+                    if (this.pressing_shift) {
+                        if (this.selection.is_reversed()) c = left_split;
+                        this.selection.end = { r: this.selection.end.r, c };
+                    } else {
+                        this.selection.start = { r: this.r, c: left_split };
+                        this.selection.end = { r: this.r, c };
+                    }
+                    this.selection.active = true;
+                    this.update(this.r, c, c, false);
+                    text.selection_update(this);
                 }
+            } else {
+                text.selection_update(this);
             }
         },
         multiple_clicks_reset() {
