@@ -122,6 +122,15 @@ function init() {
                 return this.start.r > this.end.r || (this.is_single_line && this.start.c > this.end.c);
             },
         },
+        select_all(text) {
+            let r = text.rows.length - 1;
+            let c = text.rows[r].textContent.length;
+            this.selection.start = { r: 0, c: 0 };
+            this.selection.end = { r: r, c };
+            this.selection.active = false;
+            this.update(r, c, c, false);
+            text.selection_update(this);
+        },
         selection_reset_to_cursor(optional_bool = null) {
             this.selection.start = { r: this.r, c: this.c };
             this.selection.end = { r: this.r, c: this.c };
@@ -156,7 +165,10 @@ function init() {
             this.multiple_clicks = this.multiple_clicks + 1;
             this.multiple_clicks_reset();
             let row_text = text.rows[this.r].textContent;
-            if (this.multiple_clicks === 3) {
+            if (this.multiple_clicks === 4) {
+                console.log(4);
+                this.select_all(text);
+            } else if (this.multiple_clicks === 3) {
                 let c = row_text.length;
                 let r = this.r;
                 if (this.pressing_shift) {
@@ -215,7 +227,7 @@ function init() {
         multiple_clicks_reset() {
             setTimeout(() => {
                 if (this.multiple_clicks > 0) this.multiple_clicks = this.multiple_clicks - 1;
-            }, 400);
+            }, 600);
         },
     };
 }

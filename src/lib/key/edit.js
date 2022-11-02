@@ -171,14 +171,7 @@ function insert(chars, cursor, text) {
 
 function select_all(cursor, text) {
     console.log("ctrl-a");
-    let r = text.rows.length - 1;
-    let c = text.rows[r].textContent.length;
-    cursor.selection.start = { r: 0, c: 0 };
-    cursor.selection.end = { r: r, c };
-    cursor.active = true;
-    cursor.update(r, c, c, false);
-    text.selection_update(cursor);
-    console.log(cursor);
+    cursor.select_all(text);
 }
 
 function shift_key_down(cursor) {

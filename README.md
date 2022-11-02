@@ -52,7 +52,8 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] ✅ Capslock should capitalise text
 -   [x] ✅ Ctrl-A select all
 -   [x] double clicking while holding shift will extend selection
--   [ ] triple clicking while holding shift will extend selection
+-   [x] triple clicking while holding shift will extend selection
+-   [x] quadruple clicking selects all
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
@@ -67,7 +68,6 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] tabs for multiple files
 -   [ ] line numbers
 -   [ ] Enter creates a new line at start, middle or end of current line depending on cursor
--   [ ] quadruple click selects all
 
 ## Things editaur would like to do when it grows up:
 
