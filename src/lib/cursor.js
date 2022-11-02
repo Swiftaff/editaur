@@ -160,15 +160,8 @@ function init() {
                 let c = row_text.length;
                 let r = this.r;
                 if (this.pressing_shift) {
-                    console.log(3);
-                    if (this.selection.is_reversed()) {
-                        console.log("rev");
-                        this.selection.end = this.selection.start;
-                        this.selection.start = { r, c: 0 };
-                    } else {
-                        console.log("forward");
-                        this.selection.end = { r, c };
-                    }
+                    if (this.selection.is_reversed()) c = 0;
+                    this.selection.end = { r, c };
                 } else {
                     this.selection.start = { r, c: 0 };
                     this.selection.end = { r, c };
