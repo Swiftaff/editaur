@@ -7,6 +7,7 @@ import debug from "./lib/debug.js";
 import textlib from "./lib/text.js";
 import cursorlib from "./lib/cursor.js";
 import key from "./lib/key/lib.js";
+import sidepanel_lib from "./lib/sidepanel.js";
 
 export default (function main() {
     const cursor = cursorlib.init();
@@ -19,6 +20,7 @@ export default (function main() {
     }
     let data = testname ? test_data[testname] : imported_rows;
     const text = textlib.init(data, cursor);
+    const sidepanel = sidepanel_lib.init();
     window.onmousedown = (e) => cursor.selection_start(e, text);
     window.onmousemove = (e) => cursor.update_from_mouse(e, text);
     window.onmouseup = () => cursor.selection_stop(text);
