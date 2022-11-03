@@ -20,6 +20,9 @@
         "scope": [
           "$DESKTOP/*"
         ]
+      },
+      "dialog": {
+        "open": true
       }
     },
     "bundle": {

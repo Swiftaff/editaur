@@ -23,13 +23,32 @@ main {
   overflow: auto;
   position: relative;
 }
-#sidepanel {
+#sidepanel_wrapper {
   position: absolute;
   top: 10px;
   right: 10px;
   width: calc(30vw - 30px);
   background-color: pink;
   height: calc(100vh - 20px);
+  cursor:default;
+  font-size: 0.8em;
+  line-height: 1em;
+  overflow:hidden;
+}
+#sidepanel {
+  word-wrap: none;
+  word-break: keep-all;
+  width: 1000px;
+}
+#sidepanel div{
+  cursor: pointer;
+}
+#sidepanel div:hover, #path:hover{
+  background-color: rgba(100,100,100,0.5);
+}
+#path{
+  background-color: red;
+  cursor: pointer;
 }
 div {
   user-select: none;
