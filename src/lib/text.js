@@ -102,16 +102,29 @@ function init(imported_rows, cursor) {
                 row.style.width = Math.ceil(cursor.w * row.textContent.length) + "px";
             });
         },
+        refresh_from_text(text) {
+            let array = text.split("\r\n");
+            this.refresh_from_array(array);
+        },
+        refresh_from_array(array) {
+            if (!array.length) {
+                array = [""];
+            }
+            this.remove_all_rows_and_dom_nodes();
+            array.forEach((text_content) => {
+                let row = obj.get_new_row(text_content, cursor);
+                this.el.append(row);
+                this.rows.push(row);
+            });
+        },
+        remove_all_rows_and_dom_nodes() {
+            this.rows.forEach((row) => {
+                row.remove();
+            });
+            this.rows = [];
+        },
     };
-    if (!imported_rows.length) {
-        imported_rows = [""];
-    }
-    imported_rows.forEach((text_content) => {
-        let text_div = document.getElementById("text");
-        let row = obj.get_new_row(text_content, cursor);
-        text_div.append(row);
-        obj.rows.push(row);
-    });
+    obj.refresh_from_array(imported_rows);
     return obj;
 }
 

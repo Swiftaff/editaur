@@ -1,4 +1,4 @@
-import { readDir, BaseDirectory } from "@tauri-apps/api/fs";
+import { readDir, readTextFile, BaseDirectory } from "@tauri-apps/api/fs";
 import { open } from "@tauri-apps/api/dialog";
 
 async function init(text) {
@@ -6,14 +6,16 @@ async function init(text) {
         el: document.getElementById("sidepanel"),
         path_el: document.getElementById("path"),
         rows: [],
-        path: "",
+        dir: "",
         get_new_row(entry) {
             let el = document.createElement("div");
             el.textContent = ("children" in entry ? "> " : "- ") + entry.name;
+            el.onmousedown = (e) => this.select_file(e, entry.name, el);
             this.el.append(el);
             this.rows.push(el);
         },
         async refresh_listing(dir) {
+            this.dir = dir;
             this.remove_rows();
             let entries = await this.get_files(dir);
             for (const entry of entries) {
@@ -49,6 +51,18 @@ async function init(text) {
                     }
                 }
             }
+        },
+        select_el(el) {
+            this.rows.forEach((element) => {
+                element.removeAttribute("class");
+            });
+            el.className = "selected";
+        },
+        async select_file(e, filename, el) {
+            const contents = await readTextFile(this.dir + "\\" + filename, { dir: BaseDirectory.Desktop });
+            text.refresh_from_text(contents);
+            this.select_el(el);
+            console.log("select file", this.dir, filename, contents);
         },
     };
 

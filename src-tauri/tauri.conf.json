@@ -17,6 +17,7 @@
       },
       "fs": {
         "readDir": true,
+        "readFile": true,
         "scope": [
           "$DESKTOP/*"
         ]
