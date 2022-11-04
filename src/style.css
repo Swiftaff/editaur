@@ -51,6 +51,11 @@ main {
   cursor: pointer;
   padding: 0.1rem 0 0.15rem 1.3rem;
 }
+#sidepanel ul:not(#sidepanel>ul){
+  border-left: 1px solid #e9e;
+  margin-left: 0.3rem;
+  padding-left: 1.1rem;
+}
 #sidepanel li[data-type="file"]::before{
   content: "🗋";
   position: relative;
@@ -60,7 +65,7 @@ main {
   padding-left: 1rem;
   margin-right: 0.5rem;
   margin-left: -1rem;
-  border-left: 1px solid rgba(0,0,0,0.1);
+  border-left: 1px solid #e9e;
 }
 #sidepanel li[data-type="file"]::marker{
   content:"";
@@ -74,7 +79,6 @@ main {
   padding-left: 1rem;
   margin-right: 0.6rem;
   margin-left: -0.95rem;
-  border-left: 1px solid rgba(0,0,0,0.15);
 }
 #sidepanel ul[data-type="dir"][data-expanded="false"]::before{
   content: ">";

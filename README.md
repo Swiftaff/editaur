@@ -56,7 +56,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] quadruple clicking selects all
 -   [x] display a sidepanel with files and folders from current directory
 -   [x] open or save text files
--   [x] display files and directories in nested listing - not yet fully working left-border
+-   [x] display files and directories in nested listing
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 

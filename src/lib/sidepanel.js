@@ -101,7 +101,7 @@ async function init(text, cursor) {
     };
 
     obj.path_el.onmousedown = (e) => obj.select_directory(e);
-    await obj.refresh_listing("editaur_test");
+    await obj.refresh_listing("");
     return obj;
 }
 
