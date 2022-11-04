@@ -56,6 +56,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] quadruple clicking selects all
 -   [x] display a sidepanel with files and folders from current directory
 -   [x] open or save text files
+-   [x] display files and directories in nested listing - not yet fully working left-border
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
@@ -71,6 +72,13 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] using Enter on a selection will delete it all, and insert a linebreak, and leave cursor at start of next line
 -   [ ] typing a character on a selection will delete it all, and insert the character and leave cursor after new character
 -   [ ] switch focus between text view and sidepanel. mute text view's cursor and selection when on sidepanel
+-   [ ] delete files and directories with warning
+-   [ ] rename files and directories
+-   [ ] move files and directories with drag and drop onto new parent directory
+-   [ ] create new files and directories, in an existing directory
+-   [ ] refresh listing button, should refresh and keep same directories expanded
+-   [ ] draggable sidepanel width handle
+-   [ ] identify file is dirty, ready to save
 
 ## Things editaur would like to do when it grows up:
 
