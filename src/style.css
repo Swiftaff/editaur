@@ -43,7 +43,25 @@ main {
 }
 #sidepanel div{
   cursor: pointer;
-  padding: 0.2rem 0;
+  padding: 0.2rem 0 0.2rem 1.5rem;
+}
+#sidepanel div[data-type="file"]::before{
+  content: "🗋";
+  position: absolute;
+  top: 5px;
+  left: 0;
+  font-size: 1rem;
+  margin-right: 15px;
+  margin-left: 5px;
+}
+#sidepanel div[data-type="dir"]::before{
+  content: "📁";
+  position: absolute;
+  top: 5px;
+  left: 0;
+  font-size: 0.7rem;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 #sidepanel div:hover, #path:hover{
   background-color: rgba(250,250,250,0.6);
