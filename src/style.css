@@ -33,7 +33,8 @@ main {
   cursor:default;
   font-size: 0.8em;
   line-height: 1em;
-  overflow:hidden;
+  overflow-y:auto;
+  overflow-x: hidden;
 }
 #sidepanel {
   word-wrap: none;
@@ -55,13 +56,17 @@ main {
   margin-left: 5px;
 }
 #sidepanel div[data-type="dir"]::before{
-  content: "📁";
+  content: "V";
   position: absolute;
   top: 5px;
-  left: 0;
+  left: 2px;
   font-size: 0.7rem;
   margin-right: 5px;
   margin-left: 5px;
+  transition: transform 0.05s ease-in;
+}
+#sidepanel div[data-type="dir"][data-expanded="false"]::before{
+  transform: rotate(-90deg);
 }
 #sidepanel div:hover, #path:hover{
   background-color: rgba(250,250,250,0.6);

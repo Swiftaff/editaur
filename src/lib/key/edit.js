@@ -310,8 +310,11 @@ function tab_out(cursor, text) {
 }
 
 async function save(cursor, text) {
+    //console.log(cursor.directory, cursor.file);
     const file_contents = text.rows.map((r) => r.textContent).join("\r\n");
-    await writeTextFile(cursor.directory + "\\" + cursor.file, file_contents, { dir: BaseDirectory.Desktop });
+    await writeTextFile(cursor.directory + "/" + cursor.file, file_contents, {
+        dir: BaseDirectory.Desktop,
+    });
 }
 
 export default {
