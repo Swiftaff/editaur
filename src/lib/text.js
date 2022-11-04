@@ -102,11 +102,11 @@ function init(imported_rows, cursor) {
                 row.style.width = Math.ceil(cursor.w * row.textContent.length) + "px";
             });
         },
-        refresh_from_text(text) {
+        refresh_from_text(text, cursor) {
             let array = text.split("\r\n");
-            this.refresh_from_array(array);
+            this.refresh_from_array(array, cursor);
         },
-        refresh_from_array(array) {
+        refresh_from_array(array, cursor) {
             if (!array.length) {
                 array = [""];
             }
@@ -116,6 +116,7 @@ function init(imported_rows, cursor) {
                 this.el.append(row);
                 this.rows.push(row);
             });
+            cursor.update(0, 0, 0);
         },
         remove_all_rows_and_dom_nodes() {
             this.rows.forEach((row) => {
@@ -124,7 +125,7 @@ function init(imported_rows, cursor) {
             this.rows = [];
         },
     };
-    obj.refresh_from_array(imported_rows);
+    obj.refresh_from_array(imported_rows, cursor);
     return obj;
 }
 

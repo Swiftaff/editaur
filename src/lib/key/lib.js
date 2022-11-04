@@ -4,7 +4,6 @@ import edit from "./edit.js";
 function down(e, cursor, text) {
     e.preventDefault();
     let key_combination = e.key.toLowerCase();
-    //console.log(key_combination);
     if (cursor.pressing_shift && "shift_" + key_combination in down_functions) {
         down_functions["shift_" + key_combination](cursor, text);
     } else if (cursor.pressing_control && "control_" + key_combination in down_functions) {
@@ -14,7 +13,6 @@ function down(e, cursor, text) {
     } else {
         edit.insert(e.key, cursor, text);
     }
-    //}
 }
 const noop = () => {};
 
@@ -27,6 +25,7 @@ const down_functions = {
     control_v: edit.paste,
     control_c: edit.copy,
     control_x: edit.cut,
+    control_s: edit.save,
     control_tab: edit.tab_in,
     //
     shift_tab: edit.tab_out,

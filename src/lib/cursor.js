@@ -4,6 +4,8 @@ function init() {
         text_left: 100,
         r: 0,
         c: 0,
+        directory: "",
+        file: "",
         previous_c: 0,
         flash1: null,
         flash2: null,
@@ -236,7 +238,9 @@ function get_char_dimensions() {
     // This just gets an average height and width of the fixed width font
     // by measuring the benchmark div which contains 5 rows of 5 characters
     // then deleting it
-    const benchmark = document.getElementById("benchmark");
+    const text = document.getElementById("text");
+    const benchmark = document.createElement("div");
+    text.append(benchmark);
     benchmark.innerHTML = "<span>XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX</span>";
     const b = get_el_xywh(benchmark);
     benchmark.remove();

@@ -39,9 +39,11 @@ main {
   word-wrap: none;
   word-break: keep-all;
   width: 1000px;
+  z-index: 300;
 }
 #sidepanel div{
   cursor: pointer;
+  padding: 0.2rem 0;
 }
 #sidepanel div:hover, #path:hover{
   background-color: rgba(250,250,250,0.6);
@@ -52,6 +54,7 @@ main {
 #path{
   background-color: red;
   cursor: pointer;
+  padding: 0.2rem 0;
 }
 div {
   user-select: none;

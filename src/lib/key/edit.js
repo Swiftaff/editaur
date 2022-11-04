@@ -1,3 +1,5 @@
+import { writeTextFile, BaseDirectory } from "@tauri-apps/api/fs";
+
 const clipboard = {
     // allow for testing in a plain browser window where there is no ability to readText
     // this just adds a global window variable to read and write to instead of standard clipboard
@@ -307,6 +309,11 @@ function tab_out(cursor, text) {
     }
 }
 
+async function save(cursor, text) {
+    const file_contents = text.rows.map((r) => r.textContent).join("\r\n");
+    await writeTextFile(cursor.directory + "\\" + cursor.file, file_contents, { dir: BaseDirectory.Desktop });
+}
+
 export default {
     backspace,
     del,
@@ -319,6 +326,7 @@ export default {
     copy,
     cut,
     paste,
+    save,
     select_all,
     tab_in,
     tab_out,

@@ -55,6 +55,7 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] triple clicking while holding shift will extend selection
 -   [x] quadruple clicking selects all
 -   [x] display a sidepanel with files and folders from current directory
+-   [x] open or save text files
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
@@ -64,12 +65,12 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] Multiple Undo
 -   [ ] using tab or paste into a selection will replace it
 -   [ ] navigate folders and files
--   [ ] open or save text files
 -   [ ] tabs for multiple files
 -   [ ] line numbers
 -   [ ] Enter creates a new line at start, middle or end of current line depending on cursor
 -   [ ] using Enter on a selection will delete it all, and insert a linebreak, and leave cursor at start of next line
 -   [ ] typing a character on a selection will delete it all, and insert the character and leave cursor after new character
+-   [ ] switch focus between text view and sidepanel. mute text view's cursor and selection when on sidepanel
 
 ## Things editaur would like to do when it grows up:
 
