@@ -27,7 +27,7 @@ main {
   position: absolute;
   top: 10px;
   right: 10px;
-  width: calc(30vw - 30px);
+  width: calc(30vw - 18px);
   background-color: pink;
   height: calc(100vh - 20px);
   cursor:default;
@@ -174,4 +174,32 @@ i {
   100% {
       opacity: 0;
   }
+}
+
+#drag_handle {
+  cursor: ew-resize;
+  position: absolute;
+  top: 10px;
+  left: calc(70vw + 2px);
+  width: 14px;
+  height: calc(100vh - 20px);
+  /*background-color: rgba(200,200,200,0.5);*/
+}
+
+
+#drag_handle div{
+  cursor: ew-resize;
+  display: block;
+  position: relative;
+  left: 2px;
+  top: 0px;
+  width: 5px;
+  height: calc(100vh - 20px);
+  background-color: royalblue;
+  transition: opacity 0.2s ease-in;
+  opacity: 0;
+}
+
+#drag_handle:hover div{
+  opacity: 1;
 }
