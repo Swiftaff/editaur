@@ -23,15 +23,17 @@ function init() {
             },
             mousemove(e, cursor) {
                 if (this.dragging) {
+                    let magic_number = 6;
+                    let min_width = 30;
                     console.log("move", this.offset_x);
                     this.current_x = e.x;
-                    if (this.current_x < 30) this.current_x = 30;
-                    if (this.current_x > window.innerWidth - 30) this.current_x = window.innerWidth - 30;
-                    this.el.style.left = `${this.current_x + this.click_offset_x + 2}px`;
-                    cursor.scrolling.main.style.width = `${this.current_x + this.click_offset_x}px`;
-                    cursor.sidepanel_wrapper_el.style.left = `${this.current_x + this.click_offset_x + 10}px`;
+                    if (this.current_x < min_width) this.current_x = min_width;
+                    if (this.current_x > window.innerWidth - min_width) this.current_x = window.innerWidth - min_width;
+                    this.el.style.left = `${this.current_x + this.click_offset_x}px`;
+                    cursor.scrolling.main.style.width = `${this.current_x + this.click_offset_x - 2}px`;
+                    cursor.sidepanel_wrapper_el.style.left = `${this.current_x + this.click_offset_x + magic_number}px`;
                     cursor.sidepanel_wrapper_el.style.width = `${
-                        window.innerWidth - this.current_x - this.click_offset_x - 10
+                        window.innerWidth - this.current_x - this.click_offset_x - 10 - magic_number
                     }px`;
                 }
             },
