@@ -12,7 +12,7 @@ function init() {
         flash2: null,
         pressing_shift: false,
         pressing_control: false,
-        multiple_clicks: 0,
+        multiple_clicks: { r: 0, c: 0, clicks: 0 },
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
         update(r, c, previous_c, reset_cursor = true) {
@@ -45,7 +45,7 @@ function init() {
             return { r, c };
         },
         update_from_mouse(e, text) {
-            if (this.selection.active && this.multiple_clicks < 2) {
+            if (this.selection.active && this.multiple_clicks.clicks < 2) {
                 this.scrolling.update(e);
                 let { r, c } = this.get_rc_from_mouse(e, text);
                 this.update(r, c, c, false);
@@ -165,13 +165,18 @@ function init() {
             text.highlight_row(this);
         },
         handle_multiple_clicks(text) {
-            this.multiple_clicks = this.multiple_clicks + 1;
+            if (this.multiple_clicks.c === this.c && this.multiple_clicks.r === this.r) {
+                this.multiple_clicks.clicks = this.multiple_clicks.clicks + 1;
+            } else {
+                this.multiple_clicks = { r: this.r, c: this.c, clicks: 0 };
+            }
+
             this.multiple_clicks_reset();
             let row_text = text.rows[this.r].textContent;
-            if (this.multiple_clicks === 4) {
+            if (this.multiple_clicks.clicks === 4) {
                 console.log(4);
                 this.select_all(text);
-            } else if (this.multiple_clicks === 3) {
+            } else if (this.multiple_clicks.clicks === 3) {
                 let c = row_text.length;
                 let r = this.r;
                 if (this.pressing_shift) {
@@ -184,7 +189,7 @@ function init() {
                 this.selection.active = true;
                 this.update(r, c, c, false);
                 text.selection_update(this);
-            } else if (this.multiple_clicks === 2) {
+            } else if (this.multiple_clicks.clicks === 2) {
                 let left_char = row_text.substring(this.c - 1, this.c);
                 let right_char = row_text.slice(this.c, this.c + 1);
                 let clicked_within_word = left_char !== " " && right_char !== " ";
@@ -229,7 +234,7 @@ function init() {
         },
         multiple_clicks_reset() {
             setTimeout(() => {
-                if (this.multiple_clicks > 0) this.multiple_clicks = this.multiple_clicks - 1;
+                if (this.multiple_clicks.clicks > 0) this.multiple_clicks.clicks = this.multiple_clicks.clicks - 1;
             }, 600);
         },
     };
