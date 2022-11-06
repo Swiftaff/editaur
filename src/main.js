@@ -21,9 +21,17 @@ export default (function main() {
     let data = testname ? test_data[testname] : imported_rows;
     const text = textlib.init(data, cursor);
     const sidepanel = sidepanel_lib.init(text, cursor);
-    window.onmousedown = (e) => cursor.selection_start(e, text);
-    window.onmousemove = (e) => cursor.update_from_mouse(e, text);
-    window.onmouseup = () => cursor.selection_stop(text);
+    window.onmousedown = (e) => {
+        if (!cursor.drag_handle.dragging) cursor.selection_start(e, text);
+    };
+    window.onmousemove = (e) => {
+        if (!cursor.drag_handle.dragging) cursor.update_from_mouse(e, text);
+        cursor.drag_handle.mousemove(e, cursor);
+    };
+    window.onmouseup = (e) => {
+        if (!cursor.drag_handle.dragging) cursor.selection_stop(text);
+        cursor.drag_handle.mouseup(e);
+    };
     window.onkeydown = (e) => key.down(e, cursor, text);
     window.onkeyup = (e) => key.up(e, cursor, text);
     //debug.cursor_move_right(cursor, 1234);

@@ -1,10 +1,49 @@
 function init() {
-    return {
+    let obj = {
         text_top: 0,
         text_left: 100,
         r: 0,
         c: 0,
+        sidepanel_wrapper_el: document.getElementById("sidepanel_wrapper"),
         top: document.getElementById("tabs").getBoundingClientRect().height,
+        drag_handle: {
+            el: document.getElementById("drag_handle"),
+            click_x: 0,
+            offset_x: 0,
+            current_x: 0,
+            dragging: false,
+            click_offset_x: 0,
+            mousedown(e) {
+                console.log("down", this.offset_x);
+                let { x } = this.el.getBoundingClientRect();
+                this.click_offset_x = Math.floor(x) - e.x;
+                this.click_x = e.x - this.click_offset_x;
+                this.current_x = e.x - this.click_offset_x;
+                this.dragging = true;
+            },
+            mousemove(e, cursor) {
+                if (this.dragging) {
+                    console.log("move", this.offset_x);
+                    this.current_x = e.x;
+                    if (this.current_x < 30) this.current_x = 30;
+                    if (this.current_x > window.innerWidth - 30) this.current_x = window.innerWidth - 30;
+                    this.el.style.left = `${this.current_x + this.click_offset_x + 2}px`;
+                    cursor.scrolling.main.style.width = `${this.current_x + this.click_offset_x}px`;
+                    cursor.sidepanel_wrapper_el.style.left = `${this.current_x + this.click_offset_x + 10}px`;
+                    cursor.sidepanel_wrapper_el.style.width = `${
+                        window.innerWidth - this.current_x - this.click_offset_x - 10
+                    }px`;
+                }
+            },
+            mouseup(e) {
+                if (this.dragging) {
+                    console.log("up", this.offset_x, this.click_x, this.current_x);
+                    this.dragging = false;
+                    this.offset_x = this.offset_x + this.click_x - this.current_x;
+                    console.log("up", this.offset_x);
+                }
+            },
+        },
         directory: "",
         file: "",
         previous_c: 0,
@@ -12,7 +51,16 @@ function init() {
         flash2: null,
         pressing_shift: false,
         pressing_control: false,
-        multiple_clicks: { r: 0, c: 0, clicks: 0 },
+        multiple_clicks: {
+            r: 0,
+            c: 0,
+            clicks: 0,
+            reset() {
+                setTimeout(() => {
+                    if (this.clicks > 0) this.clicks = this.clicks - 1;
+                }, 600);
+            },
+        },
         el: document.getElementsByTagName("i")[0],
         ...get_char_dimensions(),
         update(r, c, previous_c, reset_cursor = true) {
@@ -168,10 +216,12 @@ function init() {
             if (this.multiple_clicks.c === this.c && this.multiple_clicks.r === this.r) {
                 this.multiple_clicks.clicks = this.multiple_clicks.clicks + 1;
             } else {
-                this.multiple_clicks = { r: this.r, c: this.c, clicks: 0 };
+                this.multiple_clicks.r = this.r;
+                this.multiple_clicks.c = this.c;
+                this.multiple_clicks.clicks = 0;
             }
 
-            this.multiple_clicks_reset();
+            this.multiple_clicks.reset();
             let row_text = text.rows[this.r].textContent;
             if (this.multiple_clicks.clicks === 4) {
                 console.log(4);
@@ -232,12 +282,9 @@ function init() {
                 text.selection_update(this);
             }
         },
-        multiple_clicks_reset() {
-            setTimeout(() => {
-                if (this.multiple_clicks.clicks > 0) this.multiple_clicks.clicks = this.multiple_clicks.clicks - 1;
-            }, 600);
-        },
     };
+    obj.drag_handle.el.onmousedown = (e) => obj.drag_handle.mousedown(e);
+    return obj;
 }
 
 function get_char_dimensions() {

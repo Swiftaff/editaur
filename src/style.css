@@ -183,6 +183,7 @@ i {
   left: calc(70vw + 2px);
   width: 14px;
   height: calc(100vh - 20px);
+  z-index: 500;
   /*background-color: rgba(200,200,200,0.5);*/
 }
 
