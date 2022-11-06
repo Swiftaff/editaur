@@ -1,7 +1,11 @@
 function init(imported_rows, cursor) {
     let obj = {
         el: document.getElementById("text"),
+        first_tab_el: document.getElementById("tabs").firstElementChild,
         rows: [],
+        imported_rows: [],
+        hash_imported_rows: 0,
+        hash_current: 0,
         tab_spaces: 4,
         selection_reset() {
             this.rows.forEach((_row, r) => {
@@ -110,6 +114,7 @@ function init(imported_rows, cursor) {
             if (!array.length) {
                 array = [""];
             }
+            this.imported_rows = array;
             this.remove_all_rows_and_dom_nodes();
             array.forEach((text_content) => {
                 let row = obj.get_new_row(text_content, cursor);
@@ -117,12 +122,36 @@ function init(imported_rows, cursor) {
                 this.rows.push(row);
             });
             cursor.update(0, 0, 0);
+            this.hashes_reset();
         },
         remove_all_rows_and_dom_nodes() {
             this.rows.forEach((row) => {
                 row.remove();
             });
             this.rows = [];
+        },
+        check_if_changed() {
+            this.hash_current = this.hash(this.rows.map((r) => r.textContent));
+            if (this.hash_current === this.hash_imported_rows) {
+                this.first_tab_el.removeAttribute("class");
+            } else {
+                this.first_tab_el.className = "dot";
+            }
+        },
+        hashes_reset() {
+            this.hash_current = this.hash(this.imported_rows);
+            this.hash_imported_rows = this.hash_current;
+            this.first_tab_el.removeAttribute("class");
+        },
+        hash(arr) {
+            let hash = 0;
+            let str = arr.join("\r\n");
+            for (let i = 0, len = str.length; i < len; i++) {
+                let chr = str.charCodeAt(i);
+                hash = (hash << 5) - hash + chr;
+                hash |= 0; // Convert to 32bit integer
+            }
+            return hash;
         },
     };
     obj.refresh_from_array(imported_rows, cursor);

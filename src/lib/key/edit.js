@@ -56,6 +56,7 @@ function backspace(cursor, text) {
         //scroll_up();
         //scroll_down();
     }
+    text.check_if_changed();
 }
 
 function del(cursor, text) {
@@ -125,6 +126,7 @@ function del(cursor, text) {
         //scroll_up();
         //scroll_down();
     }
+    text.check_if_changed();
 }
 
 function enter(cursor, text) {
@@ -156,18 +158,16 @@ function enter(cursor, text) {
         text.highlight_row(cursor);
     }
     //scroll_down();
+    text.check_if_changed();
 }
 
 function insert(chars, cursor, text) {
-    //if (!pressing_control && char.length == 1) {
     if (chars.length > 0) {
         let { r, c } = cursor;
         let row_text = text.rows[r].textContent;
         text.update_text(text.rows[r], row_text.slice(0, c).concat(chars, row_text.slice(c)));
-        //scroll_up();
-        //scroll_down();
         cursor.update(r, c + chars.length, c + chars.length);
-        //cursor.selection_reset_to_cursor();
+        text.check_if_changed();
     }
 }
 
@@ -206,6 +206,7 @@ async function paste(cursor, text) {
     } else {
         insert(clip, cursor, text);
     }
+    text.check_if_changed();
 }
 
 async function copy(cursor, text) {
@@ -268,6 +269,7 @@ function tab_in(cursor, text) {
         text.selection_update(cursor);
         cursor.update(cursor.selection.end.r, cursor.selection.end.c, cursor.selection.end.c, false);
     }
+    text.check_if_changed();
 }
 
 function tab_out(cursor, text) {
@@ -307,6 +309,7 @@ function tab_out(cursor, text) {
         cursor.update(end.r, end.c, end.c);
         text.selection_update(cursor);*/
     }
+    text.check_if_changed();
 }
 
 async function save(cursor, text) {
@@ -315,6 +318,7 @@ async function save(cursor, text) {
     await writeTextFile(cursor.directory + "/" + cursor.file, file_contents, {
         dir: BaseDirectory.Desktop,
     });
+    text.hashes_reset();
 }
 
 export default {

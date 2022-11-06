@@ -57,9 +57,11 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] display a sidepanel with files and folders from current directory
 -   [x] open or save text files
 -   [x] display files and directories in nested listing
+-   [x] identify file is dirty with a dot in the tab, using basic string hash comparison
 
 ## Things editaur needs to do to get to "table-stakes" for a basic text editor:
 
+-   [ ] tab showing current filename
 -   [ ] if a cursor update takes cursor offscreen, as in hitting return at end of page - scroll to cursor
 -   [ ] shift-tabbing while a single or multiline select is active, will outdent the line by removing up to 4 spaces from the start of the line(s)
 -   [ ] Undo once
@@ -78,7 +80,6 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] create new files and directories, in an existing directory
 -   [ ] refresh listing button, should refresh and keep same directories expanded
 -   [ ] draggable sidepanel width handle
--   [ ] identify file is dirty, ready to save
 
 ## Things editaur would like to do when it grows up:
 

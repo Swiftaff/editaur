@@ -4,6 +4,7 @@ function init() {
         text_left: 100,
         r: 0,
         c: 0,
+        top: document.getElementById("tabs").getBoundingClientRect().height,
         directory: "",
         file: "",
         previous_c: 0,
@@ -36,7 +37,7 @@ function init() {
             let scrollTop = this.scrolling.main.scrollTop;
             let scrollLeft = this.scrolling.main.scrollLeft;
             let c = Math.floor((e.clientX - this.text_left + scrollLeft + this.w_overlap - 7) / this.w);
-            let r = Math.floor((e.clientY - this.text_top + scrollTop - 7) / this.h);
+            let r = Math.floor((e.clientY - this.text_top + scrollTop - 7 - this.top) / this.h);
             if (r < 0) r = 0;
             if (r > text.rows.length - 1) r = text.rows.length - 1;
             if (c > text.rows[r].textContent.length - 1) c = text.rows[r].textContent.length;
@@ -241,7 +242,7 @@ function get_char_dimensions() {
     const text = document.getElementById("text");
     const benchmark = document.createElement("div");
     text.append(benchmark);
-    benchmark.innerHTML = "<span>XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX</span>";
+    benchmark.innerHTML = "XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX";
     const b = get_el_xywh(benchmark);
     benchmark.remove();
     let num_Xs = 5;

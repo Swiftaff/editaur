@@ -100,16 +100,42 @@ main {
   cursor: pointer;
   padding: 0.2rem 0;
 }
+#tabs{
+  background-color: black;
+  cursor: default;
+  line-height: 1.2rem !important;
+}
+#tabs > div {
+  font-size: 0.8rem !important;
+  border-radius: 6px 6px 0 0;
+  background-color: grey;
+  width: max-content;
+  padding: 0rem 1.2rem 0 0.5rem;
+  cursor: pointer;
+  color: white;
+}
+#tabs > div.dot:after {
+  content: '';
+  cursor: pointer;
+  height: 0.4rem;
+  width: 0.4rem;
+  border-radius: 50%;
+  background-color: white;
+  right: 0.4rem;
+  position: absolute;
+  top: calc(50% - 0.2rem);
+}
 div {
   user-select: none;
   cursor: text;
   position: relative;
   padding: 0px;
   margin: 0px;
+  min-height: 1.2rem;
 }
 #text {
   position: absolute;
-  top: 0px;
+  top: 1.2rem;
   left: 100px;
   z-index: 200;
 }
