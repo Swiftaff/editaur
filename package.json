@@ -1,7 +1,16 @@
 {
-  "name": "tauri-svelte-editor",
+  "name": "editaur",
+  "description": "A basic cross-platform file editor written with html/css/javascript/tauri",
+  "keywords": [
+    "tauri",
+    "javascript",
+    "html",
+    "css",
+    "text editor",
+    "cross-platform"
+  ],
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",

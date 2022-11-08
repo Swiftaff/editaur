@@ -1,6 +1,6 @@
-# Editaur
+# editaur
 
-A simple javascript text editor, without using textarea or any dependencies - embedded in a tauri window to eventually allow file editing
+A basic cross-platform file editor written with html/css/javascript/tauri
 
 ```
 ⠀⠀⠀⠀⢀⣴⣿⣿⣿⣷⣄⠠⣤⣤⣤⣤⣤⣤⣄⣀⡀⠀⠀⠀  ⠀
@@ -60,15 +60,15 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [x] identify file is dirty with a dot in the tab, using basic string hash comparison
 -   [x] draggable sidepanel width handle
 -   [x] tab showing current filename
+-   [x] navigate folders and files
 
-## Things editaur needs to do to get to "table-stakes" for a basic text editor:
+## Things editaur still needs to be a basic text editor:
 
 -   [ ] if a cursor update takes cursor offscreen, as in hitting return at end of page - scroll to cursor
 -   [ ] shift-tabbing while a single or multiline select is active, will outdent the line by removing up to 4 spaces from the start of the line(s)
 -   [ ] Undo once
 -   [ ] Multiple Undo
 -   [ ] using tab or paste into a selection will replace it
--   [ ] navigate folders and files
 -   [ ] tabs for multiple files
 -   [ ] line numbers
 -   [ ] Enter creates a new line at start, middle or end of current line depending on cursor
@@ -87,3 +87,4 @@ A simple javascript text editor, without using textarea or any dependencies - em
 -   [ ] code colouring
 -   [ ] Multiple Undo with tree-based history?
 -   [ ] Search & replace
+-   [ ] partially implement VS Code extensions API
