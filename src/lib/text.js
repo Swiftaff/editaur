@@ -153,6 +153,9 @@ function init(imported_rows, cursor) {
             }
             return hash;
         },
+        update_first_tab_name(name) {
+            this.first_tab_el.textContent = name;
+        },
     };
     obj.refresh_from_array(imported_rows, cursor);
     return obj;

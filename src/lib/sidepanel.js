@@ -94,6 +94,7 @@ async function init(text, cursor) {
                     this.select_el(el);
                     cursor.file = filename;
                     cursor.directory = parent;
+                    text.update_first_tab_name(filename);
                     //console.log("select file", cursor.directory, filename, contents);
                 }
             }
