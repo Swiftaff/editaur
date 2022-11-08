@@ -9,6 +9,7 @@
     "text editor",
     "cross-platform"
   ],
+  "license": "MIT",
   "private": true,
   "version": "0.0.1",
   "type": "module",
