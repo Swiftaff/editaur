@@ -31,7 +31,6 @@ async function init(text, cursor) {
             this.path_el.textContent = "/" + dir;
         },
         async get_files(dir) {
-            console.log(dir);
             if (dir.length && dir[0] === "/") dir = dir.slice(1);
             return await readDir(dir, { dir: BaseDirectory.Desktop, recursive: false });
         },
@@ -101,7 +100,7 @@ async function init(text, cursor) {
         },
     };
 
-    obj.path_el.onmousedown = (e) => obj.select_directory(e);
+    obj.path_el.onmousedown = async (e) => await obj.select_directory(e);
     await obj.refresh_listing("");
     return obj;
 }

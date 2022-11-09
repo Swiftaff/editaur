@@ -20,6 +20,7 @@
         "readFile": true,
         "writeFile": true,
         "scope": [
+          "$DESKTOP",
           "$DESKTOP/*"
         ]
       },
