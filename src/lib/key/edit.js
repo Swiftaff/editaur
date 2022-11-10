@@ -32,31 +32,31 @@ function backspace(cursor, text) {
     } else {
         let { r, c } = cursor;
         let at_start_of_line = c === 0;
-        let at_end_of_line = c === text.rows[r].textContent.length;
-        let row_text = text.rows[r].textContent;
+        let at_end_of_line = c === cursor.text.rows[r].textContent.length;
+        let row_text = cursor.text.rows[r].textContent;
         if (at_start_of_line) {
             if (r > 0) {
                 let r2 = r - 1;
-                let c2 = text.rows[r2].textContent.length;
-                let text1 = text.rows[r - 1].textContent;
-                text.update_text(text.rows[r - 1], text1.concat(row_text));
-                text.rows[r].remove();
-                text.rows.splice(r, 1);
+                let c2 = cursor.text.rows[r2].textContent.length;
+                let text1 = cursor.text.rows[r - 1].textContent;
+                cursor.update_row_text_and_width(cursor.text.rows[r - 1], text1.concat(row_text));
+                cursor.text.rows[r].remove();
+                cursor.text.rows.splice(r, 1);
                 cursor.update(r2, c2, c2);
-                text.highlight_row(cursor);
+                cursor.highlight_row();
             }
         } else if (at_end_of_line) {
-            text.update_text(text.rows[r], row_text.slice(0, c - 1));
+            cursor.update_row_text_and_width(cursor.text.rows[r], row_text.slice(0, c - 1));
             cursor.update(r, c - 1, c - 1);
         } else {
             //mid-line
-            text.update_text(text.rows[r], row_text.slice(0, c - 1).concat(row_text.slice(c)));
+            cursor.update_row_text_and_width(cursor.text.rows[r], row_text.slice(0, c - 1).concat(row_text.slice(c)));
             cursor.update(r, c - 1, c - 1);
         }
         //scroll_up();
         //scroll_down();
     }
-    text.check_if_changed();
+    cursor.check_if_changed();
 }
 
 function del(cursor, text) {
@@ -69,11 +69,12 @@ function del(cursor, text) {
                 end = cursor.selection.start;
             }
             let new_text =
-                text.rows[start.r].textContent.slice(0, start.c) + text.rows[start.r].textContent.slice(end.c);
-            text.update_text(text.rows[start.r], new_text);
+                cursor.text.rows[start.r].textContent.slice(0, start.c) +
+                cursor.text.rows[start.r].textContent.slice(end.c);
+            cursor.update_row_text_and_width(cursor.text.rows[start.r], new_text);
             cursor.update(start.r, start.c, start.c);
             cursor.selection_reset_to_cursor();
-            text.selection_update(cursor);
+            cursor.text_selection_update();
         } else {
             if (start.r > end.r) {
                 start = cursor.selection.end;
@@ -83,97 +84,100 @@ function del(cursor, text) {
             for (let index = end.r; index >= start.r; index--) {
                 if (index === start.r) {
                     let new_text =
-                        text.rows[start.r].textContent.slice(0, start.c) +
-                        (text.rows[index + 1] ? text.rows[index + 1].textContent.slice(end.c) : "");
-                    text.update_text(text.rows[start.r], new_text);
+                        cursor.text.rows[start.r].textContent.slice(0, start.c) +
+                        (cursor.text.rows[index + 1] ? cursor.text.rows[index + 1].textContent.slice(end.c) : "");
+                    cursor.update_row_text_and_width(cursor.text.rows[start.r], new_text);
                     cursor.update(start.r, start.c, start.c);
                     cursor.selection_reset_to_cursor();
-                    text.selection_update(cursor);
+                    cursor.text_selection_update();
                 } else {
                     // end or middle rows
-                    text.rows[index].remove();
-                    text.rows.splice(index, 1);
+                    cursor.text.rows[index].remove();
+                    cursor.text.rows.splice(index, 1);
                 }
             }
         }
-        text.highlight_row(cursor);
+        cursor.highlight_row();
     } else {
         let { r, c } = cursor;
         let at_start_of_line = c === 0;
-        let row_text = text.rows[r].textContent;
+        let row_text = cursor.text.rows[r].textContent;
         let at_end_of_line = c === row_text.length;
-        let at_last_row = r === text.rows.length - 1;
+        let at_last_row = r === cursor.text.rows.length - 1;
         let current_line_has_no_text = row_text.length === 0;
         if (at_start_of_line) {
             if (current_line_has_no_text) {
                 if (!at_last_row) {
-                    text.rows[r].remove();
-                    text.rows.splice(r, 1);
+                    cursor.text.rows[r].remove();
+                    cursor.text.rows.splice(r, 1);
                 }
             } else {
-                text.update_text(text.rows[r], row_text.slice(c + 1));
+                cursor.update_row_text_and_width(cursor.text.rows[r], row_text.slice(c + 1));
             }
         } else if (at_end_of_line) {
             if (!at_last_row) {
-                text.update_text(text.rows[r], row_text.concat(text.rows[r + 1].textContent));
-                text.rows[r + 1].remove();
-                text.rows.splice(r + 1, 1);
+                cursor.update_row_text_and_width(
+                    cursor.text.rows[r],
+                    row_text.concat(cursor.text.rows[r + 1].textContent)
+                );
+                cursor.text.rows[r + 1].remove();
+                cursor.text.rows.splice(r + 1, 1);
             }
         } else {
             //mid-line
-            text.update_text(text.rows[r], row_text.slice(0, c).concat(row_text.slice(c + 1)));
+            cursor.update_row_text_and_width(cursor.text.rows[r], row_text.slice(0, c).concat(row_text.slice(c + 1)));
         }
         //scroll_up();
         //scroll_down();
     }
-    text.check_if_changed();
+    cursor.check_if_changed();
 }
 
 function enter(cursor, text) {
     let { r, c } = cursor;
     let at_start_of_line = c === 0;
-    let row_text = text.rows[r].textContent;
+    let row_text = cursor.text.rows[r].textContent;
     let at_end_of_line = c === row_text.length;
 
     if (at_start_of_line) {
-        let new_row = text.get_new_row("", cursor);
-        text.el.insertBefore(new_row, text.rows[r]);
-        text.rows.splice(r, 0, new_row);
+        let new_row = cursor.get_new_row("");
+        cursor.text.el.insertBefore(new_row, cursor.text.rows[r]);
+        cursor.text.rows.splice(r, 0, new_row);
         cursor.update(r + 1, c, c);
     } else if (at_end_of_line) {
-        let new_row = text.get_new_row("", cursor);
-        text.el.insertBefore(new_row, text.rows[r + 1]);
-        text.rows.splice(r + 1, 0, new_row);
+        let new_row = cursor.get_new_row("");
+        cursor.text.el.insertBefore(new_row, cursor.text.rows[r + 1]);
+        cursor.text.rows.splice(r + 1, 0, new_row);
         cursor.update(r + 1, 0, 0);
-        text.highlight_row(cursor);
+        cursor.highlight_row();
     } else {
         //mid-line
         let first_half = row_text.substring(0, c);
         let second_half = row_text.substring(c, row_text.length);
-        text.update_text(text.rows[r], first_half);
-        let new_row = text.get_new_row(second_half, cursor);
-        text.el.insertBefore(new_row, text.rows[r + 1]);
-        text.rows.splice(r + 1, 0, new_row);
+        cursor.update_row_text_and_width(cursor.text.rows[r], first_half);
+        let new_row = cursor.get_new_row(second_half);
+        cursor.text.el.insertBefore(new_row, cursor.text.rows[r + 1]);
+        cursor.text.rows.splice(r + 1, 0, new_row);
         cursor.update(r + 1, 0, 0);
-        text.highlight_row(cursor);
+        cursor.highlight_row();
     }
     //scroll_down();
-    text.check_if_changed();
+    cursor.check_if_changed();
 }
 
 function insert(chars, cursor, text) {
     if (chars.length > 0) {
         let { r, c } = cursor;
-        let row_text = text.rows[r].textContent;
-        text.update_text(text.rows[r], row_text.slice(0, c).concat(chars, row_text.slice(c)));
+        let row_text = cursor.text.rows[r].textContent;
+        cursor.update_row_text_and_width(cursor.text.rows[r], row_text.slice(0, c).concat(chars, row_text.slice(c)));
         cursor.update(r, c + chars.length, c + chars.length);
-        text.check_if_changed();
+        cursor.check_if_changed();
     }
 }
 
-function select_all(cursor, text) {
+function select_all(cursor) {
     console.log("ctrl-a");
-    cursor.select_all(text);
+    cursor.select_all();
 }
 
 function shift_key_down(cursor) {
@@ -206,7 +210,7 @@ async function paste(cursor, text) {
     } else {
         insert(clip, cursor, text);
     }
-    text.check_if_changed();
+    cursor.check_if_changed();
 }
 
 async function copy(cursor, text) {
@@ -214,13 +218,13 @@ async function copy(cursor, text) {
         cursor.selection.start.r === cursor.selection.end.r && cursor.selection.start.c === cursor.selection.end.c;
     let single_line_selection = cursor.selection.start.r === cursor.selection.end.r;
     if (no_selection) {
-        let cut_text = text.rows[cursor.selection.start.r].textContent;
+        let cut_text = cursor.text.rows[cursor.selection.start.r].textContent;
         //await writeText(cut_text);
         await clipboard.writeText(cut_text);
     } else if (single_line_selection) {
         let start = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.c < cursor.selection.end.c ? cursor.selection.end : cursor.selection.start;
-        let cut_text = text.rows[start.r].textContent.slice(start.c, end.c);
+        let cut_text = cursor.text.rows[start.r].textContent.slice(start.c, end.c);
         //await writeText(cut_text);
         await clipboard.writeText(cut_text);
     } else {
@@ -231,11 +235,13 @@ async function copy(cursor, text) {
 
         for (let index = start.r; index <= end.r; index++) {
             if (index === end.r) {
-                cut_text += text.rows[index].textContent.slice(0, end.c);
+                cut_text += cursor.text.rows[index].textContent.slice(0, end.c);
             } else if (index === start.r) {
-                cut_text += text.rows[index].textContent.slice(start.c, text.rows[index].textContent.length) + "\r\n";
+                cut_text +=
+                    cursor.text.rows[index].textContent.slice(start.c, cursor.text.rows[index].textContent.length) +
+                    "\r\n";
             } else {
-                cut_text += text.rows[index].textContent + "\r\n";
+                cut_text += cursor.text.rows[index].textContent + "\r\n";
             }
         }
         //await writeText(cut_text);
@@ -253,23 +259,26 @@ function tab_in(cursor, text) {
     let { start, end } = cursor.selection.normalised_start_end();
     if (single_line_selection) {
         //replace selection
-        let left = text.rows[start.r].textContent.slice(0, start.c);
-        let right = text.rows[start.r].textContent.slice(end.c);
-        text.update_text(text.rows[start.r], left + " ".repeat(text.tab_spaces) + right);
-        text.selection_reset();
+        let left = cursor.text.rows[start.r].textContent.slice(0, start.c);
+        let right = cursor.text.rows[start.r].textContent.slice(end.c);
+        cursor.update_row_text_and_width(cursor.text.rows[start.r], left + " ".repeat(cursor.tab_spaces) + right);
+        cursor.text.selection_reset();
         cursor.update(start.r, start.c + 4, start.c + 4);
-        text.selection_update(cursor);
+        cursor.text_selection_update();
     } else {
         //multi-line
         for (let index = start.r; index <= end.r; index++) {
-            text.update_text(text.rows[index], " ".repeat(text.tab_spaces) + text.rows[index].textContent);
+            cursor.update_row_text_and_width(
+                cursor.text.rows[index],
+                " ".repeat(cursor.tab_spaces) + cursor.text.rows[index].textContent
+            );
         }
-        cursor.selection.start = { r: cursor.selection.start.r, c: cursor.selection.start.c + text.tab_spaces };
-        cursor.selection.end = { r: cursor.selection.end.r, c: cursor.selection.end.c + text.tab_spaces };
-        text.selection_update(cursor);
+        cursor.selection.start = { r: cursor.selection.start.r, c: cursor.selection.start.c + cursor.tab_spaces };
+        cursor.selection.end = { r: cursor.selection.end.r, c: cursor.selection.end.c + cursor.tab_spaces };
+        cursor.text_selection_update();
         cursor.update(cursor.selection.end.r, cursor.selection.end.c, cursor.selection.end.c, false);
     }
-    text.check_if_changed();
+    cursor.check_if_changed();
 }
 
 function tab_out(cursor, text) {
@@ -280,16 +289,16 @@ function tab_out(cursor, text) {
     if (first_char) {
         //noop
     } else if (no_selection || single_line_selection) {
-        let current_text = text.rows[cursor.selection.start.r].textContent;
+        let current_text = cursor.text.rows[cursor.selection.start.r].textContent;
         let outdented = 0;
-        for (let index = 0; index < text.tab_spaces; index++) {
+        for (let index = 0; index < cursor.tab_spaces; index++) {
             if (current_text.length && current_text[0] === " ") {
                 outdented++;
                 current_text = current_text.slice(1);
             }
         }
         console.log("tab_out", outdented, JSON.stringify(cursor.selection));
-        text.update_text(text.rows[cursor.selection.start.r], current_text);
+        cursor.update_row_text_and_width(cursor.text.rows[cursor.selection.start.r], current_text);
         cursor.update(
             cursor.selection.start.r,
             cursor.selection.start.c - outdented,
@@ -302,19 +311,19 @@ function tab_out(cursor, text) {
         /*let start = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.start : cursor.selection.end;
         let end = cursor.selection.start.r < cursor.selection.end.r ? cursor.selection.end : cursor.selection.start;
         for (let index = start.r; index <= end.r; index++) {
-            text.update_text(text.rows[index], " ".repeat(text.tab_spaces) + text.rows[index].textContent);
+            cursor.update_row_text_and_width(cursor.text.rows[index], " ".repeat(cursor.tab_spaces) + cursor.text.rows[index].textContent);
         }
-        cursor.selection.start.c = start.c + text.tab_spaces;
-        cursor.selection.end.c = end.c + text.tab_spaces;
+        cursor.selection.start.c = start.c + cursor.tab_spaces;
+        cursor.selection.end.c = end.c + cursor.tab_spaces;
         cursor.update(end.r, end.c, end.c);
-        text.selection_update(cursor);*/
+        cursor.text_selection_update();*/
     }
-    text.check_if_changed();
+    cursor.check_if_changed();
 }
 
 async function save(cursor, text) {
     //console.log(cursor.directory, cursor.file);
-    const file_contents = text.rows.map((r) => r.textContent).join("\r\n");
+    const file_contents = cursor.text.rows.map((r) => r.textContent).join("\r\n");
     await writeTextFile(cursor.directory + "/" + cursor.file, file_contents, {
         dir: BaseDirectory.Desktop,
     });

@@ -1,13 +1,13 @@
-function arrow_down(cursor, text) {
+function arrow_down(cursor) {
     let { r, c, previous_c } = cursor;
-    let is_not_last_row = r < text.rows.length - 1;
+    let is_not_last_row = r < cursor.text.rows.length - 1;
     if (is_not_last_row) {
         r = r + 1;
-        let len = text.rows[r].textContent.length;
+        let len = cursor.text.rows[r].textContent.length;
         c = move_caret_to_eol_if_shorter_than_previous(c, previous_c, len);
         c = move_caret_back_to_previous_if_line_is_long_enough(r, c, previous_c, len);
     } else {
-        let len = text.rows[r].textContent.length;
+        let len = cursor.text.rows[r].textContent.length;
         const ret = move_caret_to_end_and_reset_previous_if_moving_down_from_within_bottom_line(r, c, previous_c, len);
         c = ret.c;
         previous_c = ret.previous_c;
@@ -16,20 +16,20 @@ function arrow_down(cursor, text) {
     if (cursor.pressing_shift) {
         cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
-        text.selection_update(cursor);
+        cursor.text_selection_update();
     } else {
         cursor.update(r, c, previous_c);
-        cursor.selection_stop(text);
-        text.selection_reset();
+        cursor.selection_stop();
+        cursor.text.selection_reset();
     }
-    text.highlight_row(cursor);
+    cursor.highlight_row();
 }
 
-function arrow_up(cursor, text) {
+function arrow_up(cursor) {
     let { r, c, previous_c } = cursor;
     if (r > 0) {
         r = r - 1;
-        let len = text.rows[r].textContent.length;
+        let len = cursor.text.rows[r].textContent.length;
         c = move_caret_to_eol_if_shorter_than_previous(c, previous_c, len);
         c = move_caret_back_to_previous_if_line_is_long_enough(r, c, previous_c, len);
     } else {
@@ -41,16 +41,16 @@ function arrow_up(cursor, text) {
     if (cursor.pressing_shift) {
         cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
-        text.selection_update(cursor);
+        cursor.text_selection_update();
     } else {
         cursor.update(r, c, previous_c);
-        cursor.selection_stop(text);
-        text.selection_reset();
+        cursor.selection_stop();
+        cursor.text.selection_reset();
     }
-    text.highlight_row(cursor);
+    cursor.highlight_row();
 }
 
-function arrow_left(cursor, text) {
+function arrow_left(cursor) {
     let { r, c, previous_c } = cursor;
     let is_not_first_char = c > 0;
     let is_not_first_row = r > 0;
@@ -59,25 +59,25 @@ function arrow_left(cursor, text) {
         previous_c = c;
     } else if (is_not_first_row) {
         r = r - 1;
-        c = text.rows[r].textContent.length;
+        c = cursor.text.rows[r].textContent.length;
         previous_c = 0;
     }
 
     if (cursor.pressing_shift) {
         cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
-        text.selection_update(cursor);
+        cursor.text_selection_update();
     } else {
         cursor.update(r, c, previous_c);
-        cursor.selection_stop(text);
-        text.selection_reset();
+        cursor.selection_stop();
+        cursor.text.selection_reset();
     }
 }
 
-function arrow_right(cursor, text) {
+function arrow_right(cursor) {
     let { r, c, previous_c } = cursor;
-    let is_not_last_row = r < text.rows.length - 1;
-    if (c < text.rows[r].textContent.length) {
+    let is_not_last_row = r < cursor.text.rows.length - 1;
+    if (c < cursor.text.rows[r].textContent.length) {
         c = c + 1;
         previous_c = c;
     } else if (is_not_last_row) {
@@ -89,11 +89,11 @@ function arrow_right(cursor, text) {
     if (cursor.pressing_shift) {
         cursor.update(r, c, previous_c, false);
         cursor.selection.end = { r, c };
-        text.selection_update(cursor);
+        cursor.text_selection_update();
     } else {
         cursor.update(r, c, previous_c);
-        cursor.selection_stop(text);
-        text.selection_reset();
+        cursor.selection_stop();
+        cursor.text.selection_reset();
     }
 }
 

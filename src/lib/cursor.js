@@ -1,7 +1,132 @@
-function init() {
+function init(imported_rows) {
     let obj = {
-        text_top: 0,
-        text_left: 100,
+        tabs: {
+            first_tab_el: document.getElementById("tabs").firstElementChild,
+            update_first_tab_name(name) {
+                this.first_tab_el.textContent = name;
+            },
+        },
+        text: {
+            el: document.getElementById("text"),
+            top: 0,
+            left: 100,
+            rows: [],
+            imported_rows: [],
+            selection_reset() {
+                this.rows.forEach((_row, r) => {
+                    this.selection_update_one_row(r, 0, 0, 0);
+                });
+            },
+            selection_update_one_row(r, c_start, c_end, c_width) {
+                if (c_start === c_end) {
+                    this.rows[r].style.background = "";
+                    delete this.rows[r].dataset.start;
+                    delete this.rows[r].dataset.end;
+                } else {
+                    let c_start2 = c_start < c_end ? c_start : c_end;
+                    let c_end2 = c_start < c_end ? c_end : c_start;
+                    let start = Math.floor(c_start * c_width) + "px";
+                    let end = Math.floor(c_end * c_width) + "px";
+                    let bgnd = "rgba(255, 255, 255, 0)";
+                    let highlight = "rgba(255, 0, 0, 1)";
+                    let style = `linear-gradient(90deg, ${bgnd} ${start}, ${highlight} ${start}, ${highlight} ${end}, ${bgnd} ${end})`;
+                    this.rows[r].style.background = style;
+                    // added below for easier testing
+                    this.rows[r].dataset.start = c_start2;
+                    this.rows[r].dataset.end = c_end2;
+                }
+            },
+        },
+        hash: {
+            imported_rows: 0,
+            current: 0,
+
+            hash(arr) {
+                let hash = 0;
+                let str = arr.join("\r\n");
+                for (let i = 0, len = str.length; i < len; i++) {
+                    let chr = str.charCodeAt(i);
+                    hash = (hash << 5) - hash + chr;
+                    hash |= 0; // Convert to 32bit integer
+                }
+                return hash;
+            },
+        },
+        check_if_changed() {
+            this.hash.current = this.hash.hash(this.text.rows.map((r) => r.textContent));
+            if (this.hash.current === this.hash.imported_rows) {
+                this.tabs.first_tab_el.removeAttribute("class");
+            } else {
+                this.tabs.first_tab_el.className = "dot";
+            }
+        },
+        hashes_reset() {
+            this.hash.current = this.hash.hash(this.text.imported_rows);
+            this.hash.imported_rows = this.hash.current;
+            this.tabs.first_tab_el.removeAttribute("class");
+        },
+        refresh_from_text(text) {
+            let array = text.split("\r\n");
+            this.refresh_from_array(array);
+        },
+        refresh_from_array(array) {
+            if (!array.length) {
+                array = [""];
+            }
+            this.text.imported_rows = array;
+            this.remove_all_rows_and_dom_nodes();
+            array.forEach((text_content) => {
+                let row = this.get_new_row(text_content);
+                this.text.el.append(row);
+                this.text.rows.push(row);
+            });
+            this.update(0, 0, 0);
+            this.hashes_reset();
+        },
+        text_selection_update() {
+            let num_rows = Math.abs(this.selection.end.r - this.selection.start.r);
+            let reverse_direction =
+                this.selection.start.r > this.selection.end.r ||
+                (this.selection.start.r === this.selection.end.r && this.selection.start.c > this.selection.end.c);
+            this.text.selection_reset();
+            if (num_rows === 0) {
+                if (reverse_direction) {
+                    this.text.selection_update_one_row(this.r, this.selection.end.c, this.selection.start.c, this.w);
+                } else {
+                    this.text.selection_update_one_row(this.r, this.selection.start.c, this.c, this.w);
+                }
+            } else {
+                for (let index = 0; index <= num_rows; index++) {
+                    // TODO allow for screen scrolling up/down
+                    // TODO allow for screen scrolling left/right
+                    let this_row = this.selection.start.r + (reverse_direction ? -index : index);
+                    let this_row_length = this.text.rows[this_row].textContent.length;
+                    let first_row = reverse_direction ? index === num_rows : index === 0;
+                    let last_row = reverse_direction ? index === 0 : index === num_rows;
+                    let start = this.selection.start.c;
+                    let end = this.selection.end.c;
+                    if (reverse_direction) {
+                        if (first_row) {
+                            this.text.selection_update_one_row(this_row, end, this_row_length, this.w);
+                        } else if (last_row) {
+                            this.text.selection_update_one_row(this_row, 0, start, this.w);
+                        } else {
+                            // all other rows
+                            this.text.selection_update_one_row(this_row, 0, this_row_length, this.w);
+                        }
+                    } else {
+                        if (first_row) {
+                            this.text.selection_update_one_row(this_row, start, this_row_length, this.w);
+                        } else if (last_row) {
+                            this.text.selection_update_one_row(this_row, 0, end, this.w);
+                        } else {
+                            // all other rows
+                            this.text.selection_update_one_row(this_row, 0, this_row_length, this.w);
+                        }
+                    }
+                }
+            }
+        },
         r: 0,
         c: 0,
         sidepanel_wrapper_el: document.getElementById("sidepanel_wrapper"),
@@ -86,11 +211,11 @@ function init() {
         get_rc_from_mouse(e, text) {
             let scrollTop = this.scrolling.main.scrollTop;
             let scrollLeft = this.scrolling.main.scrollLeft;
-            let c = Math.floor((e.clientX - this.text_left + scrollLeft + this.w_overlap - 7) / this.w);
-            let r = Math.floor((e.clientY - this.text_top + scrollTop - 7 - this.top) / this.h);
+            let c = Math.floor((e.clientX - this.text.left + scrollLeft + this.w_overlap - 7) / this.w);
+            let r = Math.floor((e.clientY - this.text.top + scrollTop - 7 - this.top) / this.h);
             if (r < 0) r = 0;
-            if (r > text.rows.length - 1) r = text.rows.length - 1;
-            if (c > text.rows[r].textContent.length - 1) c = text.rows[r].textContent.length;
+            if (r > this.text.rows.length - 1) r = this.text.rows.length - 1;
+            if (c > this.text.rows[r].textContent.length - 1) c = this.text.rows[r].textContent.length;
             if (c < 0) c = 0;
             return { r, c };
         },
@@ -100,8 +225,8 @@ function init() {
                 let { r, c } = this.get_rc_from_mouse(e, text);
                 this.update(r, c, c, false);
                 this.selection.end = { r, c };
-                text.selection_update(this);
-                text.highlight_row(this);
+                this.text_selection_update();
+                this.highlight_row();
             }
         },
         scrolling: {
@@ -175,59 +300,49 @@ function init() {
                 return this.start.r > this.end.r || (this.is_single_line && this.start.c > this.end.c);
             },
         },
-        select_all(text) {
-            let r = text.rows.length - 1;
-            let c = text.rows[r].textContent.length;
+        select_all() {
+            let r = this.text.rows.length - 1;
+            let c = this.text.rows[r].textContent.length;
             this.selection.start = { r: 0, c: 0 };
             this.selection.end = { r: r, c };
             this.selection.active = false;
             this.update(r, c, c, false);
-            text.selection_update(this);
+            this.text_selection_update();
         },
         selection_reset_to_cursor(optional_bool = null) {
             this.selection.start = { r: this.r, c: this.c };
             this.selection.end = { r: this.r, c: this.c };
             this.selection.active = optional_bool !== null ? optional_bool : this.selection.active;
         },
-        selection_start(e, text) {
+        selection_start(e) {
             if (this.scrolling.mouse_is_inside_scrollbars(e)) {
                 this.scrolling.reset(e);
-                let { r, c } = this.get_rc_from_mouse(e, text);
+                let { r, c } = this.get_rc_from_mouse(e);
                 this.update(r, c, c, false);
 
                 if (this.pressing_shift) {
-                    //this.selection.start = this.selection.start;
                     this.selection.end = { r: this.r, c: this.c };
                     this.selection.active = true;
-                    //this.selection_reset_to_cursor();
-                    //text.selection_update(this);
                 } else {
                     this.selection_reset_to_cursor(true);
-                    text.selection_reset();
-                    text.highlight_row(this);
+                    this.text.selection_reset();
+                    this.highlight_row();
                 }
-                this.handle_multiple_clicks(text);
+                this.handle_multiple_clicks();
             }
         },
-        selection_stop(text) {
+        selection_stop() {
             this.selection.end = { r: this.r, c: this.c };
             this.selection.active = false;
-            text.highlight_row(this);
+            this.highlight_row();
         },
-        handle_multiple_clicks(text) {
-            if (this.multiple_clicks.c === this.c && this.multiple_clicks.r === this.r) {
-                this.multiple_clicks.clicks = this.multiple_clicks.clicks + 1;
-            } else {
-                this.multiple_clicks.r = this.r;
-                this.multiple_clicks.c = this.c;
-                this.multiple_clicks.clicks = 0;
-            }
-
-            this.multiple_clicks.reset();
-            let row_text = text.rows[this.r].textContent;
+        handle_multiple_clicks() {
+            this.multiple_clicks.incr_or_restart();
+            this.multiple_clicks.decr_on_timeout();
+            let row_text = this.text.rows[this.r].textContent;
             if (this.multiple_clicks.clicks === 4) {
                 console.log(4);
-                this.select_all(text);
+                this.select_all();
             } else if (this.multiple_clicks.clicks === 3) {
                 let c = row_text.length;
                 let r = this.r;
@@ -240,7 +355,7 @@ function init() {
                 }
                 this.selection.active = true;
                 this.update(r, c, c, false);
-                text.selection_update(this);
+                this.text_selection_update();
             } else if (this.multiple_clicks.clicks === 2) {
                 let left_char = row_text.substring(this.c - 1, this.c);
                 let right_char = row_text.slice(this.c, this.c + 1);
@@ -278,13 +393,44 @@ function init() {
                     }
                     this.selection.active = true;
                     this.update(this.r, c, c, false);
-                    text.selection_update(this);
+                    this.text_selection_update();
                 }
             } else {
-                text.selection_update(this);
+                this.text_selection_update();
             }
         },
+        update_row_text_and_width(el, text_content) {
+            el.textContent = text_content;
+            el.style.width = Math.ceil(this.w * text_content.length) + "px";
+        },
+        get_new_row(text_content) {
+            let el = document.createElement("div");
+            this.update_row_text_and_width(el, text_content);
+            return el;
+        },
+        remove_all_rows_and_dom_nodes() {
+            this.text.rows.forEach((row) => {
+                row.remove();
+            });
+            this.text.rows = [];
+        },
+        highlight_row() {
+            this.highlight_none();
+            if (!this.selection.is_in_progress()) {
+                this.text.rows[this.r].className = "highlighted";
+                this.text.rows[this.r].style.width = "100%";
+            }
+        },
+        highlight_none() {
+            let { width } = this.scrolling.main.getBoundingClientRect();
+            this.text.el.style.width = width + "px";
+            this.text.rows.forEach((row) => {
+                row.removeAttribute("class");
+                row.style.width = Math.ceil(this.w * row.textContent.length) + "px";
+            });
+        },
     };
+    obj.refresh_from_array(imported_rows);
     obj.drag_handle.el.onmousedown = (e) => obj.drag_handle.mousedown(e);
     return obj;
 }
@@ -293,9 +439,9 @@ function get_char_dimensions() {
     // This just gets an average height and width of the fixed width font
     // by measuring the benchmark div which contains 5 rows of 5 characters
     // then deleting it
-    const text = document.getElementById("text");
+    const text_el = document.getElementById("text");
     const benchmark = document.createElement("div");
-    text.append(benchmark);
+    text_el.append(benchmark);
     benchmark.innerHTML = "XXXXX<br />XXXXX<br />XXXXX<br />XXXXX<br />XXXXX";
     const b = get_el_xywh(benchmark);
     benchmark.remove();

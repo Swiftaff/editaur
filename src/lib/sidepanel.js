@@ -1,13 +1,13 @@
 import { readDir, readTextFile, BaseDirectory } from "@tauri-apps/api/fs";
 import { open } from "@tauri-apps/api/dialog";
 
-async function init(text, cursor) {
+async function init(cursor) {
     let obj = {
         el: document.getElementById("sidepanel"),
         path_el: document.getElementById("path"),
         projects_el: document.getElementById("projects"),
         projects_button_el: document.getElementById("projects_button"),
-        get_new_row(entry, parent, insert_after_this_el) {
+        get_new_sidepanel_row(entry, parent, insert_after_this_el) {
             let el;
             let is_dir = "children" in entry;
             if (is_dir) el = document.createElement("ul");
@@ -28,7 +28,7 @@ async function init(text, cursor) {
             cursor.directory = dir;
             let entries = await this.get_files(dir);
             for (const entry of entries) {
-                this.get_new_row(entry, cursor.directory, this.el);
+                this.get_new_sidepanel_row(entry, cursor.directory, this.el);
             }
             this.path_el.textContent = "/" + dir;
         },
@@ -90,7 +90,7 @@ async function init(text, cursor) {
                         this.select_el(el);
                         let entries = await this.get_files(parent + "/" + dir);
                         for (const entry of entries.reverse()) {
-                            this.get_new_row(entry, parent + "/" + dir, el);
+                            this.get_new_sidepanel_row(entry, parent + "/" + dir, el);
                         }
                     }
                     //console.log("dir", parent + "/" + dir, el);
@@ -99,11 +99,11 @@ async function init(text, cursor) {
                     const contents = await readTextFile(parent + "/" + filename, {
                         dir: BaseDirectory.Desktop,
                     });
-                    text.refresh_from_text(contents, cursor);
+                    cursor.refresh_from_text(contents);
                     this.select_el(el);
                     cursor.file = filename;
                     cursor.directory = parent;
-                    text.update_first_tab_name(filename);
+                    cursor.tabs.update_first_tab_name(filename);
                     //console.log("select file", cursor.directory, filename, contents);
                 }
             }
