@@ -27,22 +27,29 @@ main {
   position: absolute;
   top: 10px;
   right: 10px;
-  width: calc(30vw - 18px);
   background-color: pink;
+  width: calc(30vw - 18px);
   height: calc(100vh - 20px);
   cursor:default;
   font-size: 0.8em;
   line-height: 1em;
-  overflow-y:auto;
+  overflow-y: hidden;
   overflow-x: hidden;
+  padding: 0;
 }
 #sidepanel {
   word-wrap: none;
   word-break: keep-all;
-  width: 1000px;
+  padding: 0 !important;
+  margin: 0 !important;
   z-index: 300;
-  position: relative;
+  position: absolute;
+  top: 1.2rem;
   padding: 0;
+  width: calc(30vw - 18px);
+  height: calc(100vh - 1.2rem - 20px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 #sidepanel > ul, #sidepanel > li{
   padding: 0.2rem 0 0.2rem 0.3rem !important;
@@ -98,7 +105,41 @@ main {
 #path{
   background-color: red;
   cursor: pointer;
-  padding: 0.2rem 0;
+  width: calc(100% - 2rem);
+}
+#projects_button{
+  background-color: orange;
+  cursor: pointer;
+  width: 2rem;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  text-align: center;
+}
+#projects{
+  background-color: orange;
+  top: 0rem;
+  left:  100%;
+  width: 100%;
+  position: relative;
+  transition: left 0.4s ease-in;
+  z-index: 400;
+  width: calc(30vw - 19px);
+  height: calc(100vh - 1.2rem - 20px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#projects.expanded{
+  background-color: orange;
+  left: 1px;
+}
+#projects ul{
+  opacity: 0;
+  transition: opacity 0.4s ease-in;
+}
+#projects.expanded ul{
+  opacity: 1;
+  transition: opacity 0.4s ease-in;
 }
 #tabs{
   background-color: black;

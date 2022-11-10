@@ -5,6 +5,8 @@ async function init(text, cursor) {
     let obj = {
         el: document.getElementById("sidepanel"),
         path_el: document.getElementById("path"),
+        projects_el: document.getElementById("projects"),
+        projects_button_el: document.getElementById("projects_button"),
         get_new_row(entry, parent, insert_after_this_el) {
             let el;
             let is_dir = "children" in entry;
@@ -33,6 +35,14 @@ async function init(text, cursor) {
         async get_files(dir) {
             if (dir.length && dir[0] === "/") dir = dir.slice(1);
             return await readDir(dir, { dir: BaseDirectory.Desktop, recursive: false });
+        },
+        async projects_toggle(e) {
+            console.log("projects_toggle", e);
+            if (this.projects_el.className === "") {
+                this.projects_el.className = "expanded";
+            } else {
+                this.projects_el.removeAttribute("class");
+            }
         },
         async select_directory(e) {
             if (e && "button" in e && e.button === 0) {
@@ -101,6 +111,7 @@ async function init(text, cursor) {
     };
 
     obj.path_el.onmousedown = async (e) => await obj.select_directory(e);
+    obj.projects_button_el.onmousedown = async (e) => await obj.projects_toggle(e);
     await obj.refresh_listing("");
     return obj;
 }
