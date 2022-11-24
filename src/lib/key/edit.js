@@ -327,7 +327,7 @@ async function save(cursor, text) {
     await writeTextFile(cursor.directory + "/" + cursor.file, file_contents, {
         dir: BaseDirectory.Desktop,
     });
-    text.hashes_reset();
+    cursor.hashes_reset();
 }
 
 export default {

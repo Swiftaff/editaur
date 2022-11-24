@@ -130,6 +130,7 @@ function init(imported_rows) {
         r: 0,
         c: 0,
         sidepanel_wrapper_el: document.getElementById("sidepanel_wrapper"),
+        sidepanel_el: document.getElementById("sidepanel"),
         top: document.getElementById("tabs").getBoundingClientRect().height,
         drag_handle: {
             el: document.getElementById("drag_handle"),
@@ -150,24 +151,26 @@ function init(imported_rows) {
                 if (this.dragging) {
                     let magic_number = 6;
                     let min_width = 30;
-                    console.log("move", this.offset_x);
                     this.current_x = e.x;
                     if (this.current_x < min_width) this.current_x = min_width;
                     if (this.current_x > window.innerWidth - min_width) this.current_x = window.innerWidth - min_width;
                     this.el.style.left = `${this.current_x + this.click_offset_x}px`;
-                    cursor.scrolling.main.style.width = `${this.current_x + this.click_offset_x - 2}px`;
+                    let new_width = window.innerWidth - this.current_x - this.click_offset_x - 10 - magic_number;
+                    //cursor.scrolling.main.style.width = `${this.current_x + this.click_offset_x - 2}px`;
+                    cursor.scrolling.main.style.width = `${this.current_x + this.click_offset_x - 4}px`;
                     cursor.sidepanel_wrapper_el.style.left = `${this.current_x + this.click_offset_x + magic_number}px`;
-                    cursor.sidepanel_wrapper_el.style.width = `${
-                        window.innerWidth - this.current_x - this.click_offset_x - 10 - magic_number
-                    }px`;
+                    cursor.sidepanel_wrapper_el.style.width = `${new_width}px`;
+                    cursor.sidepanel_el.style.width = `${new_width}px`;
+                    cursor.highlight_row();
                 }
             },
-            mouseup(e) {
+            mouseup(e, cursor) {
                 if (this.dragging) {
                     console.log("up", this.offset_x, this.click_x, this.current_x);
                     this.dragging = false;
                     this.offset_x = this.offset_x + this.click_x - this.current_x;
                     console.log("up", this.offset_x);
+                    cursor.highlight_row();
                 }
             },
         },
@@ -182,10 +185,19 @@ function init(imported_rows) {
             r: 0,
             c: 0,
             clicks: 0,
-            reset() {
+            decr_on_timeout() {
                 setTimeout(() => {
                     if (this.clicks > 0) this.clicks = this.clicks - 1;
                 }, 600);
+            },
+            incr_or_restart() {
+                if (this.c === this.c && this.r === this.r) {
+                    this.clicks = this.clicks + 1;
+                } else {
+                    this.r = this.r;
+                    this.c = this.c;
+                    this.clicks = 0;
+                }
             },
         },
         el: document.getElementsByTagName("i")[0],
@@ -423,7 +435,7 @@ function init(imported_rows) {
         },
         highlight_none() {
             let { width } = this.scrolling.main.getBoundingClientRect();
-            this.text.el.style.width = width + "px";
+            this.text.el.style.width = width - 100 + "px";
             this.text.rows.forEach((row) => {
                 row.removeAttribute("class");
                 row.style.width = Math.ceil(this.w * row.textContent.length) + "px";

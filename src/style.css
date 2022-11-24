@@ -52,7 +52,9 @@ main {
   overflow-x: hidden;
 }
 #sidepanel > ul, #sidepanel > li{
-  padding: 0.2rem 0 0.2rem 0.3rem !important;
+  padding: 0.2rem 0 0.2rem 0.6rem !important;
+  overflow-x: hidden !important;
+  width: 20000px !important;
 }
 #sidepanel ul, #sidepanel li{
   cursor: pointer;

@@ -28,7 +28,7 @@ export default (function main() {
     };
     window.onmouseup = (e) => {
         if (!cursor.drag_handle.dragging) cursor.selection_stop();
-        cursor.drag_handle.mouseup(e);
+        cursor.drag_handle.mouseup(e, cursor);
     };
     window.onkeydown = (e) => key.down(e, cursor);
     window.onkeyup = (e) => key.up(e, cursor);
